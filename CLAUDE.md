@@ -25,8 +25,11 @@ criteria pass. Record measurements (timings, app size) with the numbers.
 - **No dependencies** except Apple's `swift-markdown` and its
   `swift-cmark`, pinned to an exact version (ADR 0001). No other packages,
   frameworks, build tools, scripts from the internet, or vendored code.
-- **No network.** No code that makes network requests; no network
-  entitlement; the web view blocks remote loads (ADR 0003, 0005).
+- **No network.** No code that makes network requests (no `URLSession`
+  or similar). The app has the outgoing-network entitlement only because
+  WebKit needs it (ADR 0006), so the web view's block list is what keeps
+  mdview offline: never weaken it, and never show a page if it failed to
+  load. No incoming-network entitlement.
 - **No page JavaScript.** Only the app's own small scripts may run in the
   web view.
 - **Read-only.** mdview never writes to the user's Markdown files.

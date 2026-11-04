@@ -140,13 +140,14 @@ using the [test files](#test-files).
 
 | AC | Criterion |
 |---|---|
-| 9.1 | The app makes **zero network requests**. It has no network entitlement in the App Sandbox, and a network monitor shows no traffic from it during a test session. |
+| 9.1 | The app makes **zero network requests**: a network monitor shows no traffic from mdview or its WebKit processes during a test session that opens every fixture file, including ones with remote images. (The app has the outgoing-network entitlement only because WebKit needs it to run in the sandbox, ADR 0006; it has no incoming-network entitlement.) |
 | 9.2 | The app runs in the macOS App Sandbox, with read access only to files the user opens and folders the user has granted (see 9.5). |
+| 9.3 | No telemetry, analytics, crash uploading or update checks. |
+| 9.4 | The only package dependency is Apple's `swift-markdown` (and its `swift-cmark`). |
 | 9.5 | **Folder access.** When a document refers to local images or files that the app can't read yet, the window shows a slim bar: "Allow mdview to show images and linked files in this folder." Clicking it opens the standard folder picker, pointed at the document's folder; the user can choose it or any folder above it. After granting, images and links load at once, without reopening the file. |
 | 9.6 | A folder grant is remembered across launches and covers every file inside that folder, so the bar never appears again for those files. A document with no local images or links never shows the bar. |
 | 9.7 | Dismissing the bar is allowed: the document still renders, with alt-text placeholders for the images it couldn't read. |
-| 9.3 | No telemetry, analytics, crash uploading or update checks. |
-| 9.4 | The only package dependency is Apple's `swift-markdown` (and its `swift-cmark`). |
+| 9.8 | If the web view's block list for remote content can't be loaded, the document is not shown; an error appears instead. |
 
 ## 10. Errors and edge cases
 

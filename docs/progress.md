@@ -2,6 +2,69 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 0.3, web view in the sandbox
+
+**Done**
+- Spike now shows a hard-coded test page in a locked-down `WKWebView`:
+  page JavaScript off, non-persistent data store, a content rule list
+  blocking everything except `mdview-file:`, and a minimal
+  `AssetSchemeHandler` serving `pic.png` from the app bundle
+  (`spike/Spike/PreviewSpike.swift`).
+- `--check` mode loads the page, reports what loaded and quits;
+  `--no-rules` skips the block list. Run via
+  `open -n -W --stdout <file> Spike.app --args --check`.
+
+**Result: risk 2 fails on macOS 26.6.** In a sandboxed app *without* the
+outgoing-network entitlement (`com.apple.security.network.client`),
+WebKit's web content and GPU helper processes fail to launch ("web
+process failed to launch", reason Crash), so nothing renders. Tested by
+re-signing copies of the same build:
+
+| Variant | Result |
+|---|---|
+| Sandbox, no network entitlement (current design) | Web process fails to launch |
+| Same, hardened runtime off | Still fails |
+| Sandbox + `network.client` | Works |
+| No sandbox | Works |
+
+When it works (network.client or no sandbox):
+- Page script did **not** run (JavaScript off works).
+- Local image loaded through `mdview-file://` (64 px wide; handler log
+  `OK mdview-file://bundle/pic.png (2149 bytes)`).
+- Remote image (`https://www.apple.com/favicon.ico`) blocked by the rule
+  list (width 0). With `--no-rules` it **did** load (width 64), so the
+  rule list is what stops remote loads.
+- Not tested: macOS 15 (only macOS 26.6 available here).
+
+**Open (needs owner decision):** ADR 0003 (web view) and ADR 0005
+(sandbox with no network entitlement) can't both stand as written.
+Options:
+1. Keep web view and sandbox, add the outgoing-network entitlement.
+   Offline is then enforced by WebKit's block list, JavaScript off and no
+   networking code, checked by a network monitor (spec 7.3), not by
+   macOS. Sandbox still limits file access.
+2. Switch rendering to a native text view (ADR 0003's fallback). macOS
+   keeps enforcing "no network", at the cost of much more layout code.
+3. Drop the sandbox. Loses file-access limits as well; no advantage
+   over option 1.
+
+**Decided: option 1.** Recorded as ADR 0006 (ADR 0005 point 1 amended).
+- Spike now has `com.apple.security.network.client` (entitlements file
+  and `ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES`). Rebuilt from the
+  project: entitlements are sandbox + user-selected read-only +
+  network.client. `--check` passes: script didn't run, local image 64 px,
+  remote image blocked. `--no-rules` loads the remote image (first try
+  hit the 40 s alarm, retry succeeded; likely slow network).
+- Spec 9.1 reworded (network monitor is the proof); new 9.8 (don't show a
+  page if the block list fails). CLAUDE.md network rule updated.
+  Architecture risks 2 and 3 marked with results. Roadmap 3.4 now
+  includes an automated block-list test.
+- Roadmap 0.3 ticked.
+
+**Next**
+- Roadmap 0.4: open a real `.md` from Finder and time double-click →
+  first paint, cold and warm.
+
 ## 2026-11-04: Roadmap 0.2, swift-markdown check
 
 **Done**

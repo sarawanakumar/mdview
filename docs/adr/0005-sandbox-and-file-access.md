@@ -1,6 +1,7 @@
 # 0005. App Sandbox, custom URL scheme and folder access grants
 
-- **Status:** Accepted
+- **Status:** Accepted; point 1 changed by
+  [ADR 0006](0006-outgoing-network-entitlement-for-webkit.md)
 - **Date:** 2026-11-04
 
 ## Context
@@ -14,7 +15,9 @@ local images.
 ## Decision
 
 1. **Sandbox on, no network entitlement.** Only "read files the user
-   selected" is granted.
+   selected" is granted. *Changed by ADR 0006: WebKit can't run in the
+   sandbox without the outgoing-network entitlement, so that is granted
+   too, and offline is enforced by mdview and WebKit instead.*
 2. **Custom URL scheme `mdview-file://`.** The page's base URL points at
    the document's folder through this scheme. Every image request goes to
    our `AssetSchemeHandler`, which reads the file in the app and hands back

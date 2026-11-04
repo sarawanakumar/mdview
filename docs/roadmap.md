@@ -21,7 +21,7 @@ starts. Nothing from here has to survive, but whatever does can be reused.
 - [x] **0.2** Add `swift-markdown` pinned to an exact version. Parse a
       sample file and print the tree. Check tables, task lists,
       strikethrough and footnotes. *(Spec open question: footnotes.)*
-- [ ] **0.3** Show hard-coded HTML in a locked-down `WKWebView` (scripts
+- [x] **0.3** Show hard-coded HTML in a locked-down `WKWebView` (scripts
       off, remote loads blocked) inside the sandbox. Load one image through
       a minimal `mdview-file://` handler. *(Risk 2, ADR 0003, 0005.)*
 - [ ] **0.4** Open a real `.md` file from Finder and time double-click →
@@ -92,7 +92,9 @@ section 2 passes.
       absolute and `file://` image paths; renderer checks file exists.
       *(3.1–3.4, 3.6)*
 - [ ] **3.4** Remote images become alt-text placeholders; confirm
-      the content rule list blocks anything remote. *(3.5, 9.1)*
+      the content rule list blocks anything remote, with an automated
+      test; refuse to show the page if the list fails to load.
+      *(3.5, 9.1, 9.8, ADR 0006)*
 - [ ] **3.5** `LinkRouter`: web and mail links, anchors, other Markdown
       files (with `#anchor`), other local files, missing files, link
       tooltips. *(4.1–4.6)*

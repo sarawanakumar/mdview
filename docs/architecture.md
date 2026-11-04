@@ -13,7 +13,8 @@ the pieces fit.
 | [0002](adr/0002-appkit-nsdocument.md) | AppKit app built on `NSDocument`, no SwiftUI, no storyboards | Accepted |
 | [0003](adr/0003-render-with-wkwebview.md) | Render by turning Markdown into HTML and showing it in `WKWebView`, with JavaScript off | Accepted |
 | [0004](adr/0004-in-project-code-highlighter.md) | Small hand-written highlighter, run in Swift while building the HTML | Accepted |
-| [0005](adr/0005-sandbox-and-file-access.md) | App Sandbox on; local files served to the page through a custom URL scheme; one-time folder access grants | Accepted |
+| [0005](adr/0005-sandbox-and-file-access.md) | App Sandbox on; local files served to the page through a custom URL scheme; one-time folder access grants | Accepted (point 1 changed by 0006) |
+| [0006](adr/0006-outgoing-network-entitlement-for-webkit.md) | Grant the outgoing-network entitlement, because WebKit can't run in the sandbox without it; offline is enforced by the layers below | Accepted |
 
 ## Technology
 
@@ -112,8 +113,11 @@ WKWebView                             images requested via mdview-file:// →
 - Page JavaScript disabled (`allowsContentJavaScript = false`). The app can
   still run its own small scripts (for scroll position and find), but
   nothing in a Markdown file can.
-- A `WKContentRuleList` blocks every `http`, `https` and other non-local
-  load, as a second layer behind the HTML renderer never emitting them.
+- A `WKContentRuleList` blocks every load except `mdview-file:`, as a
+  second layer behind the HTML renderer never emitting remote URLs. Since
+  the app has the outgoing-network entitlement (ADR 0006), this list is
+  the main barrier: if it fails to compile or install, the document is not
+  shown (spec 9.8).
 - Non-persistent website data store: no cookies, cache or storage on disk.
 
 ## Links
@@ -205,8 +209,12 @@ the rest depends on:
    under 0.5 s on the development Mac? If not, ADR 0003 is revisited.
 2. **Sandbox and networking.** `WKWebView` in a sandboxed app without the
    network entitlement shows local HTML and custom-scheme images correctly.
+   *Result (0.3): it doesn't; WebKit needs the outgoing-network
+   entitlement. Resolved by ADR 0006.*
 3. **`swift-markdown` coverage.** Tables, task lists and strikethrough parse
    as expected; check whether footnotes are supported (spec open question).
+   *Result (0.2): all required elements parse; no footnotes (out of
+   scope).*
 4. **Bundle size** with `swift-markdown` linked in stays under 5 MB.
 
 ## Still open
