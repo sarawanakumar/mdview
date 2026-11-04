@@ -32,7 +32,9 @@ app:
 ```
 mdview.xcodeproj
 App/                        the macOS app target (AppKit)
-  AppDelegate               launch, menus, "open panel when nothing is open"
+  AppDelegate               launch, "open panel when nothing is open"
+  MainMenu                  the menu bar, built in code
+  RecentDocumentsMenu       fills File → Open Recent (spec 1.7)
   MarkdownDocumentController  opens every file as a MarkdownDocument (spec 10.5)
   MarkdownDocument          NSDocument subclass: reads the file, read-only
   DocumentWindowController  one window per file; owns the preview and find bar

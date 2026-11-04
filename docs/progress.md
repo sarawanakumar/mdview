@@ -2,6 +2,48 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 1.4, menus and the Open panel
+
+**Done**
+- `App/MainMenu.swift`: menu bar in code. mdview (About, Services,
+  Hide ⌘H, Hide Others ⌥⌘H, Show All, Quit ⌘Q), File (Open… ⌘O, Open
+  Recent, Close ⌘W), Edit (Copy ⌘C, Select All ⌘A), Window (Minimize ⌘M,
+  Zoom, Bring All to Front; set as the windows menu so macOS adds the
+  window list and tab commands), Help (empty; macOS adds its search
+  field). Items target the responder chain so AppKit enables them.
+- `App/RecentDocumentsMenu.swift`: fills Open Recent from AppKit's
+  recent-documents list each time it opens (file icon, full path as
+  tooltip, then Clear Menu). AppKit only manages this menu by itself in
+  XIB-based menus; in code it needs a private API, which we avoid.
+- `AppDelegate`: launched on its own → Open panel, never an empty window
+  (spec 1.8). Clicking the Dock icon with nothing open does the same.
+  Launched to open a file → no panel.
+
+**Checked** (with a temporary in-app dump of menus and windows, removed
+afterwards; launched with `open -a build/mdview.app`)
+- Menus and shortcuts as listed. macOS adds its own extras: Close All
+  (⌥⌘W) in File; AutoFill, Start Dictation and Emoji & Symbols in Edit.
+- Launched on its own: an `NSOpenPanel` ("Open", 880×448) is the only
+  visible window. Spec 1.8 passes.
+- Launched with a file: just that file's window, no panel.
+- Open Recent lists files from earlier launches, newest first, then a
+  separator and Clear Menu. Choosing `valid.md` from a previous launch
+  opened it in the sandbox (log shows the new process reading 42 bytes).
+  Spec 1.7 passes.
+- Open panel filtering (spec 1.3): the panel uses the document types from
+  Info.plist; not visually checked.
+- Debug and Release build with no warnings; 7 core tests pass.
+
+**Found**
+- Ad hoc signed builds forget the recent list when rebuilt (each build
+  has a new signature, so the sandbox's saved access no longer matches).
+  Same build across launches keeps it. A consistently signed release
+  won't have this; worth noting for distribution (roadmap 7.5).
+
+**Next**
+- Roadmap 1.5: the locked-down web view showing a minimal HTML version
+  of the file.
+
 ## 2026-11-04: Roadmap 1.3, read-only MarkdownDocument
 
 **Done**
