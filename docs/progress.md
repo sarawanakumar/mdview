@@ -2,6 +2,41 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 1.6, several files, reopening, errors
+
+**Done**
+- Windows now cascade (each new one 29 px down and right of the last)
+  instead of all being centred on top of each other. That was the only
+  code change: the rest of 1.6 comes from `NSDocumentController`.
+
+**Checked** (temporary in-app window dump, removed afterwards)
+
+| Spec | Test | Result |
+|---|---|---|
+| 1.4 | Open 3 files in one request (as selecting 3 in Finder) | 3 documents, 3 windows, cascaded |
+| 1.5 | Open a 4th file while running (`open -a`, the same open-document request a Dock drop sends) | 4th window opens in front |
+| 1.6 | Open `valid.md` again | Still 4 documents; its window comes to the front |
+| 1.6 | Open it through a symlink | Still 4 documents (recognised as the same file) |
+| 10.3 | Open a permission-denied file (the call Open Recent uses) | "The document “locked.md” could not be opened. You don’t have permission." No window left behind |
+| 10.3 | Open a file that doesn't exist | "…could not be opened. The file doesn’t exist." Standard modal alert on screen (260×208), no window left behind |
+
+- Debug and Release build with no warnings; 20 core tests pass.
+
+**Found**
+- An unreadable file can't reach mdview from Finder or `open`: macOS
+  refuses it first (error -5000). So in practice 10.3 is about files that
+  vanish or become unreadable before mdview reads them, such as Open
+  Recent entries.
+- After a force quit, macOS restored the previous windows on the next
+  launch, even when launched to open another file (spec 6.13 behaviour,
+  for free). Still to check in 5.6: launching on its own with restored
+  windows shouldn't also show the Open panel.
+- Not tested: an actual drag onto the Dock icon (no pointer control).
+
+**Next**
+- Roadmap 1.7: early web view start and signposts; record cold and warm
+  times.
+
 ## 2026-11-04: Roadmap 1.5, first preview
 
 **Done**

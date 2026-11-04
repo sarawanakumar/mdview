@@ -5,6 +5,10 @@ import AppKit
 final class DocumentWindowController: NSWindowController {
     private let preview = PreviewController()
 
+    /// Where the next window's top-left corner goes, so several open files
+    /// fan out instead of stacking exactly on top of each other.
+    private static var cascadePoint = NSPoint.zero
+
     init(document: MarkdownDocument) {
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 760, height: 680),
@@ -32,7 +36,8 @@ final class DocumentWindowController: NSWindowController {
         }
         preview.view.setContentHuggingPriority(.defaultLow, for: .vertical)
         window.contentView = stack
-        window.center()
+        if Self.cascadePoint == .zero { window.center() }
+        Self.cascadePoint = window.cascadeTopLeft(from: Self.cascadePoint)
 
         preview.show(document)
     }
