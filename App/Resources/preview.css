@@ -63,6 +63,16 @@ ul ul ol, ul ol ol, ol ul ol, ol ol ol { list-style-type: lower-alpha; }
   vertical-align: middle;
 }
 
+/* Blockquotes (spec 2.6), like GitHub: a bar on the left, muted text. */
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--rule);
+}
+blockquote > :first-child { margin-top: 0; }
+blockquote > :last-child { margin-bottom: 0; }
+
 code {
   font-family: ui-monospace, Menlo, monospace;
   font-size: 0.875em;

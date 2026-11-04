@@ -10,11 +10,11 @@ import Markdown
 /// in the source, which is shown as text and never becomes markup
 /// (spec 2.12).
 ///
-/// Rendered so far (roadmap 2.2–2.4): headings with anchors, paragraphs,
+/// Rendered so far (roadmap 2.2–2.5): headings with anchors, paragraphs,
 /// line breaks, emphasis, strong, strikethrough, inline code, horizontal
-/// rules, lists and task lists, inline and block HTML (as text). Links and
-/// images show their text for now. Quotes, code blocks and tables are shown
-/// as escaped source until roadmap 2.5–2.6.
+/// rules, lists and task lists, blockquotes, inline and block HTML (as
+/// text). Links and images show their text for now. Code blocks and tables
+/// are shown as escaped source until roadmap 2.6.
 public enum HTMLRenderer {
     /// Renders Markdown text. Smart punctuation is off (spec 2.15).
     public static func render(markdown: String) -> String {
@@ -165,8 +165,12 @@ struct HTMLVisitor: MarkupVisitor {
         "<pre class=\"html-source\">\(escape(trimmingFinalNewline(html.rawHTML)))</pre>\n"
     }
 
-    // Not rendered yet: shown as escaped source (roadmap 2.5, 2.6).
-    mutating func visitBlockQuote(_ quote: BlockQuote) -> String { notYetRendered(quote) }
+    /// Spec 2.6: quotes can hold any blocks, including other quotes.
+    mutating func visitBlockQuote(_ quote: BlockQuote) -> String {
+        "<blockquote>\n\(visitChildren(of: quote))</blockquote>\n"
+    }
+
+    // Not rendered yet: shown as escaped source (roadmap 2.6).
     mutating func visitCodeBlock(_ code: CodeBlock) -> String { notYetRendered(code) }
     mutating func visitTable(_ table: Table) -> String { notYetRendered(table) }
 

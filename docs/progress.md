@@ -2,6 +2,26 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 2.5, blockquotes
+
+**Done**
+- `<blockquote>` holding any blocks: paragraphs, headings, lists, other
+  quotes. Code blocks inside quotes are still shown as source until 2.6.
+- `preview.css`: GitHub-style quotes (left bar, muted text, no extra
+  space at the top and bottom).
+
+**Checked**
+- 79 tests pass (10 new: simple, lazy continuation, two paragraphs, a
+  blank line ending the quote, 3 levels, list inside, quote inside a list
+  item, heading and formatting inside, HTML inside still text, empty
+  quote).
+- `elements.md` quotes read through: 3 levels nested correctly, list
+  inside the outer quote, quote inside a numbered item.
+- App builds with no warnings. Not checked visually.
+
+**Next**
+- Roadmap 2.6: code blocks (plain for now) and tables.
+
 ## 2026-11-04: Roadmap 2.4, lists and task lists
 
 **Done**
