@@ -13,12 +13,14 @@ import Markdown
 /// Rendered (roadmap 2.2–2.6): headings with anchors, paragraphs, line
 /// breaks, emphasis, strong, strikethrough, inline code, horizontal rules,
 /// lists and task lists, blockquotes, code blocks, tables, inline and block
-/// HTML (as text). Links and images show their text for now (roadmap 3.3,
-/// 3.5); code isn't highlighted yet (M6).
+/// HTML (as text), links and bare web addresses. Front matter is hidden.
+/// Images show their alt text for now (roadmap 3.3); code isn't
+/// highlighted yet (M6).
 public enum HTMLRenderer {
-    /// Renders Markdown text. Smart punctuation is off (spec 2.15).
+    /// Renders Markdown text: front matter hidden (spec 2.13), smart
+    /// punctuation off (spec 2.15).
     public static func render(markdown: String) -> String {
-        let document = Document(parsing: markdown, options: [.disableSmartOpts])
+        let document = Document(parsing: FrontMatter.strip(markdown), options: [.disableSmartOpts])
         var visitor = HTMLVisitor()
         return visitor.visit(document)
     }
@@ -36,6 +38,10 @@ struct HTMLVisitor: MarkupVisitor {
     /// One entry per list being rendered, innermost last: whether it's
     /// tight (its items' paragraphs are shown without paragraph spacing).
     private var tightLists: [Bool] = []
+    /// How many links or images we're inside; bare web addresses aren't
+    /// linked there. Counted while walking, because asking a node for its
+    /// parents is slow in swift-markdown.
+    private var linkDepth = 0
 
     // MARK: Containers
 
@@ -245,9 +251,61 @@ struct HTMLVisitor: MarkupVisitor {
 
     // MARK: Inlines
 
+    /// Plain text, with bare web addresses turned into links (spec 2.14),
+    /// except inside a link's own text.
     mutating func visitText(_ text: Text) -> String {
-        escape(text.string)
+        guard linkDepth == 0 else { return escape(text.string) }
+        var html = ""
+        for segment in Autolinker.segments(in: text.string) {
+            switch segment {
+            case .text(let plain):
+                html += escape(String(plain))
+            case .link(let linkText, let url):
+                html += anchor(href: url, content: escape(String(linkText)))
+            }
+        }
+        return html
     }
+
+    // MARK: Links (spec 2.11)
+
+    /// A link with a safe destination becomes `<a>`; hovering shows where
+    /// it goes (spec 4.5). Anything else (`javascript:`, `data:` and so on)
+    /// keeps only its text. Clicks are handled by the app (roadmap 3.5).
+    mutating func visitLink(_ link: Link) -> String {
+        linkDepth += 1
+        let content = visitChildren(of: link)
+        linkDepth -= 1
+        guard let destination = link.destination, Self.isSafeDestination(destination) else {
+            return content
+        }
+        return anchor(href: destination, content: content)
+    }
+
+    /// Images show their alt text for now (roadmap 3.3).
+    mutating func visitImage(_ image: Image) -> String {
+        linkDepth += 1
+        defer { linkDepth -= 1 }
+        return visitChildren(of: image)
+    }
+
+    private func anchor(href: String, content: String) -> String {
+        "<a href=\"\(escape(href))\" title=\"\(escape(href))\">\(content)</a>"
+    }
+
+    /// Relative paths, `#anchors`, and http, https, mailto and file URLs.
+    static func isSafeDestination(_ destination: String) -> Bool {
+        let trimmed = destination.drop(while: \.isWhitespace)
+        // A scheme is letters, digits, "+", "-" or "." before the first ":",
+        // and only if that ":" comes before any "/", "?" or "#".
+        guard let colon = trimmed.firstIndex(of: ":"),
+              !trimmed[..<colon].contains(where: { "/?#".contains($0) }) else {
+            return true  // No scheme: a relative path or an anchor.
+        }
+        let scheme = trimmed[..<colon].lowercased()
+        return ["http", "https", "mailto", "file"].contains(scheme)
+    }
+
 
     /// A line break inside a paragraph is just a space when shown
     /// (spec 2.2); keeping it as a newline in the HTML does that.

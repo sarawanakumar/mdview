@@ -53,6 +53,7 @@ App/                        the macOS app target (AppKit)
 Packages/MDViewCore/        local Swift package, no AppKit
   UTF8Text                  bytes → text, bad bytes replaced and reported (spec 10.2)
   FrontMatter               strips a leading YAML block (spec 2.13)
+  Autolinker                finds bare web addresses, GitHub's rules (spec 2.14)
   HTMLEscaping              escapes text for HTML
   HTMLRenderer              swift-markdown tree → HTML string
   HeadingSlugger            GitHub-style heading anchors (spec 4.3)

@@ -41,6 +41,10 @@ body > :first-child { margin-top: 0; }
 
 p { margin: 0 0 1em; }
 
+/* Links (spec 2.11) in the system link colour. */
+a { color: LinkText; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
 pre {
   font-family: ui-monospace, Menlo, monospace;
   font-size: 0.875em;

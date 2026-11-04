@@ -2,6 +2,54 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 2.7, front matter, links, bare web addresses
+
+**Done**
+- `MDViewCore/FrontMatter`: removes a block from a `---` first line to
+  the next `---` or `...` line. Unclosed blocks, blocks not on line 1 and
+  `----` are left alone; later `---` lines are untouched. Works with
+  `\n`, `\r\n` and `\r` (first version split on `\n` only, which
+  missed Windows line endings because Swift treats `\r\n` as one
+  character; caught by a test).
+- Links now render as `<a href title>` (spec 2.11). `title` is the
+  destination, so hovering shows where it goes (spec 4.5; spec updated:
+  a Markdown link title isn't shown). Only relative paths, `#anchors`,
+  and http, https, mailto and file URLs get an `href`; anything else
+  (`javascript:`, `data:`, `vbscript:`, `ftp:`) keeps only its text.
+  Clicks are still cancelled by the app until roadmap 3.5.
+- `MDViewCore/Autolinker`: GFM extended autolinks for `http://`,
+  `https://` and `www.` (spec 2.14): must start at the start, after a
+  space or `* _ ~ (`; valid domain (a `.`, no `_` in the last two parts);
+  trailing `? ! . , : * _ ~ ' "`, unmatched `)` and `&entity;` dropped;
+  `www.` gets `http://`. Not inside links, images or code.
+- Smart punctuation was already off (2.2); 2.15 passes.
+- `preview.css`: links in the system link colour, underlined on hover.
+
+**Checked**
+- 124 tests pass (27 new): front matter cases incl. CRLF; link kinds,
+  safe and unsafe destinations, escaping; autolink trailing-character
+  cases (incl. Wikipedia-style parentheses, ports, queries), non-links
+  (`localhost`, underscores in the domain, email, a quote right before),
+  uppercase scheme, accented domain, not in code or link text.
+- `front-matter.md` and the links / bare address / punctuation sections
+  of `elements.md` read through: correct.
+- App builds with no warnings. Not checked visually.
+
+**Speed** (release build, render only, 5 MB generated files)
+- First version: 1,268 ms for a link-heavy file. Breakdown: parsing
+  436 ms (swift-markdown), building HTML 776 ms, of which the bare-address
+  scan 286 ms and an "inside a link?" check that walked up the tree for
+  each of 242,000 text pieces (slow in swift-markdown).
+- Fixed both: link depth is counted while walking, and a quick byte check
+  skips text with no "ht"/"ww". Now 1,133 ms link-heavy (every paragraph
+  has links, a table in every section), 152 ms for 5 MB of plain prose.
+- Spec 8.3 (5 MB opens in < 2 s) still needs an end-to-end measurement
+  including WebKit layout; that's roadmap 7.2. The link-heavy worst case
+  may need more work there.
+
+**Next**
+- Roadmap 2.8: complete `preview.css`.
+
 ## 2026-11-04: Roadmap 2.6, code blocks and tables
 
 **Done**

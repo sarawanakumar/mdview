@@ -142,14 +142,10 @@ struct HTMLSafetyTests {
     }
 }
 
-@Suite("Other text (2.15, links and images for now)")
+@Suite("Other text (2.15, images for now)")
 struct OtherTextTests {
     @Test func smartPunctuationIsOff() {
         #expect(render("\"x\" 'y' -- z...\n") == "<p>&quot;x&quot; &#39;y&#39; -- z...</p>\n")
-    }
-
-    @Test func linksShowTheirTextForNow() {
-        #expect(render("a [*link*](https://x.y) b\n") == "<p>a <em>link</em> b</p>\n")
     }
 
     @Test func imagesShowTheirAltTextForNow() {

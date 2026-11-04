@@ -77,7 +77,7 @@ parsed with Apple's `swift-markdown`.
 | 4.2 | Clicking a relative link to another Markdown file (`[x](other.md)`) opens that file in mdview. If its folder isn't granted yet, the folder picker from 9.5 appears first. |
 | 4.3 | Clicking a heading anchor (`[x](#installation)`) scrolls to that heading, using GitHub-style anchor names. A link to `other.md#section` opens the file and scrolls there. |
 | 4.4 | Clicking a link to any other local file opens it in its default app. |
-| 4.5 | Hovering over a link shows its destination (tooltip or status). |
+| 4.5 | Hovering over a link shows its destination (tooltip or status). A Markdown link title (`[x](url "title")`) isn't shown; the destination is. |
 | 4.6 | A link to a file that doesn't exist does nothing harmful. It shows a brief "File not found" message. |
 
 ## 5. Automatic reload

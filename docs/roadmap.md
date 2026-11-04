@@ -72,7 +72,7 @@ All in `MDViewCore`, test-first against fixture files.
 - [x] **2.5** Blockquotes (nested, with lists and code inside). *(2.6)*
 - [x] **2.6** Code blocks (plain for now) and tables with alignment,
       each scrolling sideways on its own. *(2.8, 2.9)*
-- [ ] **2.7** Strip front matter; turn off smart punctuation; link bare
+- [x] **2.7** Strip front matter; turn off smart punctuation; link bare
       web addresses. *(2.13, 2.14, 2.15)*
 - [ ] **2.8** `preview.css`: system fonts, ~80-character centred column,
       light and dark colours. *(6.3, 6.4)*
