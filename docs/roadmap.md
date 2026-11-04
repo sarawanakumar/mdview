@@ -74,7 +74,7 @@ All in `MDViewCore`, test-first against fixture files.
       each scrolling sideways on its own. *(2.8, 2.9)*
 - [x] **2.7** Strip front matter; turn off smart punctuation; link bare
       web addresses. *(2.13, 2.14, 2.15)*
-- [ ] **2.8** `preview.css`: system fonts, ~80-character centred column,
+- [x] **2.8** `preview.css`: system fonts, ~80-character centred column,
       light and dark colours. *(6.3, 6.4)*
 - [ ] **2.9** Fuzz test: random and truncated input never crashes or
       hangs. *(10.4)*

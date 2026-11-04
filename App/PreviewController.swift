@@ -41,6 +41,10 @@ final class PreviewController: NSViewController, WKNavigationDelegate {
 
     private func load(_ page: String, with config: WKWebViewConfiguration) {
         let webView = PreviewConfiguration.takeWebView(with: config)
+        // A brand-new web view is white until its first page loads; keep it
+        // hidden until then so dark mode never flashes white. (A spare
+        // already shows a blank page in the right colours.)
+        if webView.url == nil { webView.isHidden = true }
         webView.frame = view.bounds
         webView.autoresizingMask = [.width, .height]
         webView.navigationDelegate = self
@@ -77,6 +81,7 @@ final class PreviewController: NSViewController, WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if navigation == pageNavigation {
+            webView.isHidden = false
             Signposts.signposter.emitEvent("documentVisible")
         }
     }

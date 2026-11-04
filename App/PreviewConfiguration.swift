@@ -49,7 +49,12 @@ enum PreviewConfiguration {
 
     private static func prepareSpare(with config: WKWebViewConfiguration) {
         let webView = WKWebView(frame: .zero, configuration: config)
-        webView.loadHTMLString("<!doctype html><title></title>", baseURL: PageShell.baseURL)
+        // Blank, in the system's light or dark background, so reusing it
+        // never flashes white in dark mode.
+        webView.loadHTMLString(
+            "<!doctype html><meta name=\"color-scheme\" content=\"light dark\"><style>html{background:Canvas}</style>",
+            baseURL: PageShell.baseURL
+        )
         spare = webView
         Signposts.signposter.emitEvent("spareReady")
     }

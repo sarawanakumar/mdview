@@ -2,6 +2,47 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 2.8, the stylesheet
+
+**Done**
+- `preview.css` rewritten and organised by section (colours, page, text,
+  lists, quotes, code, tables, shown-as-text, printing), with each rule
+  tied to its spec criterion.
+- Body text: system font at **16 px** (was the macOS body style, 13 px:
+  meant for controls and small for reading; GitHub uses 16 px). Spec 6.3
+  updated.
+- Links: macOS link colours `#0068DA` / `#419CFF` (CSS `LinkText` turned
+  out to be old browser blue `#0000EE`, and pale in dark mode). Spec 2.11
+  updated.
+- Added: heading `scroll-margin-top` (for `#anchor` jumps), images never
+  wider than the column, task checkbox accent colour, tab size 4, print
+  styles (always light colours even in dark mode, full width, code
+  wrapped, blocks not split across pages).
+- No white flash in dark mode: the spare's blank page uses the system
+  background, and a brand-new web view stays hidden until its page has
+  loaded.
+- Default window 860 × 720 (was 760 × 680) so the full 80-character
+  column fits.
+
+**Checked** (temporary in-app style dump in light and dark, removed)
+- Page background: white / rgb(30, 30, 30). Body 16 px system font.
+- Contrast of every text colour on its background, light / dark:
+  body 15.8 / 14.1, links 5.3 / 5.9, muted text (quotes, h6, HTML
+  source) 6.1 / 5.7, code 14.8 / 14.7, code blocks 5.7 / 5.9, striped
+  rows 14.8 / 14.7. All above 4.5:1.
+- Column: 80 characters = 781 px; widened the default window to fit.
+- Spec 2.8 and 2.9 confirmed: the long code line (1,443 px of content in
+  a 687 px box) and the wide table (1,196 in 687) scroll inside their own
+  boxes, and the page itself never scrolls sideways.
+- Live switching when the system appearance changes: comes from
+  `prefers-color-scheme`; the dump switched the web view's appearance and
+  colours followed. Printing not tried.
+- 124 tests pass; Debug and Release build with no warnings.
+
+**Next**
+- Roadmap 2.9: fuzz test (random and truncated input never crashes or
+  hangs).
+
 ## 2026-11-04: Roadmap 2.7, front matter, links, bare web addresses
 
 **Done**

@@ -10,8 +10,10 @@ final class DocumentWindowController: NSWindowController {
     private static var cascadePoint = NSPoint.zero
 
     init(document: MarkdownDocument) {
+        // Wide enough for the 80-character column plus its margins
+        // (preview.css: 16 px text, 28 px padding each side).
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 760, height: 680),
+            contentRect: NSRect(x: 0, y: 0, width: 860, height: 720),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false

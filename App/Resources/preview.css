@@ -1,5 +1,8 @@
-/* mdview preview styles. Inlined into every page; nothing is fetched.
-   Basic reading styles so far; roadmap 2.8 completes them. */
+/* mdview preview styles (spec 6.3, 6.4).
+   Inlined into every page; nothing is fetched. Layout and spacing follow
+   GitHub's so files look as they do there; fonts are the system's. */
+
+/* ---- Colours: light, then dark (follows the system, switches live) ---- */
 
 :root {
   color-scheme: light dark;
@@ -7,6 +10,9 @@
   --muted: #59636e;
   --rule: #d1d9e0;
   --code-bg: #f6f8fa;
+  --stripe: #f6f8fa;
+  --check: #0969da;
+  --link: #0068da;            /* macOS link colour, light */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -15,44 +21,68 @@
     --muted: #9198a1;
     --rule: #3d444d;
     --code-bg: #151b23;
+    --stripe: #151b23;
+    --check: #4493f8;
+    --link: #419cff;          /* macOS link colour, dark */
   }
 }
 
-html { background: Canvas; }
+/* ---- Page ---- */
+
+html {
+  background: Canvas;
+  -webkit-text-size-adjust: 100%;
+}
 
 body {
-  font: -apple-system-body;
+  /* The system font at a reading size. macOS's own body size (13 px) is
+     meant for controls; 16 px matches GitHub. Zoom changes it (spec 6.7). */
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 16px;
   line-height: 1.6;
   color: var(--text);
-  max-width: 80ch;
+  max-width: 80ch;            /* about 80 characters, centred (spec 6.3) */
   margin: 0 auto;
   padding: 32px 28px 56px;
   overflow-wrap: break-word;
 }
 
-h1, h2, h3, h4, h5, h6 { line-height: 1.25; margin: 1.5em 0 0.6em; font-weight: 600; }
+body > :first-child { margin-top: 0; }
+body > :last-child { margin-bottom: 0; }
+
+/* ---- Text ---- */
+
+p { margin: 0 0 1em; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 1.5em 0 0.6em;
+  font-weight: 600;
+  line-height: 1.25;
+  scroll-margin-top: 16px;    /* room above a heading jumped to by #anchor */
+}
 h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid var(--rule); }
 h2 { font-size: 1.5em; padding-bottom: 0.3em; border-bottom: 1px solid var(--rule); }
 h3 { font-size: 1.25em; }
 h4 { font-size: 1em; }
 h5 { font-size: 0.875em; }
 h6 { font-size: 0.85em; color: var(--muted); }
-body > :first-child { margin-top: 0; }
 
-p { margin: 0 0 1em; }
-
-/* Links (spec 2.11) in the system link colour. */
-a { color: LinkText; text-decoration: none; }
+a { color: var(--link); text-decoration: none; }   /* macOS link colour (2.11) */
 a:hover { text-decoration: underline; }
 
-pre {
-  font-family: ui-monospace, Menlo, monospace;
-  font-size: 0.875em;
-  line-height: 1.45;
-  margin: 0 0 1em;
+hr {
+  height: 2px;
+  margin: 1.5em 0;
+  border: 0;
+  background: var(--rule);
 }
 
-/* Lists (spec 2.4, 2.5), spaced like GitHub. */
+img { max-width: 100%; height: auto; }          /* never wider than the column */
+
+::selection { background: Highlight; }
+
+/* ---- Lists (2.4, 2.5) ---- */
+
 ul, ol { margin: 0 0 1em; padding-left: 2em; }
 ul ul, ul ol, ol ol, ol ul { margin-bottom: 0; }
 li + li { margin-top: 0.25em; }
@@ -65,9 +95,11 @@ ul ul ol, ul ol ol, ol ul ol, ol ol ol { list-style-type: lower-alpha; }
 .task-list-item input[type="checkbox"] {
   margin: 0 0.35em 0.25em -1.5em;
   vertical-align: middle;
+  accent-color: var(--check);
 }
 
-/* Blockquotes (spec 2.6), like GitHub: a bar on the left, muted text. */
+/* ---- Quotes (2.6) ---- */
+
 blockquote {
   margin: 0 0 1em;
   padding: 0 1em;
@@ -77,34 +109,32 @@ blockquote {
 blockquote > :first-child { margin-top: 0; }
 blockquote > :last-child { margin-bottom: 0; }
 
-code {
-  font-family: ui-monospace, Menlo, monospace;
+/* ---- Code (2.7, 2.8) ---- */
+
+code, pre {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 0.875em;
+  tab-size: 4;
+}
+
+code {
   padding: 0.15em 0.35em;
   background: var(--code-bg);
   border-radius: 4px;
 }
 
-hr {
-  height: 2px;
-  margin: 1.5em 0;
-  border: 0;
-  background: var(--rule);
+pre {
+  margin: 0 0 1em;
+  line-height: 1.45;
 }
 
-/* HTML from the source, shown as text (spec 2.12). */
-pre.html-source {
-  white-space: pre-wrap;
-  color: var(--muted);
-}
-
-/* Code blocks (spec 2.8): long lines scroll sideways inside the block. */
-pre:has(> code) {
+pre:has(> code) {             /* a code block: long lines scroll sideways */
   padding: 12px 16px;
   background: var(--code-bg);
   border-radius: 6px;
   overflow-x: auto;
 }
+
 pre > code {
   padding: 0;
   background: none;
@@ -113,16 +143,47 @@ pre > code {
   white-space: pre;
 }
 
-/* Tables (spec 2.9): like GitHub, a table keeps its natural width, and a
-   wide one scrolls sideways inside its own box. */
+/* ---- Tables (2.9): natural width; a wide one scrolls in its own box ---- */
+
 .table { overflow-x: auto; margin: 0 0 1em; }
 table { border-collapse: collapse; border-spacing: 0; width: max-content; max-width: none; }
 th, td { padding: 6px 13px; border: 1px solid var(--rule); }
 th { font-weight: 600; }
-tbody tr:nth-child(2n) { background: var(--code-bg); }
+tbody tr:nth-child(2n) { background: var(--stripe); }
 .align-left { text-align: left; }
 .align-center { text-align: center; }
 .align-right { text-align: right; }
 
-/* Non-Markdown files (spec 10.5). */
-pre.plain-text { white-space: pre-wrap; }
+/* ---- Shown as text ---- */
+
+pre.html-source {             /* HTML from the source (2.12) */
+  white-space: pre-wrap;
+  color: var(--muted);
+}
+
+pre.plain-text {              /* a non-Markdown file (10.5) */
+  white-space: pre-wrap;
+}
+
+/* ---- Printing (6.8): full width, black on white, nothing cut in half ---- */
+
+@media print {
+  /* Light colours even when the Mac is in dark mode. */
+  :root {
+    color-scheme: light;
+    --text: #1f2328;
+    --muted: #59636e;
+    --rule: #d1d9e0;
+    --code-bg: #f6f8fa;
+    --stripe: #f6f8fa;
+    --check: #0969da;
+    --link: #0068da;
+  }
+  html { background: white; }
+  body { max-width: none; padding: 0; }
+  pre, .table, blockquote, img, tr { break-inside: avoid; }
+  h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+  pre:has(> code), .table { overflow: visible; }
+  pre > code { white-space: pre-wrap; }
+  table { width: auto; }
+}

@@ -50,7 +50,7 @@ parsed with Apple's `swift-markdown`.
 | 2.8 | **Fenced and indented code blocks** render in the system monospaced font on a background panel. Long lines scroll horizontally within the block; they don't wrap or widen the window. |
 | 2.9 | **Tables** render with a header row, cell borders and the column alignment set in the Markdown (`:--`, `:-:`, `--:`). A table wider than the window scrolls horizontally on its own. |
 | 2.10 | **Horizontal rules** (`---`, `***`) render as a thin divider. |
-| 2.11 | **Links** render in the system link colour. See section 4 for what clicking does. |
+| 2.11 | **Links** render in the macOS link colour (light and dark). See section 4 for what clicking does. |
 | 2.12 | **Inline HTML** is not rendered. It appears as plain text, so a file can never run scripts or load content. |
 | 2.13 | **YAML front matter** (a block between `---` lines at the very start of the file) is hidden. Rendering starts with the content after it. A `---` anywhere else is still a horizontal rule. |
 | 2.14 | **Bare web addresses** in normal text (`https://…`, `http://…`, `www.…`) become links, as on GitHub. Trailing punctuation such as a full stop, comma or closing bracket is not part of the link. Addresses inside inline code or code blocks stay plain text. |
@@ -96,7 +96,7 @@ parsed with Apple's `swift-markdown`.
 |---|---|
 | 6.1 | Each file opens in its own standard macOS window, titled with the file name. The window's title bar offers the standard file-path menu (Cmd+click on the title). |
 | 6.2 | Windows can be merged into tabs with the standard **Window → Merge All Windows** and the "Prefer tabs" system setting. |
-| 6.3 | Text uses the system font at a comfortable reading size, with a maximum line width (about 80 characters) centred in wide windows. |
+| 6.3 | Text uses the system font at a comfortable reading size (16 px, as on GitHub), with a maximum line width (about 80 characters) centred in wide windows. A new window is wide enough for the full column. |
 | 6.4 | The app follows the system **light/dark** setting and switches live when it changes, including code colours. |
 | 6.5 | Text can be selected and copied (Cmd+C) as plain text. |
 | 6.6 | **Edit → Find** (Cmd+F, Cmd+G) searches within the document using the standard find bar. |
