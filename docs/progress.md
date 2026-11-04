@@ -2,6 +2,44 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 1.2, Markdown file types
+
+**Done**
+- `App/Resources/Info.plist`, merged with the generated one (excluded
+  from the bundle's resources via the synced group's exceptions):
+  - Document type "Markdown document", role Viewer, rank **Alternate**
+    (offered, never takes over by itself).
+  - macOS declares `net.daringfireball.markdown` for `.md` and
+    `.markdown` only, and an app can't add extensions to it (importing
+    the type with extra extensions had no effect). So mdview exports its
+    own `com.inferly.mdview.markdown-extension` for `.mdown` and `.mkd`,
+    conforming to Markdown and plain text. Spec "Supported files" updated.
+- Unregistered the old spike builds from LaunchServices (they had
+  registered as Markdown viewers in 0.4).
+
+**Checked** (Release build copied to `build/`, registered with
+`lsregister -f`, then asked `NSWorkspace` which apps can open test files)
+
+| File | mdview offered | Default (unchanged) |
+|---|---|---|
+| `.md` | yes | Xcode |
+| `.markdown` | yes | Xcode |
+| `.mdown` | yes | Visual Studio Code |
+| `.mkd` | yes | Visual Studio Code |
+| `.txt` | no (correct) | TextEdit |
+
+- Spec 1.1 passes. Spec 1.2: mdview can be chosen as default (it's
+  offered for every extension); "double-clicking then opens it" needs the
+  document class from roadmap 1.3. I didn't change your default app.
+- Found: apps in temporary folders (the build output in the session
+  scratchpad, under `/private/tmp`) are registered but **not offered** in
+  Open With. Noted in CLAUDE.md.
+- `build/mdview.app` is still registered, so mdview shows in your Open
+  With menu. It can't open files until 1.3 (macOS will show an error).
+
+**Next**
+- Roadmap 1.3: `MarkdownDocument`, read-only NSDocument.
+
 ## 2026-11-04: Roadmap 1.1, real project layout
 
 **Done**

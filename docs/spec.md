@@ -17,8 +17,10 @@ Every criterion must pass on macOS 15 as well as on the latest release.
 mdview opens Markdown files from Finder, from its own Open dialog, and from
 the Dock.
 
-**Supported files:** `.md`, `.markdown`, `.mdown`, `.mkd` (the system
-`net.daringfireball.markdown` type). Text is read as UTF-8.
+**Supported files:** `.md`, `.markdown`, `.mdown`, `.mkd`. The first two
+are macOS's own `net.daringfireball.markdown` type; macOS doesn't know the
+other two, so mdview declares `com.inferly.mdview.markdown-extension` for
+them. Text is read as UTF-8.
 
 | AC | Criterion |
 |---|---|

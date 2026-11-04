@@ -68,6 +68,9 @@ criteria pass. Record measurements (timings, app size) with the numbers.
   (add `-configuration Release -destination 'generic/platform=macOS'`
   for a universal release build).
 - Launch builds with `open path/to/mdview.app`, not the binary directly.
+- To test Finder / Open With behaviour, copy the build to the git-ignored
+  `build/` folder and register it with `lsregister -f build/mdview.app`.
+  macOS doesn't offer apps from temporary folders in Open With.
 - The Xcode project uses folder-synced groups: new files in `App/` are
   picked up automatically. Files that must not be copied into the app
   (entitlements, Info.plist) are listed as exceptions in the project.

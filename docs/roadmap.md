@@ -41,7 +41,7 @@ screen.
 
 - [x] **1.1** Create the project layout from architecture.md: app target,
       local `MDViewCore` package with a test target, `fixtures/` folder.
-- [ ] **1.2** Register the Markdown file types in Info.plist so mdview
+- [x] **1.2** Register the Markdown file types in Info.plist so mdview
       appears in Open With and can be the default app. *(1.1, 1.2)*
 - [ ] **1.3** `MarkdownDocument` (read-only `NSDocument`): read the file,
       decode UTF-8, replace bad bytes with a notice. *(10.1, 10.2, 10.5)*
