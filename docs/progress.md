@@ -2,6 +2,63 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 0.6, M0 summary
+
+M0 is done. Every risk in architecture.md has a measured answer, and the
+architecture holds with one change (ADR 0006).
+
+**Risks**
+
+| Risk | Result | Task |
+|---|---|---|
+| 1. Cold open < 0.5 s with WKWebView | Yes: cold median 359 ms, warm 172 ms (50 KB) | 0.4 |
+| 2. WKWebView in the sandbox without network entitlement | **No**: WebKit won't launch. Fixed by granting outgoing network (ADR 0006); block list verified | 0.3 |
+| 3. swift-markdown coverage | All spec 2 elements parse. No footnotes (out of scope); bare URLs and front matter handled by us | 0.2 |
+| 4. Size < 5 MB | 2.2 MB universal, stripped | 0.5 |
+| Extra: memory < 100 MB (spec 8.5) | 86 MB total: app 26, WebContent 40, GPU 17 (135 MB peak briefly at start), Networking 5 | 0.6 |
+
+**ADRs**
+
+| ADR | Still stands? |
+|---|---|
+| 0001 swift-markdown only | Yes. Pinned 0.9.0; only swift-cmark comes with it |
+| 0002 AppKit + NSDocument | Yes, not contradicted. The spike used plain AppKit; NSDocument itself is first tried in M1 |
+| 0003 WKWebView, JS off | Yes. Speed, size and memory within targets |
+| 0004 hand-written highlighter | Yes, untested until M6. Parse + render left plenty of time budget (~4 ms for 50 KB) |
+| 0005 sandbox, scheme, folder grants | Yes, except point 1 (no network entitlement), replaced by ADR 0006. The `mdview-file://` handler works |
+| 0006 outgoing-network entitlement | Yes, new in M0 |
+
+**Things to carry into M1**
+- Create the spare web view in `applicationWillFinishLaunching`, before
+  the file arrives, and make a new one after each use (the spike's was
+  too late).
+- Memory is the tightest target (86 of 100 MB). Re-measure when the real
+  CSS, highlighter and images arrive; watch the WebKit GPU process.
+- Warm open is the tightest speed target (median 172, max 192 of 200 ms).
+- If the block list fails to load, show nothing (spec 9.8). The spike
+  already refuses to render without it.
+- Hand-written Xcode project with folder-synced groups works well: new
+  files are picked up without editing the project file. Info.plist
+  additions go in a separate file merged with the generated one.
+- Release builds need `-destination 'generic/platform=macOS'` to be
+  universal. Launch with `open` (not the binary directly) when testing.
+- Shell gotchas on this Mac: zsh's own `log` command hides
+  `/usr/bin/log`; there's no `timeout` command; zsh doesn't split
+  variables into words.
+
+**Spike**
+- `spike/` stays in the repo as reference while M1 reuses its pieces
+  (web view configuration, block list, scheme handler, timing). Delete it
+  once M1 is done.
+
+**Not tested**
+- macOS 15 (only 26.6 available). Intel Macs (built for, not run).
+- An actual Finder double-click (timed with `open -a`, same path).
+
+**Next**
+- Roadmap M1, task 1.1: create the real project layout. Needs a real
+  bundle ID (for example based on your GitHub username).
+
 ## 2026-11-04: Roadmap 0.5, app size
 
 **Done**

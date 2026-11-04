@@ -10,7 +10,7 @@ Tick a task (`[x]`) when its criteria pass, and note it in
 
 ---
 
-## M0. Spike: prove the risky choices
+## M0. Spike: prove the risky choices (done 2026-11-04)
 
 A throwaway app to check the four risks in
 [architecture.md](architecture.md#risks-to-check-first) before real work
@@ -28,7 +28,7 @@ starts. Nothing from here has to survive, but whatever does can be reused.
       first paint with signposts, cold and warm. *(Risk 1, spec 8.1, 8.2.)*
 - [x] **0.5** Build a release version and check the app size. *(Risk 4,
       spec 8.4.)*
-- [ ] **0.6** Write up the results in progress.md. If cold open misses
+- [x] **0.6** Write up the results in progress.md. If cold open misses
       0.5 s, stop and revisit ADR 0003 before going on.
 
 **Done when:** all four risks have a measured answer, and ADRs still stand

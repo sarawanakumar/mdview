@@ -43,6 +43,10 @@ Start the web view early at launch to hide WebKit's start-up cost.
   native text view as the fallback.
 - Memory is higher than a text view (WebKit's helper processes); the
   100 MB limit in spec 8.5 must be checked.
+- *Spike results (roadmap 0.4, 0.6), 50 KB file, macOS 26.6: cold open
+  median 359 ms, warm 172 ms; memory 86 MB across the app and its three
+  WebKit processes. Both within target, memory with only ~14 MB to
+  spare.*
 - WebKit doesn't provide AppKit's standard find bar, so we build a slim one
   on top of `WKWebView.find`.
 - The app can still run its own small scripts in the page (for keeping the
