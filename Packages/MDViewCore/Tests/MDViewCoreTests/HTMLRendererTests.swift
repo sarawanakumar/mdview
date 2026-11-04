@@ -157,14 +157,6 @@ struct OtherTextTests {
     }
 }
 
-@Suite("Blocks not rendered yet")
-struct NotYetRenderedTests {
-    @Test(arguments: ["```\ncode\n```\n", "| a |\n|---|\n| b |\n"])
-    func shownAsEscapedSource(_ markdown: String) {
-        #expect(render(markdown).hasPrefix("<pre class=\"not-yet-rendered\">"))
-    }
-}
-
 @Suite("Plain text files (10.5)")
 struct PlainTextTests {
     @Test func plainTextIsEscapedInPre() {

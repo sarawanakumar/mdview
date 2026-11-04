@@ -94,13 +94,31 @@ pre.html-source {
   color: var(--muted);
 }
 
-/* Blocks not rendered yet (until roadmap 2.4–2.6): shown as source. */
-pre.not-yet-rendered {
+/* Code blocks (spec 2.8): long lines scroll sideways inside the block. */
+pre:has(> code) {
   padding: 12px 16px;
   background: var(--code-bg);
   border-radius: 6px;
   overflow-x: auto;
 }
+pre > code {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  font-size: 100%;
+  white-space: pre;
+}
+
+/* Tables (spec 2.9): like GitHub, a table keeps its natural width, and a
+   wide one scrolls sideways inside its own box. */
+.table { overflow-x: auto; margin: 0 0 1em; }
+table { border-collapse: collapse; border-spacing: 0; width: max-content; max-width: none; }
+th, td { padding: 6px 13px; border: 1px solid var(--rule); }
+th { font-weight: 600; }
+tbody tr:nth-child(2n) { background: var(--code-bg); }
+.align-left { text-align: left; }
+.align-center { text-align: center; }
+.align-right { text-align: right; }
 
 /* Non-Markdown files (spec 10.5). */
 pre.plain-text { white-space: pre-wrap; }

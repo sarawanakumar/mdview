@@ -70,7 +70,7 @@ All in `MDViewCore`, test-first against fixture files.
       *(2.1, groundwork for 4.3)*
 - [x] **2.4** Lists, nested lists, start numbers, task lists. *(2.4, 2.5)*
 - [x] **2.5** Blockquotes (nested, with lists and code inside). *(2.6)*
-- [ ] **2.6** Code blocks (plain for now) and tables with alignment,
+- [x] **2.6** Code blocks (plain for now) and tables with alignment,
       each scrolling sideways on its own. *(2.8, 2.9)*
 - [ ] **2.7** Strip front matter; turn off smart punctuation; link bare
       web addresses. *(2.13, 2.14, 2.15)*
@@ -155,7 +155,9 @@ see colours sooner.*
 - [ ] **7.1** Write `fixtures/typical.md`, `fixtures/large.md` and the
       `edge/` files; a timing script for double-click → first paint.
 - [ ] **7.2** Measure everything in spec section 8; fix anything that
-      misses. *(8.1–8.6)*
+      misses. *(8.1–8.6)* Memory: measure each process's
+      `phys_footprint` after at least 10 s (WebKit's GPU process has a
+      start-up peak of ~135 MB) and add them up, several runs.
 - [ ] **7.3** Privacy check: network monitor during a test session, check
       entitlements, confirm the only package. *(9.1–9.4)*
 - [ ] **7.4** App icon and About box.

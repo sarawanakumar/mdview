@@ -10,11 +10,11 @@ import Markdown
 /// in the source, which is shown as text and never becomes markup
 /// (spec 2.12).
 ///
-/// Rendered so far (roadmap 2.2–2.5): headings with anchors, paragraphs,
-/// line breaks, emphasis, strong, strikethrough, inline code, horizontal
-/// rules, lists and task lists, blockquotes, inline and block HTML (as
-/// text). Links and images show their text for now. Code blocks and tables
-/// are shown as escaped source until roadmap 2.6.
+/// Rendered (roadmap 2.2–2.6): headings with anchors, paragraphs, line
+/// breaks, emphasis, strong, strikethrough, inline code, horizontal rules,
+/// lists and task lists, blockquotes, code blocks, tables, inline and block
+/// HTML (as text). Links and images show their text for now (roadmap 3.3,
+/// 3.5); code isn't highlighted yet (M6).
 public enum HTMLRenderer {
     /// Renders Markdown text. Smart punctuation is off (spec 2.15).
     public static func render(markdown: String) -> String {
@@ -170,12 +170,77 @@ struct HTMLVisitor: MarkupVisitor {
         "<blockquote>\n\(visitChildren(of: quote))</blockquote>\n"
     }
 
-    // Not rendered yet: shown as escaped source (roadmap 2.6).
-    mutating func visitCodeBlock(_ code: CodeBlock) -> String { notYetRendered(code) }
-    mutating func visitTable(_ table: Table) -> String { notYetRendered(table) }
+    // MARK: Code blocks (spec 2.8)
 
-    private func notYetRendered(_ markup: any Markup) -> String {
-        "<pre class=\"not-yet-rendered\">\(escape(markup.format()))</pre>\n"
+    /// `<pre><code>`; the page's CSS makes long lines scroll sideways inside
+    /// the block. The language (first word of the fence's info string) is
+    /// kept as a class for highlighting (roadmap M6).
+    mutating func visitCodeBlock(_ code: CodeBlock) -> String {
+        let language = code.language.map(Self.languageName) ?? ""
+        let attribute = language.isEmpty ? "" : " class=\"language-\(language)\""
+        return "<pre><code\(attribute)>\(escape(trimmingFinalNewline(code.code)))</code></pre>\n"
+    }
+
+    /// The fence's first word, lowercased, keeping only characters that are
+    /// safe in a class name (letters, digits, `+`, `-`, `_`, `#`, `.`).
+    static func languageName(_ infoString: String) -> String {
+        let firstWord = infoString.split(whereSeparator: \.isWhitespace).first ?? ""
+        return String(firstWord.lowercased().unicodeScalars.filter {
+            ("a"..."z").contains($0) || ("0"..."9").contains($0) || "+-_#.".unicodeScalars.contains($0)
+        }.map(Character.init))
+    }
+
+    // MARK: Tables (spec 2.9)
+
+    /// The table sits in its own scrolling box so a wide table scrolls
+    /// sideways without widening the page. Alignment is a class per cell.
+    /// Rows with fewer cells than the header are padded, as on GitHub.
+    mutating func visitTable(_ table: Table) -> String {
+        let alignments = table.columnAlignments
+        let columns = max(table.maxColumnCount, alignments.count)
+        var html = "<div class=\"table\"><table>\n<thead>\n"
+        html += row(Array(table.head.cells), tag: "th", columns: columns, alignments: alignments)
+        html += "</thead>\n"
+        let rows = Array(table.body.rows)
+        if !rows.isEmpty {
+            html += "<tbody>\n"
+            for bodyRow in rows {
+                html += row(Array(bodyRow.cells), tag: "td", columns: columns, alignments: alignments)
+            }
+            html += "</tbody>\n"
+        }
+        return html + "</table></div>\n"
+    }
+
+    private mutating func row(
+        _ cells: [Table.Cell], tag: String, columns: Int, alignments: [Table.ColumnAlignment?]
+    ) -> String {
+        var html = "<tr>\n"
+        var column = 0
+        for cell in cells where column < columns {
+            // A cell covered by a neighbour's span has a span of 0.
+            guard cell.colspan > 0, cell.rowspan > 0 else { column += 1; continue }
+            var attributes = Self.alignmentClass(column < alignments.count ? alignments[column] : nil)
+            if cell.colspan > 1 { attributes += " colspan=\"\(cell.colspan)\"" }
+            if cell.rowspan > 1 { attributes += " rowspan=\"\(cell.rowspan)\"" }
+            html += "<\(tag)\(attributes)>\(visitChildren(of: cell))</\(tag)>\n"
+            column += Int(cell.colspan)
+        }
+        while column < columns {
+            let attributes = Self.alignmentClass(column < alignments.count ? alignments[column] : nil)
+            html += "<\(tag)\(attributes)></\(tag)>\n"
+            column += 1
+        }
+        return html + "</tr>\n"
+    }
+
+    private static func alignmentClass(_ alignment: Table.ColumnAlignment?) -> String {
+        switch alignment {
+        case .left: " class=\"align-left\""
+        case .center: " class=\"align-center\""
+        case .right: " class=\"align-right\""
+        case nil: ""
+        }
     }
 
     // MARK: Inlines

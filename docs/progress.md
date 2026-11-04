@@ -2,6 +2,55 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 2.6, code blocks and tables
+
+**Done**
+- Code blocks: `<pre><code class="language-x">`, code escaped, final
+  newline trimmed, blank lines inside kept. The language is the info
+  string's first word, lowercased, filtered to letters, digits and
+  `+-_#.` so it's safe as a class (M6 hooks highlighting in here).
+  Fenced (backtick and tilde) and indented blocks.
+- Tables: `<div class="table"><table>` with `<thead>` / `<tbody>`;
+  alignment as `align-left|center|right` classes (no inline styles);
+  short rows padded with empty cells and extra cells dropped, as on
+  GitHub; colspan/rowspan passed through if present.
+- Every block is now rendered: the temporary "shown as source" path and
+  its styles are gone.
+- `preview.css`: code block box that scrolls sideways; tables with
+  borders, bold header, striped rows; tables keep their natural width so
+  a wide one scrolls inside its own box (spec 2.9).
+
+**Checked**
+- 97 tests pass (18 new: fences, indented code, escaping, blank lines,
+  empty block, info string, safe language names incl. `"><script>`,
+  code in quotes and list items; tables: structure, alignment,
+  formatting in cells, escaped pipe, padding, dropping, header only,
+  escaping).
+- `elements.md` read through: code blocks and both tables correct, code
+  and a table inside list items correct, nothing left as source.
+- App builds with no warnings. Not checked visually (wide table and long
+  code line scrolling in particular).
+
+**Memory re-check** (one file open plus the 9 MB spare; each process's
+footprint added up after 12 s; two runs each)
+
+| File | Total | Page process |
+|---|---|---|
+| typical.md (lists, tables, code heavy) | 105–114 MB | 49 MB (61 MB with the old source boxes) |
+| elements.md | 84–104 MB | 27–37 MB |
+| prose.md | 76–90 MB | 23–35 MB |
+
+- `typical.md` is still slightly over the 100 MB target (spec 8.5);
+  without the spare it would be about 96–105 MB. Readings vary 10–20 MB
+  run to run on this busy machine.
+- An earlier reading taken after 5 s showed 234 MB: WebKit's GPU process
+  still at its start-up peak (~135 MB). Measuring method now noted in
+  roadmap 7.2 (wait ≥ 10 s, add up per process, several runs).
+
+**Next**
+- Roadmap 2.7: strip front matter, link bare web addresses (smart
+  punctuation is already off).
+
 ## 2026-11-04: Roadmap 2.5, blockquotes
 
 **Done**
