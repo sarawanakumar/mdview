@@ -26,7 +26,7 @@ starts. Nothing from here has to survive, but whatever does can be reused.
       a minimal `mdview-file://` handler. *(Risk 2, ADR 0003, 0005.)*
 - [x] **0.4** Open a real `.md` file from Finder and time double-click →
       first paint with signposts, cold and warm. *(Risk 1, spec 8.1, 8.2.)*
-- [ ] **0.5** Build a release version and check the app size. *(Risk 4,
+- [x] **0.5** Build a release version and check the app size. *(Risk 4,
       spec 8.4.)*
 - [ ] **0.6** Write up the results in progress.md. If cold open misses
       0.5 s, stop and revisit ADR 0003 before going on.

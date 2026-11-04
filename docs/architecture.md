@@ -221,6 +221,7 @@ the rest depends on:
    *Result (0.2): all required elements parse; no footnotes (out of
    scope).*
 4. **Bundle size** with `swift-markdown` linked in stays under 5 MB.
+   *Result (0.5): 2.2 MB universal, archived and stripped.*
 
 ## Still open
 

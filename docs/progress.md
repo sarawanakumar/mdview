@@ -2,6 +2,32 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 0.5, app size
+
+**Done**
+- Archived the spike (`xcodebuild archive`, Release, universal), which
+  strips debug symbols the way a real release would.
+
+**Results** (spike: AppKit + WebKit + swift-markdown, two tiny resources)
+
+| What | Size | Target |
+|---|---|---|
+| Whole `.app`, universal | **2.2 MB** (2,210,978 bytes) | < 5 MB (spec 8.4) |
+| Executable, Apple silicon slice | 1.06 MB | |
+| Executable, Intel slice | 1.13 MB | |
+| Zipped (rough download size) | 0.86 MB | |
+
+- Almost all of it is `swift-markdown` + `swift-cmark`: before the package
+  the whole app was 176 KB.
+- Code signature still sandbox + user-selected read-only + network.client,
+  hardened runtime on.
+- Budget left for the real app: about 2.8 MB. The app icon is the main
+  unknown (a full icon set can be several hundred KB); our own Swift code,
+  CSS and highlighter rules should be small.
+
+**Next**
+- Roadmap 0.6: sum up M0 and confirm the ADRs still stand.
+
 ## 2026-11-04: Roadmap 0.4, open-to-preview timing
 
 **Done**
