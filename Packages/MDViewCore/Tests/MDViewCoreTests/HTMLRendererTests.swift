@@ -159,7 +159,7 @@ struct OtherTextTests {
 
 @Suite("Blocks not rendered yet")
 struct NotYetRenderedTests {
-    @Test(arguments: ["- a\n- b\n", "1. a\n", "> q\n", "```\ncode\n```\n", "| a |\n|---|\n| b |\n"])
+    @Test(arguments: ["> q\n", "```\ncode\n```\n", "| a |\n|---|\n| b |\n"])
     func shownAsEscapedSource(_ markdown: String) {
         #expect(render(markdown).hasPrefix("<pre class=\"not-yet-rendered\">"))
     }

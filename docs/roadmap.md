@@ -68,7 +68,7 @@ All in `MDViewCore`, test-first against fixture files.
       *(2.2, 2.3, 2.7, 2.10, 2.12)*
 - [x] **2.3** Headings with GitHub-style anchors (`HeadingSlugger`).
       *(2.1, groundwork for 4.3)*
-- [ ] **2.4** Lists, nested lists, start numbers, task lists. *(2.4, 2.5)*
+- [x] **2.4** Lists, nested lists, start numbers, task lists. *(2.4, 2.5)*
 - [ ] **2.5** Blockquotes (nested, with lists and code inside). *(2.6)*
 - [ ] **2.6** Code blocks (plain for now) and tables with alignment,
       each scrolling sideways on its own. *(2.8, 2.9)*

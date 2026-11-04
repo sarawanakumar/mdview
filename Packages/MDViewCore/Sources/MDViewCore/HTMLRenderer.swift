@@ -10,11 +10,11 @@ import Markdown
 /// in the source, which is shown as text and never becomes markup
 /// (spec 2.12).
 ///
-/// Rendered so far (roadmap 2.2): headings, paragraphs, line breaks,
-/// emphasis, strong, strikethrough, inline code, horizontal rules, inline
-/// and block HTML (as text). Links and images show their text for now.
-/// Lists, quotes, code blocks and tables are shown as escaped source until
-/// roadmap 2.4–2.6.
+/// Rendered so far (roadmap 2.2–2.4): headings with anchors, paragraphs,
+/// line breaks, emphasis, strong, strikethrough, inline code, horizontal
+/// rules, lists and task lists, inline and block HTML (as text). Links and
+/// images show their text for now. Quotes, code blocks and tables are shown
+/// as escaped source until roadmap 2.5–2.6.
 public enum HTMLRenderer {
     /// Renders Markdown text. Smart punctuation is off (spec 2.15).
     public static func render(markdown: String) -> String {
@@ -33,6 +33,9 @@ struct HTMLVisitor: MarkupVisitor {
     typealias Result = String
 
     private var slugger = HeadingSlugger()
+    /// One entry per list being rendered, innermost last: whether it's
+    /// tight (its items' paragraphs are shown without paragraph spacing).
+    private var tightLists: [Bool] = []
 
     // MARK: Containers
 
@@ -75,8 +78,82 @@ struct HTMLVisitor: MarkupVisitor {
         return text
     }
 
+    /// In a tight list, an item's paragraph is just its text, as on GitHub.
     mutating func visitParagraph(_ paragraph: Paragraph) -> String {
-        "<p>\(visitChildren(of: paragraph))</p>\n"
+        if paragraph.parent is ListItem, tightLists.last == true {
+            return visitChildren(of: paragraph) + "\n"
+        }
+        return "<p>\(visitChildren(of: paragraph))</p>\n"
+    }
+
+    // MARK: Lists (spec 2.4, 2.5)
+
+    mutating func visitUnorderedList(_ list: UnorderedList) -> String {
+        renderList(list, tag: "ul", start: 1)
+    }
+
+    mutating func visitOrderedList(_ list: OrderedList) -> String {
+        renderList(list, tag: "ol", start: Int(list.startIndex))
+    }
+
+    private mutating func renderList(_ list: any ListItemContainer, tag: String, start: Int) -> String {
+        var attributes = ""
+        if start != 1 { attributes += " start=\"\(start)\"" }
+        if list.listItems.contains(where: { $0.checkbox != nil }) {
+            attributes += " class=\"contains-task-list\""
+        }
+        tightLists.append(Self.isTight(list))
+        let items = visitChildren(of: list)
+        tightLists.removeLast()
+        return "<\(tag)\(attributes)>\n\(items)</\(tag)>\n"
+    }
+
+    /// A task item gets a read-only checkbox (spec 2.5); VoiceOver reads it
+    /// as checked or not checked.
+    mutating func visitListItem(_ item: ListItem) -> String {
+        var content = visitChildren(of: item)
+        // "<li>text</li>", but a nested block keeps its own line:
+        // "<li>text\n<ul>…</ul>\n</li>".
+        if Self.lastChild(of: item) is Paragraph {
+            content = Self.trimmingFinalNewline(content)
+        }
+        guard let checkbox = item.checkbox else {
+            return "<li>\(content)</li>\n"
+        }
+        let checked = checkbox == .checked ? " checked" : ""
+        return "<li class=\"task-list-item\"><input type=\"checkbox\" disabled\(checked)> \(content)</li>\n"
+    }
+
+    /// CommonMark: a list is loose if a blank line separates two of its
+    /// items, or two blocks inside one item. swift-markdown doesn't say, so
+    /// we work it out from source lines.
+    static func isTight(_ list: any ListItemContainer) -> Bool {
+        var previousEnd: Int?
+        for item in list.listItems {
+            if let previousEnd, let start = item.range?.lowerBound.line, start - previousEnd > 1 {
+                return false
+            }
+            var lastChildEnd: Int?
+            for child in item.children {
+                if let lastChildEnd, let start = child.range?.lowerBound.line, start - lastChildEnd > 1 {
+                    return false
+                }
+                lastChildEnd = contentEndLine(of: child) ?? lastChildEnd
+            }
+            previousEnd = lastChildEnd ?? item.range?.lowerBound.line
+        }
+        return true
+    }
+
+    /// The last source line with content in a block. Container ranges (list
+    /// items, lists, quotes) can include trailing blank lines, so follow the
+    /// last child down to a block whose range is exact.
+    private static func contentEndLine(of block: any Markup) -> Int? {
+        if block is ListItemContainer || block is ListItem || block is BlockQuote,
+           let last = lastChild(of: block) {
+            return contentEndLine(of: last)
+        }
+        return block.range?.upperBound.line
     }
 
     mutating func visitThematicBreak(_ thematicBreak: ThematicBreak) -> String {
@@ -88,9 +165,7 @@ struct HTMLVisitor: MarkupVisitor {
         "<pre class=\"html-source\">\(escape(trimmingFinalNewline(html.rawHTML)))</pre>\n"
     }
 
-    // Not rendered yet: shown as escaped source (roadmap 2.4–2.6).
-    mutating func visitUnorderedList(_ list: UnorderedList) -> String { notYetRendered(list) }
-    mutating func visitOrderedList(_ list: OrderedList) -> String { notYetRendered(list) }
+    // Not rendered yet: shown as escaped source (roadmap 2.5, 2.6).
     mutating func visitBlockQuote(_ quote: BlockQuote) -> String { notYetRendered(quote) }
     mutating func visitCodeBlock(_ code: CodeBlock) -> String { notYetRendered(code) }
     mutating func visitTable(_ table: Table) -> String { notYetRendered(table) }
@@ -143,6 +218,14 @@ struct HTMLVisitor: MarkupVisitor {
     }
 
     private func trimmingFinalNewline(_ text: String) -> String {
+        Self.trimmingFinalNewline(text)
+    }
+
+    private static func lastChild(of markup: any Markup) -> (any Markup)? {
+        markup.childCount > 0 ? markup.child(at: markup.childCount - 1) : nil
+    }
+
+    private static func trimmingFinalNewline(_ text: String) -> String {
         text.hasSuffix("\n") ? String(text.dropLast()) : text
     }
 }

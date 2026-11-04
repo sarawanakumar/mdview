@@ -2,6 +2,38 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 2.4, lists and task lists
+
+**Done**
+- `<ul>` / `<ol>` with `start="N"` when a list doesn't start at 1;
+  nested lists inside their item.
+- Task items: `<li class="task-list-item"><input type="checkbox" disabled
+  [checked]>`, list gets `class="contains-task-list"`. `[ ]`, `[x]`, `[X]`;
+  read-only (spec 2.5); VoiceOver reads the box as checked or not.
+- **Tight vs loose lists**, as CommonMark and GitHub do: in a tight list
+  an item's paragraph is just its text; in a loose one it stays a `<p>`.
+  swift-markdown doesn't report this, so `isTight` works it out from
+  source lines. Found while doing it: item, list and quote ranges include
+  trailing blank lines, so the check follows the last block inside down
+  to a block whose range is exact. Without that, a blank line after a
+  nested list was missed.
+- `preview.css`: list indents and spacing like GitHub, nested numbered
+  lists as i, ii, iii then a, b, c; task items have no bullet.
+- Fixture fix: `elements.md`'s "starts at seven" list directly followed
+  the numbered list, so Markdown (and GitHub) merged them into one list.
+  Added a sentence between them so the start number is really tested.
+
+**Checked**
+- 69 tests pass (18 new: 3 bullet kinds, numbering, start numbers incl.
+  0, 4-level nesting, mixed nesting, formatting, loose/tight rules incl.
+  per-list tightness, escaping, task lists open/done/capital X/mixed/
+  numbered/nested, `[x]` mid-text not a checkbox).
+- `elements.md` output read through for lists and task lists: correct.
+- App builds with no warnings. Not checked visually.
+
+**Next**
+- Roadmap 2.5: blockquotes.
+
 ## 2026-11-04: Roadmap 2.3, heading anchors
 
 **Done**

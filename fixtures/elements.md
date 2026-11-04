@@ -64,6 +64,9 @@ Not emphasis: 2 * 3 * 4, snake_case_name, and \*escaped asterisks\*.
    2. Nested numbered
 3. Numbered three
 
+A separate list that starts at seven (a sentence in between, or it would
+continue the list above):
+
 7. Starts at seven
 8. Then eight
 

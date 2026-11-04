@@ -48,6 +48,21 @@ pre {
   margin: 0 0 1em;
 }
 
+/* Lists (spec 2.4, 2.5), spaced like GitHub. */
+ul, ol { margin: 0 0 1em; padding-left: 2em; }
+ul ul, ul ol, ol ol, ol ul { margin-bottom: 0; }
+li + li { margin-top: 0.25em; }
+li > p { margin-top: 1em; }
+li > p:first-child { margin-top: 0; }
+ol ol, ul ol { list-style-type: lower-roman; }
+ul ul ol, ul ol ol, ol ul ol, ol ol ol { list-style-type: lower-alpha; }
+
+.task-list-item { list-style-type: none; }
+.task-list-item input[type="checkbox"] {
+  margin: 0 0.35em 0.25em -1.5em;
+  vertical-align: middle;
+}
+
 code {
   font-family: ui-monospace, Menlo, monospace;
   font-size: 0.875em;
