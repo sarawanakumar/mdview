@@ -2,6 +2,41 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 1.1, real project layout
+
+**Done**
+- Bundle ID **`com.inferly.mdview`** (owner's choice). Version 0.1.0.
+- `mdview.xcodeproj`: app target `mdview`, folder-synced group `App/`,
+  Swift 6, macOS 15.0 minimum, hardened runtime, ad hoc signing,
+  sandbox + user-selected read-only + outgoing network (ADR 0006), no
+  incoming network. Release drops the debug entitlement.
+- `App/AppDelegate.swift`: launches with a Quit menu only.
+  `App/mdview.entitlements` is excluded from the bundle via the synced
+  group's exception list.
+- `Packages/MDViewCore`: local Swift package (tools 6.0, macOS 15),
+  depends on swift-markdown exactly 0.9.0, linked into the app. Empty
+  `MDViewCore` namespace plus one Swift Testing test that checks
+  swift-markdown is linked.
+- `fixtures/` created (empty).
+- README (layout, build commands), CLAUDE.md (build and test commands),
+  architecture.md (entitlements location) updated.
+
+**Checked**
+- `swift test --package-path Packages/MDViewCore`: 1 test passed.
+- Debug and Release builds succeed, no Swift warnings. Schemes: `mdview`,
+  `MDViewCore`.
+- Release app: universal (x86_64, arm64), bundle ID, display name and
+  macOS 15.0 minimum correct; entitlements exactly as above; no stray
+  files copied into the bundle; swift-markdown's parser is linked in.
+- Launched with `open`: runs, and macOS created
+  `~/Library/Containers/com.inferly.mdview`.
+- Package.resolved pins swift-markdown and swift-cmark 0.9.0 for both the
+  package and the Xcode project.
+- Not checked: nothing visible yet (no window by design until 1.4).
+
+**Next**
+- Roadmap 1.2: register the Markdown file types.
+
 ## 2026-11-04: Roadmap 0.6, M0 summary
 
 M0 is done. Every risk in architecture.md has a measured answer, and the

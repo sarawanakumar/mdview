@@ -41,7 +41,8 @@ App/                        the macOS app target (AppKit)
   FileWatcher               notices when the file changes on disk (spec section 5)
   EditorLauncher            "Open in Editor" and the remembered editor (spec 6.10–6.12)
   FolderAccess              stores and restores folder access grants (ADR 0005)
-  Resources/                preview.css, Info.plist, entitlements, app icon
+  mdview.entitlements       sandbox, user-selected read-only, outgoing network
+  Resources/                preview.css, Info.plist, app icon
 Packages/MDViewCore/        local Swift package, no AppKit
   FrontMatter               strips a leading YAML block (spec 2.13)
   HTMLRenderer              swift-markdown tree → HTML string

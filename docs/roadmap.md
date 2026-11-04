@@ -39,7 +39,7 @@ or have been revised.
 The real project structure, with the simplest working path from file to
 screen.
 
-- [ ] **1.1** Create the project layout from architecture.md: app target,
+- [x] **1.1** Create the project layout from architecture.md: app target,
       local `MDViewCore` package with a test target, `fixtures/` folder.
 - [ ] **1.2** Register the Markdown file types in Info.plist so mdview
       appears in Open With and can be the default app. *(1.1, 1.2)*

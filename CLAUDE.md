@@ -63,7 +63,14 @@ criteria pass. Record measurements (timings, app size) with the numbers.
 
 - `MDViewCore` changes need unit tests; renderer output is checked against
   expected HTML for the files in `fixtures/`.
-- Build and test commands go here once the project exists (roadmap 1.1).
+- Core tests: `swift test --package-path Packages/MDViewCore`
+- App build: `xcodebuild -project mdview.xcodeproj -scheme mdview build`
+  (add `-configuration Release -destination 'generic/platform=macOS'`
+  for a universal release build).
+- Launch builds with `open path/to/mdview.app`, not the binary directly.
+- The Xcode project uses folder-synced groups: new files in `App/` are
+  picked up automatically. Files that must not be copied into the app
+  (entitlements, Info.plist) are listed as exceptions in the project.
 - Before saying something works, run the tests or the app and say what you
   checked. If something couldn't be checked, say so.
 
