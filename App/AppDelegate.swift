@@ -9,6 +9,7 @@ import AppKit
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     static func main() {
+        Signposts.signposter.emitEvent("appLaunched")
         let app = NSApplication.shared
         // The first document controller created becomes the shared one.
         _ = MarkdownDocumentController()
@@ -24,6 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        Signposts.signposter.emitEvent("launchFinished")
         NSApp.mainMenu = MainMenu.make()
 
         // Launched on its own (not to open a file): show the Open panel

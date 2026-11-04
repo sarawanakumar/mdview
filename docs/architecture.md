@@ -38,7 +38,9 @@ App/                        the macOS app target (AppKit)
   MarkdownDocumentController  opens every file as a MarkdownDocument (spec 10.5)
   MarkdownDocument          NSDocument subclass: reads the file, read-only
   DocumentWindowController  one window per file; owns the preview and find bar
-  PreviewConfiguration      the shared locked-down web view setup (block list, JS off)
+  PreviewConfiguration      the shared locked-down web view setup (block list, JS off),
+                            plus the one spare web view
+  Signposts                 timing points for Instruments
   PreviewController         wraps WKWebView: loads HTML, reload, zoom, print, find
                             (PageShell: wraps the body with CSS and a security policy)
   AssetSchemeHandler        serves local images and files to the page (ADR 0005)
@@ -190,12 +192,16 @@ separate light and dark values. Unknown tags are escaped and left plain.
 The targets are in spec section 8. The main risk is the web view's start-up
 cost on a cold launch.
 
-- **Start the web view early.** At launch, create the shared
-  `WKWebViewConfiguration` and one hidden web view, so WebKit's helper
-  process starts while the file is being read and parsed. The spare must
-  be created *before* the first file arrives (in
-  `applicationWillFinishLaunching`), and a new spare made after each use;
-  the spike created it too late, so it went unused (roadmap 0.4).
+- **Start the web view early.** In `applicationWillFinishLaunching`,
+  start building the shared `WKWebViewConfiguration`; once it's ready,
+  make one spare web view with a blank page loaded, so WebKit's page
+  process is already running. A document takes the spare; half a second
+  later a new spare is made, so the next file opens fast too. Never more
+  than one spare: a waiting spare costs about 9 MB (roadmap 1.7).
+- **Signposts** (`App/Signposts.swift`, points of interest): appLaunched,
+  launchFinished, previewReady, spareReady, documentRead,
+  documentRendered, documentVisible. Readable in Instruments or with
+  `log show --signpost`.
 - **Do the work off the main thread.** Reading, parsing and HTML building
   run on a background task; only the final `loadHTMLString` touches the UI.
 - **Show text first.** Images load after the page is shown (spec 3.7).

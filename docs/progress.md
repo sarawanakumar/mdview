@@ -2,6 +2,60 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 1.7, early web view start, signposts, timings
+
+**Done**
+- `App/Signposts.swift`: points-of-interest events appLaunched,
+  launchFinished, previewReady, spareReady, documentRead,
+  documentRendered, documentVisible (only for the document's own page,
+  not a spare's blank page).
+- `PreviewConfiguration`: once the configuration is ready, one spare web
+  view with a blank page loaded. A document takes it; 0.5 s later a new
+  spare is made. Never more than one.
+- Timing script (session scratchpad) now reads the signposts with
+  `log show --signpost`, launches with `-ApplePersistenceIgnoreState YES`
+  so restored windows don't interfere, and uses a different file for each
+  warm open (an already-open file is only brought forward).
+
+**Results** (Release, macOS 26.6, Apple silicon, 50 KB file. The machine
+was busy: load average 7–9. As a control, the spike re-measured under the
+same load: cold 418 ms, warm 182 ms, against 359 / 172 earlier.)
+
+| Variant | Cold median | Warm median (max) |
+|---|---|---|
+| No spare | 464 ms | 217 ms (236) |
+| Spare at launch only | 453–469 ms | 201–214 ms (245) |
+| **Spare at launch + refilled (kept)** | **479 ms** | **159 ms (178)** |
+
+- Spec 8.2 (warm < 200 ms) passes with the refilled spare, and every warm
+  run was under 200 ms. Without it, warm opens missed the target.
+- Spec 8.1 (cold < 500 ms) passes, but only just under this load (one run
+  hit exactly 500 ms). First launch after a rebuild was 1,197 ms (macOS
+  checking the new signature), as expected.
+- Typical cold run: appLaunched ~140 ms after `open`, launchFinished
+  ~260, documentRead ~270, previewReady ~310, spareReady ~360,
+  documentRendered ~375, documentVisible ~470. The file is read before
+  WebKit's setup is ready, so the block list lookup is on the critical
+  path; creating the spare also holds the main thread ~50 ms just when
+  the first file arrives. Candidates for roadmap 7.2.
+
+**Memory** (one file open, one spare waiting)
+
+| File | Total | Page process |
+|---|---|---|
+| prose.md (50 KB, headings and paragraphs only) | 93 MB | 35 MB + 9 MB spare |
+| typical.md (50 KB, many lists/tables/code) | **120 MB** | 61 MB + 9 MB spare |
+
+- On prose, mdview matches the spike exactly (page process 35 MB each).
+- typical.md is over the 100 MB target (spec 8.5). Bisected: not the
+  spare, not the stylesheet, not the scrollable boxes, not the fonts. It
+  comes from the minimal renderer showing hundreds of lines of lists,
+  tables and code as source boxes. M2 replaces that, so re-measure then;
+  if real code blocks and tables cost the same, memory needs work.
+
+**Next**
+- Roadmap M2, task 2.1: test files and expected-HTML tests.
+
 ## 2026-11-04: Roadmap 1.6, several files, reopening, errors
 
 **Done**

@@ -10,6 +10,9 @@ import WebKit
 final class PreviewController: NSViewController, WKNavigationDelegate {
     private var webView: WKWebView?
     private var page: String?
+    /// Our page's navigation, so a spare's blank page finishing doesn't
+    /// count as the document being visible.
+    private var pageNavigation: WKNavigation?
 
     override func loadView() {
         view = NSView()
@@ -26,6 +29,7 @@ final class PreviewController: NSViewController, WKNavigationDelegate {
             let body = await Task.detached {
                 isMarkdown ? HTMLRenderer.render(markdown: text) : HTMLRenderer.render(plainText: text)
             }.value
+            Signposts.signposter.emitEvent("documentRendered")
             do {
                 let config = try await configuration.value
                 load(PageShell.page(title: title, body: body), with: config)
@@ -36,14 +40,15 @@ final class PreviewController: NSViewController, WKNavigationDelegate {
     }
 
     private func load(_ page: String, with config: WKWebViewConfiguration) {
-        let webView = WKWebView(frame: view.bounds, configuration: config)
+        let webView = PreviewConfiguration.takeWebView(with: config)
+        webView.frame = view.bounds
         webView.autoresizingMask = [.width, .height]
         webView.navigationDelegate = self
         webView.setAccessibilityLabel("Preview")
         view.addSubview(webView)
         self.webView = webView
         self.page = page
-        webView.loadHTMLString(page, baseURL: PageShell.baseURL)
+        pageNavigation = webView.loadHTMLString(page, baseURL: PageShell.baseURL)
     }
 
     /// Spec 9.8: without the block list, show a message instead of the file.
@@ -70,9 +75,15 @@ final class PreviewController: NSViewController, WKNavigationDelegate {
         navigationAction.navigationType == .other ? .allow : .cancel
     }
 
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        if navigation == pageNavigation {
+            Signposts.signposter.emitEvent("documentVisible")
+        }
+    }
+
     /// If WebKit's page process dies, show the page again.
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        if let page { webView.loadHTMLString(page, baseURL: PageShell.baseURL) }
+        if let page { pageNavigation = webView.loadHTMLString(page, baseURL: PageShell.baseURL) }
     }
 }
 

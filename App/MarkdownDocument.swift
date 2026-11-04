@@ -31,6 +31,7 @@ final class MarkdownDocument: NSDocument {
 
     override nonisolated func read(from data: Data, ofType typeName: String) throws {
         let decoded = UTF8Text.decode(data)
+        Signposts.signposter.emitEvent("documentRead")
         MainActor.assumeIsolated {
             text = decoded.text
             hadInvalidBytes = decoded.hadInvalidBytes

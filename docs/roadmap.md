@@ -51,7 +51,7 @@ screen.
       a minimal HTML version of the file (paragraphs and headings only).
 - [x] **1.6** Multiple files, Dock drop, already-open files brought to the
       front, unreadable-file alert. *(1.4, 1.5, 1.6, 10.3)*
-- [ ] **1.7** Add the early web view start and signposts from the
+- [x] **1.7** Add the early web view start and signposts from the
       architecture performance plan; record cold/warm times.
 
 **Done when:** double-clicking a `.md` file opens a window showing its
