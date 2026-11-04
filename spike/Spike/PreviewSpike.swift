@@ -48,22 +48,47 @@ enum PreviewSpike {
     })
     """
 
+    /// Shared configuration: page JavaScript off, nothing stored, our
+    /// scheme handler, and (unless disabled) the block-remote rule list.
+    /// The rule list is looked up first and only compiled if missing.
     @MainActor
-    static func makeWebView(handler: AssetSchemeHandler, blockRemote: Bool) async throws -> WKWebView {
+    static func makeConfiguration(handler: AssetSchemeHandler, blockRemote: Bool) async throws -> WKWebViewConfiguration {
         let config = WKWebViewConfiguration()
         config.defaultWebpagePreferences.allowsContentJavaScript = false
         config.websiteDataStore = .nonPersistent()
         config.setURLSchemeHandler(handler, forURLScheme: scheme)
         if blockRemote {
-            let store = WKContentRuleListStore.default()
-            if let rules = try await store?.compileContentRuleList(
-                forIdentifier: "mdview-block-remote",
-                encodedContentRuleList: ruleListJSON
-            ) {
-                config.userContentController.add(rules)
+            guard let store = WKContentRuleListStore.default() else {
+                throw URLError(.cannotLoadFromNetwork)
             }
+            let id = "mdview-block-remote"
+            let rules: WKContentRuleList?
+            if let existing = try? await store.contentRuleList(forIdentifier: id) {
+                rules = existing
+            } else {
+                rules = try await store.compileContentRuleList(forIdentifier: id, encodedContentRuleList: ruleListJSON)
+            }
+            guard let rules else { throw URLError(.cannotLoadFromNetwork) }
+            config.userContentController.add(rules)
         }
-        return WKWebView(frame: .zero, configuration: config)
+        return config
+    }
+
+    /// Wraps rendered Markdown in a minimal page shell.
+    static func page(title: String, body: String) -> String {
+        """
+        <!doctype html>
+        <html><head><meta charset="utf-8"><title>\(title)</title>
+        <meta name="color-scheme" content="light dark">
+        <style>
+          body { font: -apple-system-body; line-height: 1.5; max-width: 46em; margin: 2em auto; padding: 0 1.5em; }
+          table { border-collapse: collapse; display: block; overflow-x: auto; }
+          td, th { border: 1px solid #8888; padding: .3em .6em; }
+          pre { overflow-x: auto; background: #8882; padding: .6em; }
+          code { font-family: ui-monospace, monospace; }
+        </style></head>
+        <body>\(body)</body></html>
+        """
     }
 }
 

@@ -179,7 +179,10 @@ cost on a cold launch.
 
 - **Start the web view early.** At launch, create the shared
   `WKWebViewConfiguration` and one hidden web view, so WebKit's helper
-  process starts while the file is being read and parsed.
+  process starts while the file is being read and parsed. The spare must
+  be created *before* the first file arrives (in
+  `applicationWillFinishLaunching`), and a new spare made after each use;
+  the spike created it too late, so it went unused (roadmap 0.4).
 - **Do the work off the main thread.** Reading, parsing and HTML building
   run on a background task; only the final `loadHTMLString` touches the UI.
 - **Show text first.** Images load after the page is shown (spec 3.7).
@@ -207,6 +210,8 @@ the rest depends on:
 
 1. **Cold open time with `WKWebView`.** Is "double-click to first paint"
    under 0.5 s on the development Mac? If not, ADR 0003 is revisited.
+   *Result (0.4): yes. Cold median 359 ms, warm median 172 ms for a 50 KB
+   file (details in progress.md).*
 2. **Sandbox and networking.** `WKWebView` in a sandboxed app without the
    network entitlement shows local HTML and custom-scheme images correctly.
    *Result (0.3): it doesn't; WebKit needs the outgoing-network

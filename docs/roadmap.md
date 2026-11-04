@@ -24,7 +24,7 @@ starts. Nothing from here has to survive, but whatever does can be reused.
 - [x] **0.3** Show hard-coded HTML in a locked-down `WKWebView` (scripts
       off, remote loads blocked) inside the sandbox. Load one image through
       a minimal `mdview-file://` handler. *(Risk 2, ADR 0003, 0005.)*
-- [ ] **0.4** Open a real `.md` file from Finder and time double-click →
+- [x] **0.4** Open a real `.md` file from Finder and time double-click →
       first paint with signposts, cold and warm. *(Risk 1, spec 8.1, 8.2.)*
 - [ ] **0.5** Build a release version and check the app size. *(Risk 4,
       spec 8.4.)*

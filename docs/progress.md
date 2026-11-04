@@ -2,6 +2,57 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 0.4, open-to-preview timing
+
+**Done**
+- Spike registers as a Markdown viewer (`spike/Info.plist`: document type
+  `net.daringfireball.markdown`, role Viewer, rank Alternate, extensions
+  md/markdown/mdown/mkd), merged with the generated Info.plist.
+- Opening a file (Finder or `open`) reads, parses and renders it off the
+  main thread with swift-markdown's built-in `HTMLFormatter` (smart
+  punctuation off), shows it in a locked-down web view in its own window,
+  and prints a `TIMING` line. Signposts are emitted too (not yet looked at
+  in Instruments).
+- Timing script (kept in the session scratchpad, not the repo) records
+  the moment it runs `open -a Spike.app file.md` and compares it with the
+  app's "document loaded" time. Cold = app not running; warm = app
+  running, open another file.
+
+**Results** (Release, universal build, macOS 26.6, Apple silicon, 50 KB
+file made from this project's docs; 6 cold runs, 18 warm runs)
+
+| | Median | Min | Max | Target |
+|---|---|---|---|---|
+| Cold (first launch after build) | 430 ms | | | < 500 ms |
+| Cold (other 5) | 359 ms | 332 ms | 367 ms | < 500 ms |
+| Warm | 172 ms | 142 ms | 192 ms | < 200 ms |
+
+Where a typical cold open goes (ms after process start, run 4):
+- `open` → process start: ~20 ms
+- process start → `main`: ~80 ms (loading system frameworks)
+- `main` → app finished launching (file delivered): ~90 ms
+- read + parse + render 50 KB: ~12 ms
+- window + web view created: ~35 ms
+- web view load → loaded: ~120 ms
+
+**Caveats**
+- "Loaded" is WebKit's `didFinish` navigation, a stand-in for first
+  paint; real first paint is around the same moment.
+- Timed with `open -a`, which uses the same LaunchServices path as a
+  Finder double-click, but not an actual double-click.
+- The spike renders with the built-in formatter and minimal CSS. The real
+  renderer and highlighter will cost more, but parsing + rendering was
+  only ~4 ms here, so there's room.
+- The spare web view was created too late (after the file arrived) and
+  went unused; a cold open with it working should be faster. Noted in
+  architecture.md.
+- Warm opens sit close to the 200 ms target (max 192 ms); most of that is
+  WebKit starting a page for the new web view. Keeping a spare web view
+  ready after each open is the obvious fix if it creeps over.
+
+**Next**
+- Roadmap 0.5: release build size check.
+
 ## 2026-11-04: Roadmap 0.3, web view in the sandbox
 
 **Done**
