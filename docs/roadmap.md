@@ -63,7 +63,7 @@ All in `MDViewCore`, test-first against fixture files.
 
 - [x] **2.1** Write `fixtures/elements.md` and `fixtures/front-matter.md`,
       plus expected-HTML test setup. *(2.16)*
-- [ ] **2.2** `HTMLRenderer` for paragraphs, line breaks, emphasis,
+- [x] **2.2** `HTMLRenderer` for paragraphs, line breaks, emphasis,
       strikethrough, inline code, horizontal rules, with HTML escaping.
       *(2.2, 2.3, 2.7, 2.10, 2.12)*
 - [ ] **2.3** Headings with GitHub-style anchors (`HeadingSlugger`).

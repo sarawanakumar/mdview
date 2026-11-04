@@ -2,6 +2,37 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 2.2, inline elements and rules
+
+**Done**
+- `HTMLRenderer` rebuilt as a swift-markdown `MarkupVisitor`
+  (`HTMLVisitor`). Renders headings, paragraphs, soft breaks (kept as a
+  newline, shown as a space), hard breaks (`<br>`, from two spaces or a
+  backslash), `<em>`, `<strong>`, `<del>` (`~~` and `~`), `<code>`,
+  `<hr>`. Inline HTML is escaped into the text; an HTML block becomes
+  `<pre class="html-source">` with its source escaped (spec 2.12).
+  Entities are decoded by the parser, then escaped. Links and images
+  show their text for now; lists, quotes, code blocks and tables are
+  still escaped source until 2.4–2.6.
+- Tests rewritten as one suite per criterion: 41 tests in 12 suites,
+  including a check that no `<img>`, `<iframe>`, `<style>` or `<script>`
+  from the source ever survives.
+- `preview.css`: inline code, rules, and muted HTML source.
+
+**Checked**
+- 41 tests pass. Recorded `elements.md`'s HTML once to read it (then
+  deleted it): every 2.2 element renders as intended, and the only tags
+  in the output are mdview's own.
+- Noticed in that output: a line in `elements.md` that starts with
+  `<script>` becomes an HTML block, not part of the paragraph above. That
+  is correct CommonMark (such tags can end a paragraph), and it's still
+  shown only as text.
+- App builds with no warnings and opens `elements.md` (read and visible
+  signposts). Not visually checked.
+
+**Next**
+- Roadmap 2.3: headings with GitHub-style anchors.
+
 ## 2026-11-04: Roadmap 2.1, M2 test files and expected-HTML tests
 
 **Done**
