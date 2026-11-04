@@ -1,0 +1,2 @@
+Just plain text, not Markdown.
+# This line should not become a heading.

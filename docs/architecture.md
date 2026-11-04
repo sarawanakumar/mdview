@@ -33,6 +33,7 @@ app:
 mdview.xcodeproj
 App/                        the macOS app target (AppKit)
   AppDelegate               launch, menus, "open panel when nothing is open"
+  MarkdownDocumentController  opens every file as a MarkdownDocument (spec 10.5)
   MarkdownDocument          NSDocument subclass: reads the file, read-only
   DocumentWindowController  one window per file; owns the preview and find bar
   PreviewController         wraps WKWebView: loads HTML, reload, zoom, print, find
@@ -44,6 +45,7 @@ App/                        the macOS app target (AppKit)
   mdview.entitlements       sandbox, user-selected read-only, outgoing network
   Resources/                preview.css, Info.plist, app icon
 Packages/MDViewCore/        local Swift package, no AppKit
+  UTF8Text                  bytes → text, bad bytes replaced and reported (spec 10.2)
   FrontMatter               strips a leading YAML block (spec 2.13)
   HTMLRenderer              swift-markdown tree → HTML string
   HeadingSlugger            GitHub-style heading anchors (spec 4.3)

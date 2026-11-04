@@ -43,7 +43,7 @@ screen.
       local `MDViewCore` package with a test target, `fixtures/` folder.
 - [x] **1.2** Register the Markdown file types in Info.plist so mdview
       appears in Open With and can be the default app. *(1.1, 1.2)*
-- [ ] **1.3** `MarkdownDocument` (read-only `NSDocument`): read the file,
+- [x] **1.3** `MarkdownDocument` (read-only `NSDocument`): read the file,
       decode UTF-8, replace bad bytes with a notice. *(10.1, 10.2, 10.5)*
 - [ ] **1.4** Menus in code: File (Open, Open Recent, Close), Edit (Copy),
       Window. Open panel at launch when nothing is open. *(1.3, 1.7, 1.8)*

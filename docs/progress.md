@@ -2,6 +2,52 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 1.3, read-only MarkdownDocument
+
+**Done**
+- `MDViewCore/UTF8Text`: decodes bytes as UTF-8, drops a leading byte
+  order mark, replaces invalid bytes with U+FFFD and reports that it did.
+  6 unit tests (valid, empty, BOM, BOM only, invalid bytes, Latin-1).
+- `App/MarkdownDocument.swift`: read-only `NSDocument` (not a native
+  type, no autosave). Reads on the main thread only
+  (`canConcurrentlyReadDocuments` is false; `read` asserts it). Logs
+  type, size and whether UTF-8 was invalid (no file names or content).
+  `isMarkdown` is false for non-Markdown files.
+- `App/MarkdownDocumentController.swift`: opens every file type as a
+  `MarkdownDocument`, so Open With → Other works (spec 10.5). Created in
+  `main` so it's the shared controller.
+- `App/DocumentWindowController.swift`: one window per file showing the
+  text in a read-only monospaced text view, with a notice bar when the
+  file wasn't valid UTF-8. **Temporary**: 1.5 replaces it with the
+  preview.
+- Info.plist names the document class. No untitled document at launch.
+- `fixtures/edge/`: `empty.md`, `latin1.md` (invalid UTF-8),
+  `plain.txt`, `valid.md`.
+
+**Checked**
+- `swift test`: 7 tests pass.
+- Debug and Release build with no warnings (first build had four Swift 6
+  concurrency warnings in `read`; fixed as above).
+- Opened each edge file with `open -a build/mdview.app`; the app's log:
+
+| File | Type | Bytes | Invalid UTF-8 | Markdown |
+|---|---|---|---|---|
+| valid.md | net.daringfireball.markdown | 42 | no | yes |
+| empty.md | net.daringfireball.markdown | 0 | no | yes |
+| latin1.md | net.daringfireball.markdown | 91 | **yes** | yes |
+| plain.txt | public.plain-text | 72 | no | **no** |
+
+- Window server: 4 mdview windows on screen, 760×712 each, no error
+  alerts. Spec 10.1, 10.2 (detection) and 10.5 (opens) pass; spec 1.2's
+  "double-click opens it in mdview" now works too.
+- Not checked: what the windows show (no screen access). The notice bar
+  and text need a visual check.
+- Log noise from macOS (App Intents connection, a missing system
+  database) also appeared in the spike; not mdview errors.
+
+**Next**
+- Roadmap 1.4: menus in code and the Open panel at launch.
+
 ## 2026-11-04: Roadmap 1.2, Markdown file types
 
 **Done**

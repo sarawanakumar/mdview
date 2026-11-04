@@ -11,6 +11,8 @@
 			<string>Markdown document</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>NSDocumentClass</key>
+			<string>$(PRODUCT_MODULE_NAME).MarkdownDocument</string>
 			<!-- Alternate: offered in Open With and can be made the default,
 			     but never takes over .md files on its own. -->
 			<key>LSHandlerRank</key>
