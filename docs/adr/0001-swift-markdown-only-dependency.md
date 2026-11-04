@@ -32,7 +32,16 @@ needs a new ADR.
 
 - Full GitHub-flavored parsing (tables, task lists, strikethrough) without
   writing a parser.
-- Adds roughly 1–2 MB to the app; to be confirmed against the 5 MB limit.
+- Pinned to **0.9.0** (with `swift-cmark` 0.9.0). Its build-time docs
+  plugin is not pulled in when used from Xcode, so these are the only two
+  packages resolved.
+- Adds about 1 MB per chip type (2.2 MB for a stripped universal app);
+  full size check in roadmap 0.5.
 - We depend on Apple keeping it maintained; pinning the version means
   updates are deliberate.
-- Footnotes may not be supported; to check in the first spike.
+- Checked in roadmap 0.2: tables (with alignment), task lists,
+  strikethrough, nested lists, list start numbers and nested quotes all
+  parse correctly. Not supported: footnotes, GitHub-style bare-URL links,
+  and front matter (parsed as a rule plus a heading, so it must be stripped
+  first). By default it also turns straight quotes, `--` and `...` into
+  typographic ones.

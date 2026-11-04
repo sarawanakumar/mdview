@@ -2,6 +2,48 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 0.2, swift-markdown check
+
+**Done**
+- Added `swift-markdown` to the spike, pinned to exactly **0.9.0** (latest,
+  released Sept 2026). Resolved packages: `swift-markdown` 0.9.0 and
+  `swift-cmark` 0.9.0 only; `Package.resolved` is in
+  `spike/Spike.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/`.
+- `spike/Spike/sample.md` covers every spec section 2 element plus front
+  matter, footnotes, bare URLs, inline and block HTML.
+- The spike shows the parsed tree in its window; running
+  `Spike.app/Contents/MacOS/Spike --dump` prints it and exits.
+
+**Results**
+- Parse correctly: headings, emphasis, bold+italic, inline code,
+  `~~strike~~` and `~strike~`, links, soft and hard line breaks, nested
+  lists 4 deep, ordered list start number (3), task lists (`[ ]`/`[x]`),
+  nested quotes with lists, fenced code with language tag, indented code,
+  tables with left/centre/right alignment, horizontal rules, images.
+- Inline HTML and HTML blocks come out as their own nodes, so escaping
+  them (spec 2.12) is straightforward.
+- **Front matter** is not recognised: it parses as a horizontal rule plus
+  an H2 heading. Confirms it must be stripped before parsing.
+- **Footnotes** are not supported (no footnote nodes in the source; text
+  stays literal). Recorded as out of scope in spec.md.
+- **Bare URLs** (`https://example.com` without `<>`) are not turned into
+  links; GitHub does this. Angle-bracket autolinks work.
+- **Smart punctuation** is on by default: `"x"` → “x”, `--` → –,
+  `...` → …. GitHub doesn't do this. Can be turned off with
+  `.disableSmartOpts`.
+- Size: Release universal app 3.3 MB unstripped, **2.2 MB stripped**
+  (about 1.1 MB per chip type). Up from 176 KB before the package.
+- Build succeeded with no Swift warnings.
+
+**Decided**
+- Bare web addresses become links, done by our renderer (spec 2.14).
+- Smart punctuation off, text shows as written (spec 2.15).
+- Old spec 2.14 (reference file) is now 2.16. Both added to roadmap 2.7.
+
+**Next**
+- Roadmap 0.3: locked-down `WKWebView` in the sandbox with one image via
+  `mdview-file://`.
+
 ## 2026-11-04: Roadmap 0.1, git and spike project
 
 **Done**

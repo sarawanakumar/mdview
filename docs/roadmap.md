@@ -18,7 +18,7 @@ starts. Nothing from here has to survive, but whatever does can be reused.
 
 - [x] **0.1** Set up git and the Xcode project: AppKit app target,
       sandbox on with no network permission, Swift 6, macOS 15 minimum.
-- [ ] **0.2** Add `swift-markdown` pinned to an exact version. Parse a
+- [x] **0.2** Add `swift-markdown` pinned to an exact version. Parse a
       sample file and print the tree. Check tables, task lists,
       strikethrough and footnotes. *(Spec open question: footnotes.)*
 - [ ] **0.3** Show hard-coded HTML in a locked-down `WKWebView` (scripts
@@ -62,7 +62,7 @@ headings and paragraphs, and section 1 of the spec passes.
 All in `MDViewCore`, test-first against fixture files.
 
 - [ ] **2.1** Write `fixtures/elements.md` and `fixtures/front-matter.md`,
-      plus expected-HTML test setup. *(2.14)*
+      plus expected-HTML test setup. *(2.16)*
 - [ ] **2.2** `HTMLRenderer` for paragraphs, line breaks, emphasis,
       strikethrough, inline code, horizontal rules, with HTML escaping.
       *(2.2, 2.3, 2.7, 2.10, 2.12)*
@@ -72,7 +72,8 @@ All in `MDViewCore`, test-first against fixture files.
 - [ ] **2.5** Blockquotes (nested, with lists and code inside). *(2.6)*
 - [ ] **2.6** Code blocks (plain for now) and tables with alignment,
       each scrolling sideways on its own. *(2.8, 2.9)*
-- [ ] **2.7** Strip front matter. *(2.13)*
+- [ ] **2.7** Strip front matter; turn off smart punctuation; link bare
+      web addresses. *(2.13, 2.14, 2.15)*
 - [ ] **2.8** `preview.css`: system fonts, ~80-character centred column,
       light and dark colours. *(6.3, 6.4)*
 - [ ] **2.9** Fuzz test: random and truncated input never crashes or

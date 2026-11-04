@@ -51,7 +51,9 @@ parsed with Apple's `swift-markdown`.
 | 2.11 | **Links** render in the system link colour. See section 4 for what clicking does. |
 | 2.12 | **Inline HTML** is not rendered. It appears as plain text, so a file can never run scripts or load content. |
 | 2.13 | **YAML front matter** (a block between `---` lines at the very start of the file) is hidden. Rendering starts with the content after it. A `---` anywhere else is still a horizontal rule. |
-| 2.14 | A [reference test file](#test-files) containing every element above renders with nothing missing, garbled or out of order. |
+| 2.14 | **Bare web addresses** in normal text (`https://…`, `http://…`, `www.…`) become links, as on GitHub. Trailing punctuation such as a full stop, comma or closing bracket is not part of the link. Addresses inside inline code or code blocks stay plain text. |
+| 2.15 | **Punctuation shows as written.** Straight quotes stay straight, and `--` and `...` are not turned into dashes or ellipses. |
+| 2.16 | A [reference test file](#test-files) containing every element above renders with nothing missing, garbled or out of order. |
 
 ## 3. Images
 
@@ -164,6 +166,9 @@ Taken from the vision's non-goals: editing, export beyond Print/PDF, remote
 images, plugins, themes, a settings screen, Mermaid diagrams, math, and any
 network access.
 
+**Footnotes** are also out: `swift-markdown` 0.9.0 doesn't support them
+(checked in roadmap 0.2), so `[^1]` and its definition show as plain text.
+
 ## Test files
 
 A folder of Markdown files kept in the repo for checking the criteria above
@@ -181,5 +186,3 @@ A folder of Markdown files kept in the repo for checking the criteria above
 
 ## Open questions
 
-- **Footnotes.** Need to check whether `swift-markdown` parses them. Skip
-  for v1 unless they come free.

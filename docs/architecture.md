@@ -79,9 +79,17 @@ WKWebView                             images requested via mdview-file:// →
 ### Rendering details
 
 - **Parsing.** `swift-markdown` with its GitHub-flavored extensions (tables,
-  strikethrough, task lists). The tree is walked by our own `MarkupVisitor`
+  strikethrough, task lists), and with smart punctuation turned off
+  (`.disableSmartOpts`) so text shows as written (spec 2.15). The tree is walked by our own `MarkupVisitor`
   rather than the package's built-in HTML formatter, because we need
   heading anchors, code highlighting, image placeholders and HTML escaping.
+- **Front matter** must be removed before parsing: `swift-markdown` would
+  otherwise read it as a horizontal rule followed by a heading (roadmap
+  0.2).
+- **Bare web addresses.** `swift-markdown` doesn't link them, so the
+  renderer scans plain text nodes (never code) for `http://`, `https://`
+  and `www.` addresses and wraps them in links, leaving trailing
+  punctuation outside, following GitHub's rules (spec 2.14).
 - **Inline HTML** in the source is escaped and shown as text (spec 2.12).
 - **Page shell.** The CSS is bundled in the app and inlined into each page,
   so nothing is fetched. It uses system fonts (`-apple-system`,
