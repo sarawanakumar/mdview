@@ -20,15 +20,15 @@ struct HTMLEscapingTests {
 @Suite("Headings (2.1)")
 struct HeadingTests {
     @Test func atxHeadingsKeepTheirLevel() {
-        #expect(render("# One\n\n## Two\n\n###### Six\n") == "<h1>One</h1>\n<h2>Two</h2>\n<h6>Six</h6>\n")
+        #expect(render("# One\n\n## Two\n\n###### Six\n") == "<h1 id=\"one\">One</h1>\n<h2 id=\"two\">Two</h2>\n<h6 id=\"six\">Six</h6>\n")
     }
 
     @Test func setextHeadings() {
-        #expect(render("Title\n=====\n\nSub\n---\n") == "<h1>Title</h1>\n<h2>Sub</h2>\n")
+        #expect(render("Title\n=====\n\nSub\n---\n") == "<h1 id=\"title\">Title</h1>\n<h2 id=\"sub\">Sub</h2>\n")
     }
 
     @Test func formattingInsideHeadings() {
-        #expect(render("## A *b* `c`\n") == "<h2>A <em>b</em> <code>c</code></h2>\n")
+        #expect(render("## A *b* `c`\n") == "<h2 id=\"a-b-c\">A <em>b</em> <code>c</code></h2>\n")
     }
 }
 

@@ -66,7 +66,7 @@ All in `MDViewCore`, test-first against fixture files.
 - [x] **2.2** `HTMLRenderer` for paragraphs, line breaks, emphasis,
       strikethrough, inline code, horizontal rules, with HTML escaping.
       *(2.2, 2.3, 2.7, 2.10, 2.12)*
-- [ ] **2.3** Headings with GitHub-style anchors (`HeadingSlugger`).
+- [x] **2.3** Headings with GitHub-style anchors (`HeadingSlugger`).
       *(2.1, groundwork for 4.3)*
 - [ ] **2.4** Lists, nested lists, start numbers, task lists. *(2.4, 2.5)*
 - [ ] **2.5** Blockquotes (nested, with lists and code inside). *(2.6)*

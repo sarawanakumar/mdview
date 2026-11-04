@@ -32,6 +32,8 @@ public enum HTMLRenderer {
 struct HTMLVisitor: MarkupVisitor {
     typealias Result = String
 
+    private var slugger = HeadingSlugger()
+
     // MARK: Containers
 
     mutating func defaultVisit(_ markup: any Markup) -> String {
@@ -48,9 +50,29 @@ struct HTMLVisitor: MarkupVisitor {
 
     // MARK: Blocks
 
+    /// Each heading gets a GitHub-style `id`, so `#anchor` links work
+    /// (spec 4.3). A heading with no usable characters gets none.
     mutating func visitHeading(_ heading: Heading) -> String {
         let level = min(max(heading.level, 1), 6)
-        return "<h\(level)>\(visitChildren(of: heading))</h\(level)>\n"
+        let slug = slugger.slug(for: Self.text(of: heading))
+        let id = slug.isEmpty ? "" : " id=\"\(escape(slug))\""
+        return "<h\(level)\(id)>\(visitChildren(of: heading))</h\(level)>\n"
+    }
+
+    /// The text a reader sees in a heading: formatting removed, code kept
+    /// without its backticks. This is what GitHub makes anchors from.
+    static func text(of markup: any Markup) -> String {
+        var text = ""
+        for child in markup.children {
+            switch child {
+            case let plain as Text: text += plain.string
+            case let code as InlineCode: text += code.code
+            case let html as InlineHTML: text += html.rawHTML
+            case is SoftBreak, is LineBreak: text += " "
+            default: text += Self.text(of: child)
+            }
+        }
+        return text
     }
 
     mutating func visitParagraph(_ paragraph: Paragraph) -> String {

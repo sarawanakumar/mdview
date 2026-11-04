@@ -2,6 +2,33 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 2.3, heading anchors
+
+**Done**
+- `MDViewCore/HeadingSlugger`: GitHub's `github-slugger` rules. Lowercase;
+  keep letters, marks, numbers, `-`, `_` in any script; each space
+  becomes `-` (not merged); drop punctuation, symbols and emoji; repeats
+  get `-1`, `-2`, … skipping names already used. One per document.
+- Headings render as `<hN id="slug">`. The slug comes from the text a
+  reader sees (formatting removed, inline code without backticks, link
+  text included). A heading with no usable characters gets no `id`.
+
+**Checked**
+- 51 tests pass. Slug cases include `Tables (2.9)` → `tables-29`,
+  `Punctuation: "quotes", & ampersands, (brackets)!` →
+  `punctuation-quotes--ampersands-brackets`, accents, Japanese, emoji,
+  `C++ & C#` → `c--c`, `v1.2.3` → `v123`, numbering that skips a name
+  already taken (`Foo 1`, `Foo`, `Foo`, `Foo` → `foo-1`, `foo`, `foo-2`,
+  `foo-3`), and that quotes can't break out of the attribute.
+- `elements.md`: 31 headings, all IDs unique, duplicates numbered,
+  `tables-29` exists for the file's own `#tables-29` link.
+- App builds with no warnings.
+- Not checked against GitHub itself (no network use); the expected
+  slugs are from GitHub's documented rules and known examples.
+
+**Next**
+- Roadmap 2.4: lists, nested lists, start numbers, task lists.
+
 ## 2026-11-04: Roadmap 2.2, inline elements and rules
 
 **Done**
