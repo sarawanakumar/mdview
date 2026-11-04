@@ -3,8 +3,8 @@ import AppKit
 /// mdview: a read-only Markdown viewer for macOS. See docs/vision.md.
 ///
 /// Documents are handled by `MarkdownDocumentController` and
-/// `MarkdownDocument`; the menu bar by `MainMenu`. The preview arrives in
-/// roadmap 1.5.
+/// `MarkdownDocument`; the menu bar by `MainMenu`; the preview by
+/// `PreviewController`.
 @main
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -16,6 +16,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         app.delegate = delegate
         app.setActivationPolicy(.regular)
         app.run()
+    }
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        // Start WebKit's setup now, so it's ready when the first file arrives.
+        PreviewConfiguration.shared()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

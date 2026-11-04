@@ -47,7 +47,7 @@ screen.
       decode UTF-8, replace bad bytes with a notice. *(10.1, 10.2, 10.5)*
 - [x] **1.4** Menus in code: File (Open, Open Recent, Close), Edit (Copy),
       Window. Open panel at launch when nothing is open. *(1.3, 1.7, 1.8)*
-- [ ] **1.5** `PreviewController` with a locked-down web view; show
+- [x] **1.5** `PreviewController` with a locked-down web view; show
       a minimal HTML version of the file (paragraphs and headings only).
 - [ ] **1.6** Multiple files, Dock drop, already-open files brought to the
       front, unreadable-file alert. *(1.4, 1.5, 1.6, 10.3)*

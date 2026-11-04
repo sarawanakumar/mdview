@@ -2,6 +2,57 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 1.5, first preview
+
+**Done**
+- `MDViewCore/HTMLEscaping` and a minimal `HTMLRenderer`: headings and
+  paragraphs rendered; inline formatting shown as its text; soft and hard
+  breaks; every other block shown as escaped source in
+  `<pre class="not-yet-rendered">` so nothing is lost or interpreted;
+  smart punctuation off; plain-text files in `<pre class="plain-text">`.
+  13 new tests (20 total), including inline and block HTML never
+  becoming markup.
+- `App/PreviewConfiguration.swift`: one shared configuration, started in
+  `applicationWillFinishLaunching`: page JavaScript off, non-persistent
+  store, block list (`mdview-block-remote-v1`, looked up before
+  compiling), `mdview-file:` scheme. If the block list can't be loaded,
+  the window shows a message instead of the file (spec 9.8).
+- `App/AssetSchemeHandler.swift`: stub that fails every request (3.3
+  fills it in).
+- `App/PreviewController.swift`: renders off the main thread, then shows
+  the page in a web view; only our own page load is allowed, link clicks
+  are cancelled for now; reloads the page if WebKit's page process dies.
+  `PageShell` adds the inlined CSS and a Content Security Policy
+  (`default-src 'none'`) as an extra layer.
+- `App/Resources/preview.css`: system font, 80-character column, heading
+  sizes and rules, light/dark colours.
+- Document windows now show the preview instead of the temporary text
+  view.
+
+**Checked**
+- 20 core tests pass. Debug and Release build with no warnings (one
+  build error on the way: a main-thread-only constant used from a
+  non-main context; fixed).
+- With a temporary page summary (removed afterwards), opened 5 files:
+
+| File | Page |
+|---|---|
+| valid.md | H1 "Valid", 1 paragraph, "café ✓" intact |
+| latin1.md | H1 "Caf� menu", 1 paragraph |
+| plain.txt | 1 plain-text block; `#` line not a heading |
+| empty.md | empty page |
+| spike sample.md | 5 headings, 7 paragraphs, 10 blocks shown as source; its `<b>`/`<div>` created no elements; 0 scripts |
+
+- All pages: system body font, column 649 px (80 characters). 5 windows
+  on screen.
+- Not checked: how it looks (no screen access), dark mode, the notice
+  bar above the preview, and the spec 9.8 error path (couldn't force the
+  block list to fail).
+
+**Next**
+- Roadmap 1.6: multiple files, Dock drop, bring already-open files to
+  the front, unreadable-file alert.
+
 ## 2026-11-04: Roadmap 1.4, menus and the Open panel
 
 **Done**

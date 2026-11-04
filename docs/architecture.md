@@ -38,7 +38,9 @@ App/                        the macOS app target (AppKit)
   MarkdownDocumentController  opens every file as a MarkdownDocument (spec 10.5)
   MarkdownDocument          NSDocument subclass: reads the file, read-only
   DocumentWindowController  one window per file; owns the preview and find bar
+  PreviewConfiguration      the shared locked-down web view setup (block list, JS off)
   PreviewController         wraps WKWebView: loads HTML, reload, zoom, print, find
+                            (PageShell: wraps the body with CSS and a security policy)
   AssetSchemeHandler        serves local images and files to the page (ADR 0005)
   LinkRouter                decides what a clicked link does (spec section 4)
   FileWatcher               notices when the file changes on disk (spec section 5)
@@ -49,6 +51,7 @@ App/                        the macOS app target (AppKit)
 Packages/MDViewCore/        local Swift package, no AppKit
   UTF8Text                  bytes → text, bad bytes replaced and reported (spec 10.2)
   FrontMatter               strips a leading YAML block (spec 2.13)
+  HTMLEscaping              escapes text for HTML
   HTMLRenderer              swift-markdown tree → HTML string
   HeadingSlugger            GitHub-style heading anchors (spec 4.3)
   Highlighter/              tokenizer + one small rule set per language (ADR 0004)
@@ -124,6 +127,11 @@ WKWebView                             images requested via mdview-file:// →
   the main barrier: if it fails to compile or install, the document is not
   shown (spec 9.8).
 - Non-persistent website data store: no cookies, cache or storage on disk.
+- Each page carries a Content Security Policy (`default-src 'none'`,
+  images only from `mdview-file:`, inline styles only): one more layer
+  that blocks scripts and remote loads even if the others failed.
+- Navigation: only our own page load is allowed; clicked links are
+  cancelled until `LinkRouter` (roadmap 3.5).
 
 ## Links
 

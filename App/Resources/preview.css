@@ -1,0 +1,60 @@
+/* mdview preview styles. Inlined into every page; nothing is fetched.
+   Roadmap 1.5: basic reading styles. Roadmap 2.8 completes them. */
+
+:root {
+  color-scheme: light dark;
+  --text: #1f2328;
+  --muted: #59636e;
+  --rule: #d1d9e0;
+  --code-bg: #f6f8fa;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e6edf3;
+    --muted: #9198a1;
+    --rule: #3d444d;
+    --code-bg: #151b23;
+  }
+}
+
+html { background: Canvas; }
+
+body {
+  font: -apple-system-body;
+  line-height: 1.6;
+  color: var(--text);
+  max-width: 80ch;
+  margin: 0 auto;
+  padding: 32px 28px 56px;
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3, h4, h5, h6 { line-height: 1.25; margin: 1.5em 0 0.6em; font-weight: 600; }
+h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid var(--rule); }
+h2 { font-size: 1.5em; padding-bottom: 0.3em; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.25em; }
+h4 { font-size: 1em; }
+h5 { font-size: 0.875em; }
+h6 { font-size: 0.85em; color: var(--muted); }
+body > :first-child { margin-top: 0; }
+
+p { margin: 0 0 1em; }
+
+pre {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.875em;
+  line-height: 1.45;
+  margin: 0 0 1em;
+}
+
+/* Blocks the minimal renderer doesn't handle yet: shown as source. */
+pre.not-yet-rendered {
+  padding: 12px 16px;
+  background: var(--code-bg);
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+/* Non-Markdown files (spec 10.5). */
+pre.plain-text { white-space: pre-wrap; }

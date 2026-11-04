@@ -1,10 +1,10 @@
 import AppKit
 
-/// One window per file (spec 6.1).
-///
-/// Temporary content for roadmap 1.3: the file's text in a read-only text
-/// view. Roadmap 1.5 replaces it with the rendered preview.
+/// One window per file (spec 6.1): an optional notice bar above the
+/// rendered preview.
 final class DocumentWindowController: NSWindowController {
+    private let preview = PreviewController()
+
     init(document: MarkdownDocument) {
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 760, height: 680),
@@ -14,21 +14,13 @@ final class DocumentWindowController: NSWindowController {
         )
         super.init(window: window)
 
-        let scroll = NSTextView.scrollableTextView()
-        if let textView = scroll.documentView as? NSTextView {
-            textView.isEditable = false
-            textView.font = .monospacedSystemFont(ofSize: 13, weight: .regular)
-            textView.textContainerInset = NSSize(width: 16, height: 16)
-            textView.string = document.text
-        }
-
         var views: [NSView] = []
         if document.hadInvalidBytes {
             views.append(Self.noticeBar(
                 "Some of this file isn’t valid UTF-8 text, so it may not display correctly."
             ))
         }
-        views.append(scroll)
+        views.append(preview.view)
 
         let stack = NSStackView(views: views)
         stack.orientation = .vertical
@@ -38,9 +30,11 @@ final class DocumentWindowController: NSWindowController {
         for view in views {
             view.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
         }
-        scroll.setContentHuggingPriority(.defaultLow, for: .vertical)
+        preview.view.setContentHuggingPriority(.defaultLow, for: .vertical)
         window.contentView = stack
         window.center()
+
+        preview.show(document)
     }
 
     @available(*, unavailable)
@@ -51,12 +45,9 @@ final class DocumentWindowController: NSWindowController {
         let label = NSTextField(wrappingLabelWithString: message)
         label.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
         label.textColor = .secondaryLabelColor
-        label.setAccessibilityRole(.staticText)
 
         let bar = NSStackView(views: [label])
         bar.edgeInsets = NSEdgeInsets(top: 6, left: 12, bottom: 6, right: 12)
-        bar.wantsLayer = true
-        bar.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
         bar.setContentHuggingPriority(.required, for: .vertical)
         return bar
     }
