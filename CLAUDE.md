@@ -62,7 +62,10 @@ criteria pass. Record measurements (timings, app size) with the numbers.
 ## Testing
 
 - `MDViewCore` changes need unit tests; renderer output is checked against
-  expected HTML for the files in `fixtures/`.
+  expected HTML for the files in `fixtures/` (stored in
+  `fixtures/expected/`). After a deliberate rendering change, re-record
+  with `MDVIEW_RECORD_EXPECTED=1 swift test --package-path
+  Packages/MDViewCore` and review the diff before committing.
 - Core tests: `swift test --package-path Packages/MDViewCore`
 - App build: `xcodebuild -project mdview.xcodeproj -scheme mdview build`
   (add `-configuration Release -destination 'generic/platform=macOS'`

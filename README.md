@@ -12,7 +12,6 @@ App/               the macOS app (AppKit, WebKit)
 Packages/
   MDViewCore/      Markdown → HTML logic, no AppKit; tested with `swift test`
 fixtures/          Markdown test files (spec.md, "Test files")
-spike/             throwaway M0 prototype, removed after M1
 docs/
   vision.md        why, for whom, what success looks like
   spec.md          what the product does, with acceptance criteria

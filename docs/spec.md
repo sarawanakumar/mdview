@@ -178,6 +178,8 @@ A folder of Markdown files kept in the repo for checking the criteria above
 (location decided in the architecture doc):
 
 - `elements.md`: every element in section 2, plus nested combinations
+  (also a local and a remote image, and links, so it shows every kind of
+  content in one place)
 - `front-matter.md`: front matter at the top, plus a `---` rule further down
 - `images.md`: relative, absolute, missing, remote and oversized images
 - `links.md`: web, relative, anchor and broken links
@@ -186,6 +188,7 @@ A folder of Markdown files kept in the repo for checking the criteria above
 - `typical.md`: about 50 KB of realistic README-style content (performance)
 - `large.md`: about 5 MB (performance)
 - `edge/`: empty, non-UTF-8 and pathological files
+- `expected/`: the expected HTML for each file above, used by the tests
 
 ## Open questions
 

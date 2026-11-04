@@ -61,7 +61,7 @@ headings and paragraphs, and section 1 of the spec passes.
 
 All in `MDViewCore`, test-first against fixture files.
 
-- [ ] **2.1** Write `fixtures/elements.md` and `fixtures/front-matter.md`,
+- [x] **2.1** Write `fixtures/elements.md` and `fixtures/front-matter.md`,
       plus expected-HTML test setup. *(2.16)*
 - [ ] **2.2** `HTMLRenderer` for paragraphs, line breaks, emphasis,
       strikethrough, inline code, horizontal rules, with HTML escaping.
@@ -78,6 +78,10 @@ All in `MDViewCore`, test-first against fixture files.
       light and dark colours. *(6.3, 6.4)*
 - [ ] **2.9** Fuzz test: random and truncated input never crashes or
       hangs. *(10.4)*
+- [ ] **2.10** Look over `elements.md` and `front-matter.md` in the app
+      (light and dark), then record their expected HTML
+      (`MDVIEW_RECORD_EXPECTED=1`) so later changes are caught.
+      Re-measure memory with `typical.md` (spec 8.5). *(2.16)*
 
 **Done when:** `elements.md` renders completely and correctly, and spec
 section 2 passes.

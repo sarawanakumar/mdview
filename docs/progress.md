@@ -2,6 +2,46 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 2.1, M2 test files and expected-HTML tests
+
+**Done**
+- Removed `spike/` (planned once M1 was done; it stays in git history).
+  Nothing in the app used it.
+- `fixtures/elements.md`: every spec section 2 element, each section
+  labelled with its criterion. Covers ATX and setext headings, duplicate
+  and punctuated headings (for anchors), soft/hard/backslash breaks, all
+  emphasis forms and non-emphasis cases, lists (3 bullet kinds, 4 levels,
+  start number, loose items), task lists (nested, capital X), quotes (3
+  levels, with list and code), inline code with backticks, fenced (with
+  and without language, tilde), indented and very long code, tables
+  (alignment, inline formatting, escaped pipe, empty cells, a very wide
+  one), 3 kinds of rule, inline/titled/reference/autolinks, relative and
+  anchor links, bare web addresses with trailing punctuation, punctuation
+  as written, a local and a remote image, inline and block HTML,
+  escapes, entities, and lists containing quotes, code and tables.
+- `fixtures/front-matter.md`: front matter, a later `---` rule, and a
+  setext heading whose underline is `---`.
+- `fixtures/images/sample.png` (48×48) for the local image.
+- `Tests/MDViewCoreTests/FixtureTests.swift`: finds every `.md`/`.txt`
+  under `fixtures/` (except `expected/`); checks each renders without
+  crashing (spec 10.4) and, where `fixtures/expected/<name>.html` exists,
+  matches it exactly. `MDVIEW_RECORD_EXPECTED=1` writes the expected
+  files. `fixtures/expected/README.md` explains this.
+- Roadmap: added **2.10**, review the fixtures in the app, then record the
+  expected HTML and re-measure memory. Recording now would only capture
+  the temporary minimal renderer's output.
+
+**Checked**
+- 23 tests pass (6 fixtures × 2 tests, plus a check that the fixtures
+  folder is found).
+- Record mode wrote 6 expected files; comparison then passed; changing
+  one made the test fail with "elements.md differs from elements.html".
+  Recorded files deleted afterwards.
+
+**Next**
+- Roadmap 2.2: paragraphs, line breaks, emphasis, strikethrough, inline
+  code, rules, with HTML escaping.
+
 ## 2026-11-04: Roadmap 1.7, early web view start, signposts, timings
 
 **Done**
