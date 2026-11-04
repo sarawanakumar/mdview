@@ -2,6 +2,53 @@
 
 Newest session first.
 
+## 2026-11-04: Roadmap 2.9, fuzz testing (found 2 crashes and 2 hangs)
+
+**Found and fixed**
+1. **Crash: deep nesting.** 1,000 nested quotes, 1,000 nested lists or
+   10,000 `*` crashed (stack overflow) *inside swift-markdown's parser*,
+   on the 512 KB stack Swift tasks get, which is where the app rendered.
+   - Markdown now renders on a dedicated thread with a 64 MB stack
+     (`HTMLRenderer.renderSafely`). Measured safe to 20,000 levels;
+     80,000 quotes or 100,000 `*` still crash there.
+   - `NestingGuard`: a quick byte scan estimates the deepest nesting
+     (`>` and list markers at line starts, indentation, the longest run of
+     `* _ ~`). Over 1,000 levels, the file is shown as plain text with a
+     notice. All fixtures estimate under 50.
+2. **Hang: deep lists.** 3,000 nested lists took 7.3 s to render
+   (2,000: 3.1 s). Cause: mdview's tight/loose list check followed each
+   list's last block down to the bottom, quadratic in depth. Now it only
+   looks when something follows. 2,000 levels: 19 ms.
+3. **Hang: long first line.** A file of 100,000 spaces took 17.7 s in
+   front matter detection (trimming a long line one character at a time).
+   Lines over 64 bytes can't be a fence, and line ends are found by
+   searching bytes. Now well under 100 ms; regression test added.
+
+**Done**
+- `Tests/MDViewCoreTests/FuzzTests.swift` (seeded, reproducible): 600
+  random Markdown fragments, 200 random byte strings (incl. invalid
+  UTF-8), 300 random mutations of `elements.md`, every `.md` fixture cut
+  at about 400 points, 28 pathological inputs (all the above plus huge
+  tables, 1 MB lines, unclosed fences and front matter, control
+  characters, 50,000 combining marks, …). Each input must render
+  something (unless it's blank or only front matter) in under 2 s, via
+  the same `renderSafely` the app uses. Plus checks that the guard
+  catches the crash cases and doesn't flag real files.
+- App uses `renderSafely`; notice style in `preview.css`.
+
+**Checked**
+- 134 tests pass: 1.4 s debug, 0.5 s release.
+- In the app (Release): opened 6 pathological files at once (1,000 and
+  100,000 quotes, 3,000 lists, 10,000 `*`, 100,000 spaces, 900 quotes):
+  no crash, all 6 read and shown, no crash reports.
+- Timing unchanged on a busy machine (load average 9): cold median
+  485 ms (one run 554 ms), warm median 158 ms (max 185 ms).
+
+**Next**
+- Roadmap 2.10: look over `elements.md` and `front-matter.md` in the app
+  (light and dark), then record their expected HTML. Needs the owner's
+  eyes.
+
 ## 2026-11-04: Roadmap 2.8, the stylesheet
 
 **Done**

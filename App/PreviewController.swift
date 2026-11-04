@@ -26,9 +26,11 @@ final class PreviewController: NSViewController, WKNavigationDelegate {
         let configuration = PreviewConfiguration.shared()
 
         Task {
-            let body = await Task.detached {
-                isMarkdown ? HTMLRenderer.render(markdown: text) : HTMLRenderer.render(plainText: text)
-            }.value
+            // Markdown goes through renderSafely: a large stack, and a plain
+            // text fallback for files nested too deeply to parse (spec 10.4).
+            let body = isMarkdown
+                ? await HTMLRenderer.renderSafely(markdown: text)
+                : await Task.detached { HTMLRenderer.render(plainText: text) }.value
             Signposts.signposter.emitEvent("documentRendered")
             do {
                 let config = try await configuration.value

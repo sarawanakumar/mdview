@@ -1,3 +1,4 @@
+import Foundation
 import Markdown
 
 /// Markdown → HTML body (spec section 2).
@@ -29,6 +30,31 @@ public enum HTMLRenderer {
     public static func render(plainText: String) -> String {
         "<pre class=\"plain-text\">\(HTMLEscaping.escape(plainText))</pre>\n"
     }
+
+    /// What the app uses (spec 10.4): never crashes, whatever the file.
+    ///
+    /// Files nested too deeply to parse safely are shown as plain text with
+    /// a notice. Everything else renders on a thread with a 64 MB stack,
+    /// because swift-markdown's recursion needs far more than the 512 KB a
+    /// Swift task's thread has.
+    public static func renderSafely(markdown: String) async -> String {
+        if NestingGuard.isTooDeep(markdown) {
+            return tooDeeplyNestedNotice + render(plainText: markdown)
+        }
+        return await withCheckedContinuation { continuation in
+            let thread = Thread {
+                continuation.resume(returning: render(markdown: markdown))
+            }
+            thread.stackSize = renderStackSize
+            thread.qualityOfService = .userInitiated
+            thread.start()
+        }
+    }
+
+    static let renderStackSize = 64 << 20
+
+    static let tooDeeplyNestedNotice =
+        "<p class=\"notice\">This file is nested too deeply to show as Markdown, so it’s shown as plain text.</p>\n"
 }
 
 struct HTMLVisitor: MarkupVisitor {
@@ -133,20 +159,23 @@ struct HTMLVisitor: MarkupVisitor {
     /// CommonMark: a list is loose if a blank line separates two of its
     /// items, or two blocks inside one item. swift-markdown doesn't say, so
     /// we work it out from source lines.
+    ///
+    /// Where a block's content ends is only worked out when something
+    /// follows it; otherwise deeply nested lists would make this quadratic.
     static func isTight(_ list: any ListItemContainer) -> Bool {
-        var previousEnd: Int?
-        for item in list.listItems {
-            if let previousEnd, let start = item.range?.lowerBound.line, start - previousEnd > 1 {
-                return false
-            }
-            var lastChildEnd: Int?
-            for child in item.children {
-                if let lastChildEnd, let start = child.range?.lowerBound.line, start - lastChildEnd > 1 {
+        let items = Array(list.listItems)
+        for (index, item) in items.enumerated() {
+            let children = Array(item.children)
+            for (previous, next) in zip(children, children.dropFirst()) {
+                if let end = contentEndLine(of: previous), let start = next.range?.lowerBound.line,
+                   start - end > 1 {
                     return false
                 }
-                lastChildEnd = contentEndLine(of: child) ?? lastChildEnd
             }
-            previousEnd = lastChildEnd ?? item.range?.lowerBound.line
+            if index + 1 < items.count, let start = items[index + 1].range?.lowerBound.line {
+                let end = children.last.flatMap(contentEndLine(of:)) ?? item.range?.lowerBound.line
+                if let end, start - end > 1 { return false }
+            }
         }
         return true
     }

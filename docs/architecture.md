@@ -54,6 +54,7 @@ Packages/MDViewCore/        local Swift package, no AppKit
   UTF8Text                  bytes → text, bad bytes replaced and reported (spec 10.2)
   FrontMatter               strips a leading YAML block (spec 2.13)
   Autolinker                finds bare web addresses, GitHub's rules (spec 2.14)
+  NestingGuard              spots files nested too deeply to parse safely (spec 10.4)
   HTMLEscaping              escapes text for HTML
   HTMLRenderer              swift-markdown tree → HTML string
   HeadingSlugger            GitHub-style heading anchors (spec 4.3)
@@ -204,7 +205,12 @@ cost on a cold launch.
   documentRendered, documentVisible. Readable in Instruments or with
   `log show --signpost`.
 - **Do the work off the main thread.** Reading, parsing and HTML building
-  run on a background task; only the final `loadHTMLString` touches the UI.
+  run in the background; only the final `loadHTMLString` touches the UI.
+  Markdown is rendered on its own thread with a 64 MB stack
+  (`HTMLRenderer.renderSafely`): swift-markdown parses nesting by
+  recursion and overflows the 512 KB stack Swift tasks run on at about
+  1,000 levels. Files estimated deeper than 1,000 levels are shown as
+  plain text with a notice (roadmap 2.9).
 - **Show text first.** Images load after the page is shown (spec 3.7).
 - **Measure.** Points of interest are marked with `os_signpost` (launch,
   file read, parse done, HTML done, first paint), so Instruments shows where

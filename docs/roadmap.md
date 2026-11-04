@@ -76,7 +76,7 @@ All in `MDViewCore`, test-first against fixture files.
       web addresses. *(2.13, 2.14, 2.15)*
 - [x] **2.8** `preview.css`: system fonts, ~80-character centred column,
       light and dark colours. *(6.3, 6.4)*
-- [ ] **2.9** Fuzz test: random and truncated input never crashes or
+- [x] **2.9** Fuzz test: random and truncated input never crashes or
       hangs. *(10.4)*
 - [ ] **2.10** Look over `elements.md` and `front-matter.md` in the app
       (light and dark), then record their expected HTML

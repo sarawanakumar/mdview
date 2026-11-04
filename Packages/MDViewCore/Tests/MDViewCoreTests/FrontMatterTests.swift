@@ -42,6 +42,16 @@ struct FrontMatterTests {
         #expect(FrontMatter.strip("# Title\n\n---\n") == "# Title\n\n---\n")
     }
 
+    /// Found by the fuzz tests: this took 17 s before the length check.
+    @Test(.timeLimit(.minutes(1)))
+    func longFirstLineIsFast() {
+        let text = String(repeating: " ", count: 100_000)
+        let clock = ContinuousClock()
+        let elapsed = clock.measure { _ = FrontMatter.strip(text) }
+        #expect(elapsed < .milliseconds(100))
+        #expect(FrontMatter.strip("---" + String(repeating: " ", count: 100_000) + "\n---\nx") != "x")
+    }
+
     @Test func renderedPageHidesItAndKeepsLaterRules() {
         let html = HTMLRenderer.render(markdown: "---\ntitle: Hidden\n---\n\n# Shown\n\ntext\n\n---\n\nend\n")
         #expect(html == "<h1 id=\"shown\">Shown</h1>\n<p>text</p>\n<hr>\n<p>end</p>\n")

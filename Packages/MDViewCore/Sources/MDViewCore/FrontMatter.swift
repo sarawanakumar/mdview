@@ -18,17 +18,26 @@ public enum FrontMatter {
     }
 
     /// The line starting at `start` (without its line ending) and where the
-    /// following line starts. Handles `\n`, `\r\n` and `\r` (Swift treats
-    /// `\r\n` as one character).
+    /// following line starts. Handles `\n`, `\r\n` and `\r`. Searches the
+    /// raw bytes: much faster than going character by character.
     private static func nextLine(in text: String, from start: String.Index) -> (Substring, String.Index) {
-        guard let end = text[start...].firstIndex(where: \.isNewline) else {
+        let bytes = text.utf8
+        guard let end = bytes[start...].firstIndex(where: { $0 == 0x0A || $0 == 0x0D }) else {
             return (text[start...], text.endIndex)
         }
-        return (text[start..<end], text.index(after: end))
+        var next = bytes.index(after: end)
+        if bytes[end] == 0x0D, next < bytes.endIndex, bytes[next] == 0x0A {
+            next = bytes.index(after: next)
+        }
+        return (text[start..<end], next)
     }
 
     /// `---` (or `...` when closing), ignoring trailing spaces and tabs.
     private static func isFence(_ line: Substring, allowDots: Bool) -> Bool {
+        // A fence is three characters plus a little trailing space. Checking
+        // the length first keeps very long lines fast: trimming them one
+        // character at a time took 17 s for a line of 100,000 spaces.
+        guard line.utf8.count <= 64 else { return false }
         var trimmed = line
         while let last = trimmed.last, last == " " || last == "\t" {
             trimmed = trimmed.dropLast()

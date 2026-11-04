@@ -165,6 +165,13 @@ pre.plain-text {              /* a non-Markdown file (10.5) */
   white-space: pre-wrap;
 }
 
+p.notice {                    /* e.g. a file nested too deeply (10.4) */
+  padding: 8px 12px;
+  color: var(--muted);
+  background: var(--code-bg);
+  border-radius: 6px;
+}
+
 /* ---- Printing (6.8): full width, black on white, nothing cut in half ---- */
 
 @media print {
