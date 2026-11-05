@@ -268,6 +268,13 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
         }
     }
 
+    // MARK: Reveal in Finder (spec 6.9)
+
+    @objc func revealInFinder(_ sender: Any?) {
+        guard let file = documentFile else { return }
+        NSWorkspace.shared.activateFileViewerSelecting([file])
+    }
+
     // MARK: Printing (spec 6.8)
 
     func printOperation(with info: NSPrintInfo) -> NSPrintOperation? {
@@ -296,12 +303,14 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
 
     // MARK: Menu validation
 
-    /// Greys out zoom commands that wouldn't change anything.
+    /// Greys out commands that wouldn't do anything.
     func validateMenuItem(_ item: NSMenuItem) -> Bool {
         switch item.action {
         case #selector(zoomIn(_:)): ZoomLevels.zoomedIn(from: preview.zoom) != nil
         case #selector(zoomOut(_:)): ZoomLevels.zoomedOut(from: preview.zoom) != nil
         case #selector(actualSize(_:)): !ZoomLevels.isActualSize(preview.zoom)
+        // Nothing to show while the file is gone (spec 5.4).
+        case #selector(revealInFinder(_:)): missingNotice == nil && documentFile != nil
         default: true
         }
     }

@@ -57,6 +57,9 @@ enum MainMenu {
         menu.addItem(submenuItem(recent))
 
         menu.addItem(.separator())
+        // Spec 6.9; handled by the document window.
+        menu.addItem(item("Reveal in Finder", #selector(DocumentWindowController.revealInFinder(_:)), "r", [.command, .shift]))
+        menu.addItem(.separator())
         menu.addItem(item("Close", #selector(NSWindow.performClose(_:)), "w"))
         // Spec 6.8; NSDocument handles both (it's in the responder chain).
         menu.addItem(.separator())

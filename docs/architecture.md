@@ -217,7 +217,7 @@ The document is read-only: no saving, no autosave, no "edited" dot.
 | Find (6.6) | `FindBar`: a slim bar at the top of the window (search field, previous/next, match count, Done) driving `WKWebView.find(_:configuration:)`, case-insensitive and wrapping. Typing searches from the top; Return / Shift-Return step; Esc closes. Edit ▸ Find: Find… ⌘F, Find Next ⌘G, Find Previous ⇧⌘G, Use Selection for Find ⌘E, handled by the document window. The match count and selected text come from the app's own script (search text passed as an argument). WebKit doesn't provide AppKit's standard find bar, so this is ours. |
 | Zoom (6.7) | `WKWebView.pageZoom`, per window, in Safari's steps (`ZoomLevels`, MDViewCore: 50–300 %). View menu: Actual Size ⌘0, Zoom In ⌘= (and ⌘+), Zoom Out ⌘−, greyed out when they'd do nothing. Kept when the page re-renders; not remembered after the window closes. |
 | Print (6.8) | File ▸ Page Setup… ⇧⌘P and Print… ⌘P, handled by `NSDocument`. `MarkdownDocument.printOperation(withSettings:)` returns `WKWebView.printOperation(with:)` (its view given the web view's size, or WebKit prints blank pages), fitted to the page width. The standard print panel includes Save as PDF. Print styles in `preview.css` make it black on white at full width, even in dark mode. |
-| Reveal in Finder (6.9) | `NSWorkspace.activateFileViewerSelecting` |
+| Reveal in Finder (6.9) | File ▸ Reveal in Finder ⇧⌘R → `NSWorkspace.activateFileViewerSelecting`; greyed out while the file is gone (spec 5.4) |
 | Open in Editor (6.10–6.12) | Remembered app URL in `UserDefaults`; `NSWorkspace.open(_:withApplicationAt:)`. Picker is an `NSOpenPanel` limited to applications. |
 | VoiceOver (6.14) | Comes from WebKit reading proper HTML headings, links and image alt text |
 

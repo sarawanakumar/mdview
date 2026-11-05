@@ -2,6 +2,26 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 5.4, Reveal in Finder
+
+**Done**
+- File ▸ Reveal in Finder ⇧⌘R (handled by the document window):
+  `NSWorkspace.activateFileViewerSelecting` with the document's file.
+  Greyed out while the file is gone (after the "no longer available"
+  notice).
+
+**Checked** (temporary hooks, removed)
+- Menu item present with ⇧⌘R and enabled; choosing it opened a Finder
+  window (Finder windows 5 → 6; it's still open on your screen).
+- Finder didn't come to the front in the test because MDView was
+  launched in the background and wasn't the active app; macOS only lets
+  the active app hand over focus, so it will when you use the menu.
+- Deleting the file greyed the item out (enabled true → false).
+- 197 tests pass; Debug and Release build with no warnings.
+
+**Next**
+- Roadmap 5.5: Open in Editor and Change Editor.
+
 ## 2026-11-05: Roadmap 5.3, printing and Save as PDF
 
 **Done**
