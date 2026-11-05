@@ -176,6 +176,35 @@ see colours sooner.*
 **Done when:** every spec criterion passes and mdview has replaced
 whatever you used before.
 
+## M8. v1.1: edit mode (ADR 0008, spec section 11)
+
+ADR 0008 accepted 2026-11-05.
+
+- [x] **8.1** On acceptance, update vision.md, CLAUDE.md's read-only rule
+      and ADR 0002/0005 statuses (ADR 0008 consequences). Switch the
+      entitlement to `files.user-selected.read-write`. Spike: save a
+      file with `NSDocument` inside the sandbox, both one opened from
+      Finder and one opened through an old read-only folder grant; check
+      the file watcher keeps working after our own save. *(9.2, 11.11)*
+- [ ] **8.2** `UTF8Text.encode` in `MDViewCore` (text back to bytes, byte
+      order mark restored), with round-trip tests over `fixtures/edge/`.
+      *(11.8)*
+- [ ] **8.3** Editable `MarkdownDocument`: `data(ofType:)`, edited state,
+      File → Save, the close and quit question, save errors, dimmed for
+      files with bad bytes. *(11.6, 11.7, 11.10, 11.12)*
+- [ ] **8.4** The editor and toggle: View → Edit Mode (Cmd+/), plain
+      `NSTextView` made on first use, substitutions off, preview renders
+      the unsaved text; Edit menu gains Undo, Redo, Cut, Paste. *(11.1–11.5)*
+- [ ] **8.5** Find and zoom in edit mode; keyboard and VoiceOver.
+      *(6.6, 6.7, 11.9, 11.13)*
+- [ ] **8.6** Outside changes while editing: reload when clean, Keep My
+      Edits / Reload from Disk when not, ignore our own saves. *(11.11)*
+- [ ] **8.7** Measure: open times unchanged, 5 MB file in edit mode, app
+      size, offline check; add section 11 to `checklist.md` and run it.
+      Version 1.1.0, tag v1.1 and push. *(8.1–8.4, 9.1, 11.2, 11.14)*
+
+**Done when:** spec section 11 passes and every v1 criterion still does.
+
 ---
 
 ## After v1 (not planned)

@@ -2,6 +2,83 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 8.1, edit mode accepted; sandbox save spike
+
+**Done**
+- The owner accepted ADR 0008. Updated to match: vision.md ("a viewer
+  first", "No rich editing"), CLAUDE.md (the read-only rule is now
+  "writes only on save"), the statuses of ADR 0002 and 0005, and
+  architecture.md's ADR table.
+- Entitlement is now `files.user-selected.read-write`. Trap found: the
+  project's build setting `ENABLE_USER_SELECTED_FILES = readonly` adds
+  its own read-only entitlement, so the first build had both. The
+  setting is now `readwrite` too (both configurations); the signed
+  release has only read-write.
+- Spike, with temporary code (an env variable made `MarkdownDocument`
+  append a line and save twice through `NSDocument`), on a release build.
+  Removed afterwards; `MarkdownDocument.swift` is unchanged.
+  - **Saving works in the sandbox** for a file opened from Finder
+    (`open`): both saves succeeded in about 15 ms. NSDocument saves
+    safely: the file got a new inode (written elsewhere, then swapped in).
+  - **Saving works for a file opened through a folder grant.** The owner
+    granted a test folder in the picker and opened a linked file; both
+    spike saves landed in it.
+  - **Old read-only grants** aren't an issue in practice: there were none
+    stored ("restored 0 of 0"), and an ad-hoc rebuild drops grants anyway
+    (note in `FolderAccess`), so after updating to v1.1 every grant is made
+    again under the read-write entitlement. ADR 0008's fallback (the save
+    error alert, spec 11.12) still covers it.
+  - **The watcher survives our own saves.** After two safe saves, an
+    outside append, an outside rename-save and another append each
+    reloaded the file (spec 5.3).
+  - **Our own save comes back as a reload** about 95 ms later (same
+    bytes). Harmless today, but 8.6 must ignore it, as ADR 0008 point 7
+    plans, or it would reset the editor.
+- Checked after removing the spike: 264 core tests pass; release build
+  succeeds with no warnings; `check-offline.zsh` passes; app 4,808 KB
+  (`du -sk`).
+
+**Open**
+- Possible v1 bug (spec 4.2), seen during the spike: the owner clicked a
+  link to a file in an ungranted folder, the picker appeared, they
+  granted the folder, and the linked file didn't open. Clicking the link
+  again opened it. `withAccess(to:then:)` in `DocumentWindowController`
+  is meant to open it after the grant. Not looked into yet.
+- `/usr/bin/log`, not `log`: in zsh, `log` is a builtin.
+
+**Next**
+- 8.2: `UTF8Text.encode` with round-trip tests.
+
+## 2026-11-05: v1.1 planned, edit mode (ADR 0008 proposed)
+
+**Done**
+- Interviewed the owner about an edit mode toggle for v1.1. Their
+  choices: swap the editor in place of the preview (no split view);
+  save only on ⌘S, with the standard unsaved-changes question (no
+  autosave); View → Edit Mode on ⌘/ (⌘E and ⇧⌘E are taken), no toolbar;
+  ask Keep My Edits / Reload from Disk when the file changes on disk
+  under unsaved edits; the preview shows the unsaved text; a plain
+  monospaced editor with no colouring; editing dimmed for files with bad
+  bytes or UTF-16; every window opens in preview.
+- ADR 0008 written, status Proposed. It goes against the vision's "No
+  editing" non-goal, CLAUDE.md's read-only rule, ADR 0002's read-only
+  document and ADR 0005's read-only entitlement, so those change only
+  once the owner accepts it (roadmap 8.1).
+- spec.md: new section 11 (14 criteria, marked v1.1); 6.6, 6.7 and 9.2
+  mention edit mode; "Out of scope" drops editing and lists what rich
+  editing stays out.
+- roadmap.md: new milestone M8 (tasks 8.1–8.7). architecture.md lists
+  ADR 0008. No code changed.
+
+**Open**
+- ADR 0008 needs the owner's OK.
+- To check in 8.1: saving inside the sandbox, files opened through
+  folder grants made under the read-only entitlement, and the watcher
+  after our own save.
+
+**Next**
+- 8.1, once ADR 0008 is accepted.
+
 ## 2026-11-05: Roadmap 7.8, v1.0
 
 **Done**

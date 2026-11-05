@@ -21,7 +21,8 @@ decision.
 
 - A native macOS desktop app for macOS 15 Sequoia and later, built with Apple's SDKs and system APIs. The
   only package it uses is Apple's own `swift-markdown` (see Non-goals).
-- A **viewer**, not an editor.
+- A **viewer** first. Since v1.1 it has a plain edit mode for small fixes
+  (ADR 0008), but it's not an editor app.
 - Fully offline: it never touches the network.
 
 ## What success looks like
@@ -66,7 +67,10 @@ Concretely, v1 is successful when:
   (and the Apple-maintained `swift-cmark` it builds on), added through Swift
   Package Manager. It parses full GitHub-flavored Markdown, which the
   built-in system APIs can't, and Apple maintains it.
-- **No editing.** Opening the file in my real editor is one click away.
+- **No rich editing.** v1.1 adds a plain-text edit mode, swapped in place
+  of the preview and saved only on ⌘S (ADR 0008). No side-by-side view,
+  colouring, autosave or new files: for real writing, opening the file in
+  my editor is one click away.
 - **No network:** no remote images, no update checks, no telemetry, no sync.
 - **No export** (PDF, HTML) in v1. Print from the system menu is acceptable
   if it comes free.

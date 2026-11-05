@@ -1,6 +1,7 @@
 # Spec
 
-What mdview v1 does, and how we know each part works. See
+What mdview v1 does, plus the edit mode planned for v1.1 (section 11),
+and how we know each part works. See
 [vision.md](vision.md) for why. How it's built belongs in
 [architecture.md](architecture.md).
 
@@ -99,8 +100,8 @@ parsed with Apple's `swift-markdown`.
 | 6.3 | Text uses the system font at a comfortable reading size (16 px, as on GitHub), with a maximum line width (about 80 characters) centred in wide windows. A new window is wide enough for the full column. |
 | 6.4 | The app follows the system **light/dark** setting and switches live when it changes, including code colours. |
 | 6.5 | Text can be selected and copied (Cmd+C) as plain text. |
-| 6.6 | **Edit → Find** (Cmd+F, Cmd+G) searches within the document using the standard find bar. |
-| 6.7 | **View → Zoom In / Zoom Out / Actual Size** (Cmd+=, Cmd+−, Cmd+0) change the text size for that window. |
+| 6.6 | **Edit → Find** (Cmd+F, Cmd+G) searches within the document using the standard find bar. In edit mode it searches the source (spec 11.9). |
+| 6.7 | **View → Zoom In / Zoom Out / Actual Size** (Cmd+=, Cmd+−, Cmd+0) change the text size for that window, in the preview and in edit mode. |
 | 6.8 | **File → Print…** (Cmd+P) prints the rendered document using the standard print panel (which also offers "Save as PDF"). |
 | 6.9 | **File → Reveal in Finder** (Cmd+Shift+R) shows the file in Finder. |
 | 6.10 | **File → Open in Editor** (Cmd+Shift+E) opens the current file in a chosen editor app. The first time, a standard app picker (starting in Applications) asks which editor to use. After that, the choice is remembered and the file opens there directly. |
@@ -143,7 +144,7 @@ using the [test files](#test-files).
 | AC | Criterion |
 |---|---|
 | 9.1 | The app makes **zero network requests**: a network monitor shows no traffic from mdview or its WebKit processes during a test session that opens every fixture file, including ones with remote images. (The app has the outgoing-network entitlement only because WebKit needs it to run in the sandbox, ADR 0006; it has no incoming-network entitlement.) |
-| 9.2 | The app runs in the macOS App Sandbox, with read access only to files the user opens and folders the user has granted (see 9.5). |
+| 9.2 | The app runs in the macOS App Sandbox, with read access only to files the user opens and folders the user has granted (see 9.5). It writes only to an open file, and only when the user saves it in edit mode (section 11, ADR 0008). |
 | 9.3 | No telemetry, analytics, crash uploading or update checks. |
 | 9.4 | The only package dependency is Apple's `swift-markdown` (and its `swift-cmark`). |
 | 9.5 | **Folder access.** When a document refers to local images or files that the app can't read yet, the window shows a slim bar: "Allow MDView to show images and linked files in this folder." Clicking it opens the standard folder picker, pointed at the document's folder; the user can choose it or any folder above it. After granting, images and links load at once, without reopening the file. |
@@ -161,13 +162,40 @@ using the [test files](#test-files).
 | 10.4 | **Any Markdown input**, however malformed, renders something and never crashes or hangs the app. |
 | 10.5 | Opening a **non-Markdown file** that's been forced into mdview (Open With → Other) shows its contents as plain text. |
 
+## 11. Edit mode (v1.1)
+
+A plain-text editor for the open file, swapped in place of the preview
+([ADR 0008](adr/0008-edit-mode.md)). MDView stays a viewer first: nothing
+is written unless the user saves.
+
+| AC | Criterion |
+|---|---|
+| 11.1 | **View → Edit Mode** (Cmd+/) swaps the preview for an editor showing the file's full source, front matter included, in the same window. The menu item is checked while in edit mode; choosing it again swaps back to the preview. |
+| 11.2 | Every window opens in preview, including windows restored on relaunch (6.13). Opening a file is no slower than in v1 (8.1, 8.2): the editor is only created when a window first switches to it. |
+| 11.3 | The editor uses the system monospaced font, follows light/dark mode, and wraps long lines to the window width. There is no colouring and no automatic changes to what's typed: no smart quotes or dashes, no automatic links, no spelling corrections. |
+| 11.4 | Undo and Redo (Cmd+Z, Shift+Cmd+Z), Cut, Copy, Paste and Select All work in the editor, from the Edit menu and the keyboard. Undo history survives switching to the preview and back. |
+| 11.5 | Switching back to the preview renders the editor's current text, saved or not, in under 0.2 s for a typical file. |
+| 11.6 | Unsaved edits show the standard edited marker in the window's title bar and close button. **File → Save** (Cmd+S) writes the file. Nothing else writes it: no autosave, no Versions, no Save As. |
+| 11.7 | Closing a window or quitting with unsaved edits asks the standard Save / Don't Save / Cancel question. |
+| 11.8 | A saved file is UTF-8, keeps its byte order mark if it had one, and keeps its line endings. Saving without changes writes the same bytes the file had. |
+| 11.9 | In edit mode, **Edit → Find** (Cmd+F, Cmd+G) searches the source with the standard find bar. |
+| 11.10 | Edit Mode is dimmed for a file that didn't decode cleanly as UTF-8 (the notice in 10.2, including UTF-16 files), so its original bytes can't be overwritten. |
+| 11.11 | When the file changes on disk and there are no unsaved edits, it reloads as in section 5, in either mode. With unsaved edits, an alert says the file was changed by another app and offers **Keep My Edits** or **Reload from Disk**. MDView's own saves never cause a reload or this alert, and the file keeps being watched after them (5.3). |
+| 11.12 | If saving fails (the file is locked, its folder can't be written, the file is gone), a standard alert names the file and the reason, and the edits stay in the window. |
+| 11.13 | The editor is reachable by keyboard and readable with VoiceOver, as a standard text view. |
+| 11.14 | A 5 MB file (8.3) can be switched to edit mode, scrolled and typed in without a spinning cursor. The app is still under 5 MB (8.4). |
+
 ---
 
 ## Out of scope for v1
 
-Taken from the vision's non-goals: editing, export beyond Print/PDF, remote
+Taken from the vision's non-goals: export beyond Print/PDF, remote
 images, plugins, themes, a settings screen, Mermaid diagrams, math, and any
 network access.
+
+**Rich editing** stays out in v1.1 (ADR 0008): no side-by-side source and
+preview, no colouring in the editor, no autosave or Versions, no Save As,
+no new files, and no ticking task-list boxes in the preview (2.5).
 
 **Footnotes** are also out: `swift-markdown` 0.9.0 doesn't support them
 (checked in roadmap 0.2), so `[^1]` and its definition show as plain text.

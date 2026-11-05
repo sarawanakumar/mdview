@@ -2,10 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- ADR 0005: sandboxed, reads only files the user opens or grants. -->
+	<!-- ADR 0005, 0008: sandboxed; reads files the user opens or grants, and
+	     writes an open file only when the user saves it in edit mode. -->
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
-	<key>com.apple.security.files.user-selected.read-only</key>
+	<key>com.apple.security.files.user-selected.read-write</key>
 	<true/>
 	<!-- ADR 0005: remember folders the user allowed, across launches. -->
 	<key>com.apple.security.files.bookmarks.app-scope</key>

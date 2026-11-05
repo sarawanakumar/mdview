@@ -1,8 +1,8 @@
 # mdview
 
-An ultra-lightweight, read-only Markdown viewer for macOS 15+. Native
+An ultra-lightweight Markdown viewer for macOS 15+. Native
 AppKit, fully offline, open source, built primarily for its owner's daily
-use. Speed and simplicity beat features.
+use. Since v1.1 it has a plain edit mode (ADR 0008). Speed and simplicity beat features.
 
 ## Start of every session
 
@@ -33,7 +33,8 @@ criteria pass. Record measurements (timings, app size) with the numbers.
   load. No incoming-network entitlement.
 - **No page JavaScript.** Only the app's own small scripts may run in the
   web view.
-- **Read-only.** mdview never writes to the user's Markdown files.
+- **Writes only on save.** mdview writes a user's file only when they
+  press ⌘S in edit mode (ADR 0008): no autosave, no other writes.
 - **Stay in scope.** Work on the current roadmap task. Anything listed as a
   non-goal in `vision.md` or "out of scope" in `spec.md` needs the owner's
   OK first.

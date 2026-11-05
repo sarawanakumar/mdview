@@ -1,7 +1,8 @@
 # 0005. App Sandbox, custom URL scheme and folder access grants
 
 - **Status:** Accepted; point 1 changed by
-  [ADR 0006](0006-outgoing-network-entitlement-for-webkit.md)
+  [ADR 0006](0006-outgoing-network-entitlement-for-webkit.md) (network) and
+  [ADR 0008](0008-edit-mode.md) (user-selected files are read-write)
 - **Date:** 2026-11-04
 
 ## Context

@@ -1,6 +1,7 @@
 # 0002. AppKit app built on NSDocument
 
-- **Status:** Accepted
+- **Status:** Accepted; read-only document changed by
+  [ADR 0008](0008-edit-mode.md) (edit mode, saved on ⌘S)
 - **Date:** 2026-11-04
 
 ## Context
