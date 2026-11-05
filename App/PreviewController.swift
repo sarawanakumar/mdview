@@ -280,8 +280,15 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         guard navigation == pageNavigation else { return }
         pageNavigation = nil
+        let isFirstShow = !hasShownPage
         hasShownPage = true
         webView.isHidden = false
+        // Focus the page when it first appears, so arrow keys, Space and
+        // Tab work straight away (spec 6.14), unless something else (the
+        // find field) already has focus.
+        if isFirstShow, let window = webView.window, window.firstResponder === window {
+            window.makeFirstResponder(webView)
+        }
         Signposts.signposter.emitEvent("documentVisible")
         if let fragment = pendingFragment {
             pendingFragment = nil

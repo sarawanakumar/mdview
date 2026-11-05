@@ -68,6 +68,8 @@ enum PreviewConfiguration {
     private static func make() async throws -> WKWebViewConfiguration {
         let config = WKWebViewConfiguration()
         config.defaultWebpagePreferences.allowsContentJavaScript = false
+        // Tab and Shift-Tab move through links; Return follows one (spec 6.14).
+        config.preferences.tabFocusesLinks = true
         config.websiteDataStore = .nonPersistent()
         config.setURLSchemeHandler(assets, forURLScheme: scheme)
 

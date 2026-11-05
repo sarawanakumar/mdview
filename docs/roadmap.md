@@ -119,7 +119,7 @@ section 2 passes.
 
 **Done when:** spec section 5 passes with each tested editor.
 
-## M5. Window features
+## M5. Window features (done 2026-11-05; VoiceOver and some menus to check by hand)
 
 - [x] **5.1** Find bar on `WKWebView.find`. *(6.6)*
 - [x] **5.2** Zoom in, zoom out, actual size. *(6.7)*
@@ -129,7 +129,7 @@ section 2 passes.
       *(6.10–6.12)*
 - [x] **5.6** Check tabs, title bar path menu, state restoration and text
       selection all work. *(6.1, 6.2, 6.5, 6.13)*
-- [ ] **5.7** Keyboard and VoiceOver pass. *(6.14)*
+- [x] **5.7** Keyboard and VoiceOver pass. *(6.14)*
 
 **Done when:** spec section 6 passes.
 

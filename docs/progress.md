@@ -2,6 +2,48 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 5.7, keyboard and VoiceOver; M5 done
+
+**Found and fixed**
+- When a file opened, keyboard focus was on the window, not the page, so
+  arrows and Space did nothing until you clicked. The page now takes focus
+  when it first appears, unless something else (the find field) has it.
+- Tab didn't move through links. Turned on WebKit's `tabFocusesLinks`.
+
+**Checked** (temporary hook sending real key events, removed)
+- Focus on open: the web view. Space: scrolled 0 → 648 px with no click.
+- links.md: Tab, Tab, Tab moved through the first three links in order;
+  Shift-Tab, Shift-Tab went back; Return on "Jump to the end" scrolled to
+  the end (0 → 779 px).
+- Folder bar buttons are focusable.
+- An earlier run of the Return check on elements.md followed its first
+  link, so it most likely opened https://example.com in the default
+  browser (harmless; the redo used a same-page link).
+- 197 tests pass; Debug and Release build with no warnings.
+- **Timing:** warm opens measured slower than in 3.5 (median 173–195 ms,
+  slowest up to 217 ms, against 131 ms then). Turning each of the two
+  changes off made no difference, and builds of earlier commits made
+  today were as slow or slower (end of M3: 191 ms median, slowest 203;
+  task 5.1: 195 / 230; now: 173 / 183). So it's the machine, not this
+  change. Warm opens sit close to the 200 ms target (spec 8.2) in every
+  version; to look into in roadmap 7.2. Cold median ~470 ms.
+
+**Not checked automatically: VoiceOver itself.** WebKit builds the
+accessibility tree only when an assistive app connects, and reading it
+from outside needs Accessibility permission this shell doesn't have. The
+page uses the HTML VoiceOver relies on (headings, links, image alt text
+or `role="img"` placeholders, checkboxes, table headers). To check:
+turn on VoiceOver (⌘F5), open `fixtures/elements.md`, use the rotor
+(VO-U) to list headings and links; images should read their alt text and
+task items "checkbox, checked/unchecked".
+
+**M5 is done.** Still to try by hand: VoiceOver as above, the Window
+menu's tab commands, ⌘-click on the title, the print panel, and picking
+an editor in the app picker.
+
+**Next**
+- Roadmap M6, task 6.1: the code highlighter's scanner.
+
 ## 2026-11-05: Roadmap 5.6, windows, tabs, copying, restoration
 
 No code changes were needed; this was checking. (Temporary hooks,
