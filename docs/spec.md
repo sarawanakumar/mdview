@@ -170,7 +170,7 @@ is written unless the user saves.
 
 | AC | Criterion |
 |---|---|
-| 11.1 | **View → Edit Mode** (Cmd+/) swaps the preview for an editor showing the file's full source, front matter included, in the same window. The menu item is checked while in edit mode; choosing it again swaps back to the preview. |
+| 11.1 | **View → Edit Mode** (Cmd+/) swaps the preview for an editor showing the file's full source, front matter included, in the same window. The menu item is checked while in edit mode; choosing it again swaps back to the preview. **File → Print…** prints the preview, so it's dimmed in edit mode. |
 | 11.2 | Every window opens in preview, including windows restored on relaunch (6.13). Opening a file is no slower than in v1 (8.1, 8.2): the editor is only created when a window first switches to it. |
 | 11.3 | The editor uses the system monospaced font, follows light/dark mode, and wraps long lines to the window width. There is no colouring and no automatic changes to what's typed: no smart quotes or dashes, no automatic links, no spelling corrections. |
 | 11.4 | Undo and Redo (Cmd+Z, Shift+Cmd+Z), Cut, Copy, Paste and Select All work in the editor, from the Edit menu and the keyboard. Undo history survives switching to the preview and back. |

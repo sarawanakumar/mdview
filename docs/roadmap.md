@@ -192,7 +192,7 @@ ADR 0008 accepted 2026-11-05.
 - [x] **8.3** Editable `MarkdownDocument`: `data(ofType:)`, edited state,
       File → Save, the close and quit question, save errors, dimmed for
       files with bad bytes. *(11.6, 11.7, 11.10, 11.12)*
-- [ ] **8.4** The editor and toggle: View → Edit Mode (Cmd+/), plain
+- [x] **8.4** The editor and toggle: View → Edit Mode (Cmd+/), plain
       `NSTextView` made on first use, substitutions off, preview renders
       the unsaved text; Edit menu gains Undo, Redo, Cut, Paste. Check Edit
       Mode is dimmed for `latin1.md` and `utf16.md` (`canEdit`, 8.3).
@@ -200,9 +200,10 @@ ADR 0008 accepted 2026-11-05.
 - [ ] **8.5** Find and zoom in edit mode; keyboard and VoiceOver.
       *(6.6, 6.7, 11.9, 11.13)*
 - [ ] **8.6** Outside changes while editing: reload when clean, Keep My
-      Edits / Reload from Disk when not, ignore our own saves. *(11.11)*
+      Edits / Reload from Disk when not, ignore our own saves (today the
+      reload after our own save clears the undo history). *(11.11, 11.4)*
 - [ ] **8.7** Measure: open times unchanged, 5 MB file in edit mode, app
-      size, offline check; add section 11 to `checklist.md` and run it.
+      size, offline check, preview after editing under 0.2 s (11.5); add section 11 to `checklist.md` and run it.
       Version 1.1.0, tag v1.1 and push. *(8.1–8.4, 9.1, 11.2, 11.14)*
 
 **Done when:** spec section 11 passes and every v1 criterion still does.

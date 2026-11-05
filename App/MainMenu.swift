@@ -75,7 +75,14 @@ enum MainMenu {
 
     private static func editMenu() -> NSMenu {
         let menu = NSMenu(title: "Edit")
+        // Undo, Redo, Cut and Paste only do something in edit mode (spec 11.4);
+        // AppKit dims them in the preview.
+        menu.addItem(item("Undo", Selector(("undo:")), "z"))
+        menu.addItem(item("Redo", Selector(("redo:")), "z", [.command, .shift]))
+        menu.addItem(.separator())
+        menu.addItem(item("Cut", #selector(NSText.cut(_:)), "x"))
         menu.addItem(item("Copy", #selector(NSText.copy(_:)), "c"))
+        menu.addItem(item("Paste", #selector(NSText.paste(_:)), "v"))
         menu.addItem(item("Select All", #selector(NSText.selectAll(_:)), "a"))
         menu.addItem(.separator())
 
@@ -92,6 +99,9 @@ enum MainMenu {
     /// Spec 6.7, per window; handled by the document window.
     private static func viewMenu() -> NSMenu {
         let menu = NSMenu(title: "View")
+        // Spec 11.1, ADR 0008; checked while editing. ⌘E is taken by Find.
+        menu.addItem(item("Edit Mode", #selector(DocumentWindowController.toggleEditMode(_:)), "/"))
+        menu.addItem(.separator())
         menu.addItem(item("Actual Size", #selector(DocumentWindowController.actualSize(_:)), "0"))
         menu.addItem(item("Zoom In", #selector(DocumentWindowController.zoomIn(_:)), "="))
         // ⌘+ too (Shift-= on most keyboards), without a second visible item.

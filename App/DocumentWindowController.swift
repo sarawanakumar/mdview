@@ -200,6 +200,7 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
     /// (spec 5.1, 5.4).
     func documentDidChangeOnDisk() {
         removeMissingNotice()
+        if let document = document as? MarkdownDocument { editor?.setText(document.text) }
         preview.reload()
     }
 
@@ -225,6 +226,51 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
     private func removeMissingNotice() {
         missingNotice?.removeFromSuperview()
         missingNotice = nil
+    }
+
+    // MARK: Edit mode (spec 11.1–11.5, ADR 0008)
+
+    /// Made on the first switch to edit mode, then kept (with its undo
+    /// history) for the window's life.
+    private var editor: SourceEditor?
+    private(set) var isEditing = false
+    /// The editor changed the text since the preview last rendered it.
+    private var previewIsStale = false
+
+    /// View ▸ Edit Mode: swaps the preview for the source editor, or back.
+    @objc func toggleEditMode(_ sender: Any?) {
+        guard let document = document as? MarkdownDocument else { return }
+        if isEditing {
+            isEditing = false
+            editor?.view.isHidden = true
+            preview.view.isHidden = false
+            // Spec 11.5: the preview shows the editor's text, saved or not.
+            if previewIsStale {
+                previewIsStale = false
+                preview.reload()
+            }
+            window?.makeFirstResponder(preview.view.subviews.first)
+        } else {
+            guard document.canEdit else { return }  // spec 11.10
+            hideFindBar()
+            let editor = editor ?? makeEditor(for: document)
+            isEditing = true
+            preview.view.isHidden = true
+            editor.view.isHidden = false
+            editor.focus(in: window)
+        }
+    }
+
+    private func makeEditor(for document: MarkdownDocument) -> SourceEditor {
+        let editor = SourceEditor(text: document.text)
+        editor.onChange = { [weak self, weak document] text in
+            document?.updateText(text)
+            self?.previewIsStale = true
+        }
+        add(editor.view)
+        editor.view.setContentHuggingPriority(.defaultLow, for: .vertical)
+        self.editor = editor
+        return editor
     }
 
     // MARK: Find (spec 6.6)
@@ -322,6 +368,15 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
     func validateMenuItem(_ item: NSMenuItem) -> Bool {
         let fileIsThere = missingNotice == nil && documentFile != nil
         switch item.action {
+        case #selector(toggleEditMode(_:)):
+            item.state = isEditing ? .on : .off
+            return isEditing || (document as? MarkdownDocument)?.canEdit == true
+        case #selector(showFindBar(_:)), #selector(findNextMatch(_:)), #selector(findPreviousMatch(_:)),
+             #selector(useSelectionForFind(_:)):
+            return !isEditing  // find in the source comes in roadmap 8.5
+        case #selector(zoomIn(_:)) where isEditing, #selector(zoomOut(_:)) where isEditing,
+             #selector(actualSize(_:)) where isEditing:
+            return false  // editor zoom comes in roadmap 8.5
         case #selector(zoomIn(_:)):
             return ZoomLevels.zoomedIn(from: preview.zoom) != nil
         case #selector(zoomOut(_:)):

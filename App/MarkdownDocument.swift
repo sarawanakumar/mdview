@@ -111,6 +111,10 @@ final class MarkdownDocument: NSDocument {
     /// the preview never touches the file.
     override func validateUserInterfaceItem(_ item: any NSValidatedUserInterfaceItem) -> Bool {
         if item.action == #selector(save(_:)) { return isDocumentEdited && canEdit }
+        // Print prints the rendered preview, so only from the preview.
+        if item.action == #selector(printDocument(_:)) {
+            return !windowControllers.contains { ($0 as? DocumentWindowController)?.isEditing == true }
+        }
         return super.validateUserInterfaceItem(item)
     }
 

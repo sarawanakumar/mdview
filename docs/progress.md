@@ -2,6 +2,56 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 8.4, the editor and the Edit Mode toggle
+
+**Done**
+- Committed 8.3 (`244aeb4`).
+- `App/SourceEditor.swift`: a plain `NSTextView` in a scroll view.
+  System monospaced font at the system size, `textColor` on
+  `textBackgroundColor` (follows light and dark), lines wrap to the
+  window, 16 pt inset. Not rich text. Every automatic change is off:
+  quotes, dashes, text replacement, spelling correction, link and data
+  detection, completion, spell and grammar checking. Accessibility label
+  "Markdown source".
+- `DocumentWindowController`: View ▸ Edit Mode ⌘/ (checked while
+  editing). The editor is made on the first switch and then kept, so the
+  window keeps its undo history. Edits go straight to the document. The
+  preview re-renders on the way back only if the text changed. Edit Mode
+  is dimmed when `canEdit` is false. A reload from disk updates the
+  editor too (cursor kept as close as possible; nothing happens if the
+  text is the same).
+- Edit menu: Undo ⌘Z, Redo ⇧⌘Z, Cut, Paste added around Copy and Select
+  All. Print is dimmed in edit mode (spec 11.1 now says so).
+- Until 8.5, Find and Zoom are dimmed in edit mode, so they can't act on
+  the hidden preview.
+- Checked on a release build with System Events (small test file with
+  front matter):
+  - The editor shows the full source, front matter included; the menu
+    item gets its check mark; ⌘/ toggles both ways.
+  - Typed `He said "hi" -- ok... (c) teh`: saved exactly so, with no
+    curly quotes, dashes, ellipsis, © or correction.
+  - Edited marker on after typing. Undo ("Undo Typing") back to the saved
+    text clears it; Redo sets it again.
+  - The preview after switching back shows the unsaved words (found in
+    the web view's accessibility tree).
+  - Undo still works after going to the preview and back.
+  - ⌘S saves the typed text and clears the marker.
+  - In the preview, Cut, Paste and Undo are dimmed; in edit mode, Print.
+  - `latin1.md`: Edit Mode dimmed, and ⌘/ does nothing.
+- Release build, no warnings. Core unchanged (271 tests passed in 8.3).
+
+**Open**
+- After a save, Undo is empty: our own save comes back from the watcher
+  as a reload (`revert`), which clears the undo history. Ignoring our own
+  saves is already 8.6's job; added the undo note to it.
+- Not measured yet: preview after editing under 0.2 s (11.5) and the
+  5 MB file in edit mode (11.14). Both are in 8.7.
+- In System Events, the Undo item is renamed ("Undo Typing"), so scripts
+  should click it by position.
+
+**Next**
+- 8.5: Find and Zoom in edit mode; keyboard and VoiceOver.
+
 ## 2026-11-05: Roadmap 8.3, saving the document
 
 **Done**

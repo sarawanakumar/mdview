@@ -41,6 +41,7 @@ App/                        the macOS app target (AppKit)
   MarkdownDocument          NSDocument subclass: reads the file; saves it only on File ▸ Save (ADR 0008)
   DocumentWindowController  one window per file; owns the preview and find bar
   FindBar                   the find bar (spec 6.6)
+  SourceEditor              edit mode's plain NSTextView, made on first use (spec 11, ADR 0008)
   PreviewConfiguration      the shared locked-down web view setup (block list, JS off),
                             plus the one spare web view
   Signposts                 timing points for Instruments
@@ -227,6 +228,15 @@ nothing changed or the file had bad bytes (`canEdit`), its own alert when
 the file is gone, and `prepareSavePanel` returning false so no save panel
 ever opens. While there are unsaved edits, changes on disk aren't reloaded
 (roadmap 8.6 adds the question).
+
+**Edit mode** (spec 11, ADR 0008). View ▸ Edit Mode ⌘/ hides the preview and
+shows a `SourceEditor` in the same place in the window's stack; the editor
+is made the first time and then kept, so its undo history lasts as long as
+the window. Each change goes straight to `MarkdownDocument.updateText`, so
+Save and the preview always see the editor's text; the preview re-renders
+on the way back only if something changed. The text view uses the window's
+undo manager, which is the document's, so `NSDocument` keeps the edited
+marker in step with undo and redo without any code of ours.
 
 | Spec | How |
 |---|---|
