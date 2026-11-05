@@ -243,12 +243,16 @@ cost on a cold launch.
   process is already running. A document takes the spare; half a second
   later a new spare is made, so the next file opens fast too. Never more
   than one spare: a waiting spare costs about 9 MB (roadmap 1.7).
+  The block list lookup starts there too, with WebKit's callback API: a
+  task wouldn't run until AppKit finishes launching, about 85 ms later
+  (roadmap 7.2).
 - **Signposts** (`App/Signposts.swift`, points of interest): appLaunched,
   launchFinished, previewReady, spareReady, documentRead,
   documentRendered, documentVisible. Readable in Instruments or with
   `log show --signpost`.
 - **Do the work off the main thread.** Reading, parsing and HTML building
   run in the background; only the final `loadHTMLString` touches the UI.
+  Rendering starts before the window is built, so the two overlap.
   Markdown is rendered on its own thread with a 64 MB stack
   (`HTMLRenderer.renderSafely`): swift-markdown parses nesting by
   recursion and overflows the 512 KB stack Swift tasks run on at about

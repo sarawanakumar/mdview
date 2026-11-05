@@ -23,6 +23,7 @@ enum PreviewConfiguration {
     @discardableResult
     static func shared() -> Task<WKWebViewConfiguration, any Error> {
         if let loading { return loading }
+        startLookingUpBlockList()
         let task = Task {
             let config = try await make()
             Signposts.signposter.emitEvent("previewReady")
@@ -73,27 +74,62 @@ enum PreviewConfiguration {
         config.websiteDataStore = .nonPersistent()
         config.setURLSchemeHandler(assets, forURLScheme: scheme)
 
-        guard let store = WKContentRuleListStore.default() else {
-            throw PreviewError.blockListUnavailable
-        }
-        // Any failure here means no page is shown (spec 9.8), with mdview's
-        // own message rather than WebKit's.
-        let rules: WKContentRuleList?
-        do {
-            if let cached = try? await store.contentRuleList(forIdentifier: PageSecurity.blockListID) {
-                rules = cached
-            } else {
-                rules = try await store.compileContentRuleList(
-                    forIdentifier: PageSecurity.blockListID, encodedContentRuleList: PageSecurity.blockList
-                )
-            }
-        } catch {
-            log.error("block list unavailable: \(error.localizedDescription, privacy: .public)")
-            throw PreviewError.blockListUnavailable
-        }
-        guard let rules else { throw PreviewError.blockListUnavailable }
+        let rules = try await blockList()
         config.userContentController.add(rules)
         return config
+    }
+}
+
+extension PreviewConfiguration {
+    /// The block list's lookup starts as soon as launch asks for the
+    /// configuration, with WebKit's callback API rather than in a task. A
+    /// task wouldn't start until AppKit finishes launching, about 85 ms
+    /// later; this way the answer is usually waiting by then (roadmap 7.2).
+    private static var blockListResult: Result<WKContentRuleList, any Error>?
+    private static var blockListWaiters: [CheckedContinuation<WKContentRuleList, any Error>] = []
+
+    fileprivate static func startLookingUpBlockList() {
+        guard let store = WKContentRuleListStore.default() else {
+            finishBlockList(nil, error: nil)
+            return
+        }
+        store.lookUpContentRuleList(forIdentifier: PageSecurity.blockListID) { cached, _ in
+            Task { @MainActor in
+                if let cached {
+                    finishBlockList(cached, error: nil)
+                    return
+                }
+                // Only on first launch, or after WebKit drops its cache.
+                do {
+                    let compiled = try await store.compileContentRuleList(
+                        forIdentifier: PageSecurity.blockListID, encodedContentRuleList: PageSecurity.blockList
+                    )
+                    finishBlockList(compiled, error: nil)
+                } catch {
+                    finishBlockList(nil, error: error)
+                }
+            }
+        }
+    }
+
+    /// Any failure means no page is shown (spec 9.8), with mdview's own
+    /// message rather than WebKit's.
+    private static func finishBlockList(_ rules: WKContentRuleList?, error: (any Error)?) {
+        let result: Result<WKContentRuleList, any Error>
+        if let rules {
+            result = .success(rules)
+        } else {
+            log.error("block list unavailable: \(error?.localizedDescription ?? "no store", privacy: .public)")
+            result = .failure(PreviewError.blockListUnavailable)
+        }
+        blockListResult = result
+        for waiter in blockListWaiters { waiter.resume(with: result) }
+        blockListWaiters = []
+    }
+
+    fileprivate static func blockList() async throws -> WKContentRuleList {
+        if let blockListResult { return try blockListResult.get() }
+        return try await withCheckedThrowingContinuation { blockListWaiters.append($0) }
     }
 }
 

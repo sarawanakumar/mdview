@@ -58,12 +58,17 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
         renderGeneration += 1
         let generation = renderGeneration
 
-        Task {
-            // Markdown goes through renderSafely: a large stack, and a plain
-            // text fallback for files nested too deeply to parse (spec 10.4).
-            let rendered = isMarkdown
+        // Rendering starts now, off the main thread, while the window is
+        // still being built (roadmap 7.2). Markdown goes through
+        // renderSafely: a large stack, and a plain text fallback for files
+        // nested too deeply to parse (spec 10.4).
+        let rendering = Task.detached(priority: .userInitiated) {
+            isMarkdown
                 ? await HTMLRenderer.renderSafely(markdown: text, locateImage: locateImage)
-                : RenderedPage(html: await Task.detached { HTMLRenderer.render(plainText: text) }.value, localReferences: [])
+                : RenderedPage(html: HTMLRenderer.render(plainText: text), localReferences: [])
+        }
+        Task {
+            let rendered = await rendering.value
             guard generation == renderGeneration else { return }  // a newer render is on its way
             Signposts.signposter.emitEvent("documentRendered")
             onFolderAccessNeeded?(fileURL.flatMap { Self.folderNeeded(for: rendered.localReferences, document: $0) })

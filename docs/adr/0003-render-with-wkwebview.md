@@ -42,7 +42,8 @@ Start the web view early at launch to hide WebKit's start-up cost.
   proven in the first spike; if it fails, this ADR is revisited, with the
   native text view as the fallback.
 - Memory is higher than a text view (WebKit's helper processes); the
-  100 MB limit in spec 8.5 must be checked.
+  100 MB limit in spec 8.5 must be checked. *(2026-11-05: the limit is
+  now 110 MB; see spec 8.5 and progress.md, roadmap 7.2.)*
 - *Spike results (roadmap 0.4, 0.6), 50 KB file, macOS 26.6: cold open
   median 359 ms, warm 172 ms; memory 86 MB across the app and its three
   WebKit processes. Both within target, memory with only ~14 MB to

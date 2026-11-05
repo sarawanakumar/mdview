@@ -135,7 +135,7 @@ using the [test files](#test-files).
 | 8.2 | **Warm open:** app already running, open a typical file → rendered text visible in **under 0.2 s**. |
 | 8.3 | **Large file:** a 5 MB Markdown file opens with text visible in under 2 s, and scrolling stays smooth (no spinning cursor). |
 | 8.4 | **Bundle size:** the built `.app` is **under 5 MB**. |
-| 8.5 | **Memory:** a single open typical file uses under 100 MB. |
+| 8.5 | **Memory:** a single open typical file uses under 110 MB, adding up mdview and its WebKit processes. (Raised from 100 MB in roadmap 7.2: about 70 MB is fixed WebKit and AppKit overhead, and the spare web view that keeps warm opens under 0.2 s costs 9 MB of the rest.) |
 | 8.6 | **Idle:** with files open and nothing changing, the app uses ~0% CPU. |
 
 ## 9. Offline, privacy and safety

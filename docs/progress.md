@@ -2,6 +2,67 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 7.2, measuring spec section 8 (in progress)
+
+**Done**
+- Cold-open timeline, using temporary signposts (since removed), median
+  of 6 runs, in ms after `open`:
+  - `main` starts at ~180. Everything links from the system's shared
+    cache, so there's nothing to trim there.
+  - `NSApplication.shared` takes ~55, and AppKit's own launch work
+    another ~85.
+  - Making a web view holds the main thread ~40.
+  - WebKit takes ~80 from `loadHTMLString` to `didFinish`.
+- Two changes on the open path:
+  - **The block list lookup starts in `applicationWillFinishLaunching`,
+    with WebKit's callback API.** The old `Task` didn't start until
+    AppKit had finished launching, ~85 ms later. Now the list is usually
+    ready before the file is read, and the spare exists by then too
+    (spareReady 358 against 395).
+  - **Rendering starts before the window is built,** in a detached task,
+    instead of after.
+
+  Neither changes the offline protection: no web view exists without
+  the block list, and a failure still shows mdview's own error
+  (spec 9.8).
+- Tried and dropped: `malloc_zone_pressure_relief` after a page shows.
+  The app process holds ~19 MB that's freed but still resident (a 9.9 MB
+  empty large region, plus fragmentation), and the call released none
+  of it.
+
+**Measurements** (release build; the load average was 4–7, at one
+point 13, from other apps)
+
+| Spec | Result | Target |
+|---|---|---|
+| 8.1 cold | 455 ms median (8 runs) in a quieter spell; 480–530 ms at load 4–7 | under 500 ms: borderline |
+| 8.2 warm | 148–198 ms median | under 200 ms: pass |
+| 8.3 large (5.0 MB) | 1,127–1,170 ms median | under 2 s: pass (scrolling not yet checked) |
+| 8.4 bundle | 4.72 MB (`du -sk` 4,720) | under 5 MB: pass |
+| 8.5 memory, typical.md | 103–106 MB | under 110 MB (was 100): pass |
+| 8.6 idle | 0 s of CPU time in 30 s, three files open, all 7 processes | ~0%: pass |
+
+- Cold-open runs that alternated with the committed build couldn't
+  separate the two: 529 against 542 ms, then 497 against 460 ms. The
+  machine's noise (±50 ms) is bigger than the gain. The timeline shows
+  the block list now arrives before the file, as intended.
+- Memory, typical.md (each process's footprint after 12 s, 3 runs):
+  app 29–41, page 30–49 (mostly graphics tiles), GPU 14–19, networking
+  4, spare 9 MB. Without the refilled spare it's **95 MB**, but warm
+  opens go from ~172 to ~200 ms (two rounds of 12, alternating). The
+  spare decides between 8.2 and 8.5. **The owner chose to keep the spare
+  and raise spec 8.5 to 110 MB,** so 8.5 now passes at 103–106 MB. ADR
+  0003, which mentions the old limit, has a dated note.
+
+**Open**
+- 8.3 smooth scrolling of the 5 MB file: a hand check.
+- 8.1 should be re-measured with the Mac quiet. Under the load seen
+  today it's within ±50 ms of the limit either way.
+
+**Next**
+- Finish 7.2: the scrolling hand check, and cold open re-measured on a
+  quiet Mac. Then 7.3 (privacy check).
+
 ## 2026-11-05: Roadmap 7.1, performance and edge fixtures, timing script
 
 **Done**

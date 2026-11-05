@@ -155,10 +155,9 @@ see colours sooner.*
 - [x] **7.1** Write `fixtures/typical.md`, `fixtures/large.md` and the
       `edge/` files; a timing script for double-click → first paint.
 - [ ] **7.2** Measure everything in spec section 8; fix anything that
-      misses. *(8.1–8.6)* Memory is over target (see progress.md,
-      2026-11-05): about 70 MB is fixed overhead before any content.
-      Options include dropping the refilled spare (−9 MB), trimming what
-      WebKit keeps per page, or revisiting the 100 MB target. Measure each process's
+      misses. *(8.1–8.6)* The memory target is now 110 MB, the owner's
+      choice over dropping the refilled spare (see progress.md,
+      2026-11-05). Measure each process's
       `phys_footprint` after at least 10 s (WebKit's GPU process has a
       start-up peak of ~135 MB) and add them up, several runs.
 - [ ] **7.3** Privacy check: network monitor during a test session, check

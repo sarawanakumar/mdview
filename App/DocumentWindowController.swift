@@ -21,6 +21,10 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
     private static var cascadePoint = NSPoint.zero
 
     init(document: MarkdownDocument) {
+        super.init(window: nil)
+        // Start rendering before building the window, so the two overlap.
+        preview.show(document)
+
         // Wide enough for the 80-character column plus its margins
         // (preview.css: 16 px text, 28 px padding each side).
         let window = NSWindow(
@@ -29,7 +33,7 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
             backing: .buffered,
             defer: false
         )
-        super.init(window: window)
+        self.window = window
 
         stack.orientation = .vertical
         stack.spacing = 0
@@ -52,7 +56,6 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
         NotificationCenter.default.addObserver(
             self, selector: #selector(folderAccessDidChange), name: FolderAccess.didChange, object: nil
         )
-        preview.show(document)
     }
 
     @available(*, unavailable)
