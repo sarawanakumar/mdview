@@ -47,7 +47,6 @@ App/                        the macOS app target (AppKit)
                             decides which may be shown and builds their URLs
   (links)                   PreviewController passes clicks to DocumentWindowController,
                             which carries out LinkRoute's decision (spec section 4)
-  FileWatcher               notices when the file changes on disk (spec section 5)
   EditorLauncher            "Open in Editor" and the remembered editor (spec 6.10–6.12)
   FolderAccess              stores and restores folder access grants (ADR 0005)
   mdview.entitlements       sandbox, user-selected read-only, app-scoped bookmarks,
@@ -66,6 +65,7 @@ Packages/MDViewCore/        local Swift package, no AppKit
   Files/FolderGrantList     which folders are granted (pure path rules, spec 9.6)
   Files/LocalReferences     resolves a page's local references; suggests a folder
   Files/LinkRoute           decides what a clicked link does (spec 4.1–4.4)
+  Files/FileWatcher         notices when a file changes on disk (spec section 5)
   Tests/                    unit tests, run with `swift test`
 fixtures/                   the test Markdown files listed in spec.md
 ```
@@ -177,11 +177,17 @@ and are routed the same way; no new web view is made.
 
 ## Automatic reload
 
-- `FileWatcher` uses a `DispatchSource` on the open file for write, delete
-  and rename events. Many editors save by writing a new file and renaming it
-  over the old one, so on delete/rename it waits briefly, then reopens the
-  path and watches the new file (spec 5.3).
-- Events are debounced (~50 ms) so one save causes one reload.
+- `FileWatcher` (MDViewCore, no AppKit, unit tested with real files) uses
+  a `DispatchSource` on the open file for write, extend, delete, rename,
+  revoke and link events. Many editors save by writing a new file and
+  renaming it over the old one, so on delete/rename it looks for a file at
+  the path again every 50 ms (up to 1 s) and watches that (spec 5.3). If
+  none appears it reports the file gone, then checks once a second for it
+  to come back (spec 5.4).
+- Events are debounced (50 ms) so one save causes one reload.
+- Each `MarkdownDocument` owns a watcher (started with its window, stopped
+  on close). A change re-reads the file with `revert(toContentsOf:)` and
+  tells its window to render again.
 - On reload, the new HTML body is swapped into the existing page with a
   small app-side script instead of reloading the page. That keeps the scroll
   position (spec 5.2) and is faster than a full load.

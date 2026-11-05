@@ -2,6 +2,39 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 4.1, watching files for changes
+
+**Done**
+- `MDViewCore/Files/FileWatcher` (no AppKit, so unit tested):
+  `DispatchSource` on the file for write/extend/delete/rename/revoke/link.
+  Bursts debounced to one `.changed` after 50 ms. After a delete or
+  rename it looks for a file at the path every 50 ms for up to 1 s
+  (save-by-replace), then reports `.disappeared` once and polls every
+  second until the file returns (`.changed`). Events on its own serial
+  queue; `stop()` guarantees no more events.
+- `MarkdownDocument` owns a watcher from its window opening until it
+  closes; on `.changed` it re-reads with `revert(toContentsOf:)` and the
+  window renders again. `.disappeared` is only logged for now (notice in
+  4.3). Scroll position isn't kept yet (4.2).
+
+**Checked**
+- 8 watcher tests with real files: in-place write reported < 500 ms; 10
+  quick writes → exactly one change; save-by-replace twice then in place
+  → three changes; three `.atomic` writes → three; delete → disappeared,
+  recreate → changed, then watched again; moved away and back; nothing
+  after `stop()`; starting on a missing file waits for it. Ran 4 times,
+  stable (8 s per run, mostly deliberate waits).
+- In the app (Release, file in `~/Library/Caches`): saved from outside 9
+  times. Window updated after **39–41 ms** (in place), **92–96 ms**
+  (rename over), **89–94 ms** (atomic replace); target < 500 ms (spec
+  5.1). Every save was seen, including repeated replaces (re-watching
+  works in the sandbox, spec 5.3), and each read had the new byte count.
+- 192 tests pass; Debug and Release build with no warnings.
+
+**Next**
+- Roadmap 4.2: keep the scroll position on reload; refresh changed
+  images.
+
 ## 2026-11-05: Roadmap 3.6, images and links test files; M3 tasks done
 
 **Done**

@@ -193,6 +193,11 @@ final class DocumentWindowController: NSWindowController {
         (document as? MarkdownDocument)?.fileURL?.resolvingSymlinksInPath()
     }
 
+    /// The file changed on disk and has been read again (spec 5.1).
+    func documentDidChangeOnDisk() {
+        preview.reload()
+    }
+
     /// A grant anywhere may cover what this window needs: render again.
     @objc private func folderAccessDidChange() {
         guard suggestedFolder != nil else { return }

@@ -109,7 +109,7 @@ section 2 passes.
 
 ## M4. Automatic reload
 
-- [ ] **4.1** `FileWatcher` with `DispatchSource`, debouncing, and
+- [x] **4.1** `FileWatcher` with `DispatchSource`, debouncing, and
       re-watching after save-by-replace. *(5.1, 5.3)*
 - [ ] **4.2** Swap in new content while keeping the scroll position;
       refresh changed images. *(5.2, 5.5)*

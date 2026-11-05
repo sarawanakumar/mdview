@@ -44,5 +44,46 @@ final class MarkdownDocument: NSDocument {
 
     override func makeWindowControllers() {
         addWindowController(DocumentWindowController(document: self))
+        startWatching()
+    }
+
+    override func close() {
+        watcher?.stop()
+        watcher = nil
+        super.close()
+    }
+
+    // MARK: Changes on disk (spec section 5)
+
+    private var watcher: FileWatcher?
+
+    private func startWatching() {
+        guard watcher == nil, let url = fileURL else { return }
+        let watcher = FileWatcher(url: url) { [weak self] event in
+            Task { @MainActor in self?.fileDidChange(event) }
+        }
+        self.watcher = watcher
+        watcher.start()
+    }
+
+    /// The file was saved by another app (or came back): read it again and
+    /// show the new content. If it can't be read right now, keep showing
+    /// what we have; the next change will try again.
+    private func fileDidChange(_ event: FileWatcher.Event) {
+        guard let url = fileURL, let type = fileType else { return }
+        switch event {
+        case .changed:
+            do {
+                try revert(toContentsOf: url, ofType: type)
+                for case let controller as DocumentWindowController in windowControllers {
+                    controller.documentDidChangeOnDisk()
+                }
+            } catch {
+                Self.log.info("re-read failed: \(error.localizedDescription, privacy: .public)")
+            }
+        case .disappeared:
+            // Roadmap 4.3 shows a notice; for now the last content stays.
+            Self.log.info("file disappeared")
+        }
     }
 }
