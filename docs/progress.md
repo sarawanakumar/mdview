@@ -2,7 +2,7 @@
 
 Newest session first.
 
-## 2026-11-05: Roadmap 7.2, measuring spec section 8 (in progress)
+## 2026-11-05: Roadmap 7.2, measuring spec section 8
 
 **Done**
 - Cold-open timeline, using temporary signposts (since removed), median
@@ -54,14 +54,16 @@ point 13, from other apps)
   and raise spec 8.5 to 110 MB,** so 8.5 now passes at 103–106 MB. ADR
   0003, which mentions the old limit, has a dated note.
 
-**Open**
-- 8.3 smooth scrolling of the 5 MB file: a hand check.
-- 8.1 should be re-measured with the Mac quiet. Under the load seen
-  today it's within ±50 ms of the limit either way.
+**Final checks** (by the owner, after the 7.2 commit)
+- `swift scripts/time-open.swift`, 5 runs, load average 5.7: cold
+  median 463 ms (427–485, every run under 500), warm 131 ms (118–151),
+  large 1,125 ms (1,094–1,145). 8.1–8.3 pass.
+- Scrolling quickly through the 5 MB file was smooth, with no spinning
+  cursor (8.3).
+- All of spec section 8 passes, so 7.2 is ticked.
 
 **Next**
-- Finish 7.2: the scrolling hand check, and cold open re-measured on a
-  quiet Mac. Then 7.3 (privacy check).
+- 7.3: privacy check (network monitor, entitlements, the only package).
 
 ## 2026-11-05: Roadmap 7.1, performance and edge fixtures, timing script
 

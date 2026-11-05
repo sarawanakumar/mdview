@@ -154,7 +154,7 @@ see colours sooner.*
 
 - [x] **7.1** Write `fixtures/typical.md`, `fixtures/large.md` and the
       `edge/` files; a timing script for double-click → first paint.
-- [ ] **7.2** Measure everything in spec section 8; fix anything that
+- [x] **7.2** Measure everything in spec section 8; fix anything that
       misses. *(8.1–8.6)* The memory target is now 110 MB, the owner's
       choice over dropping the refilled spare (see progress.md,
       2026-11-05). Measure each process's
