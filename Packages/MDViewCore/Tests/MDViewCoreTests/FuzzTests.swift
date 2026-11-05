@@ -18,7 +18,7 @@ struct FuzzTests {
         let clock = ContinuousClock()
         var html = ""
         let elapsed = await clock.measure {
-            html = await HTMLRenderer.renderSafely(markdown: markdown)
+            html = await HTMLRenderer.renderSafely(markdown: markdown).html
         }
         // Something must show, unless there's nothing to show: a blank file,
         // or one that is only front matter (hidden, spec 2.13).
@@ -120,7 +120,7 @@ struct FuzzTests {
 
     @Test func deepInputsAreShownAsPlainText() async {
         for (name, input) in Self.pathological where NestingGuard.estimatedDepth(input) > NestingGuard.limit {
-            let html = await HTMLRenderer.renderSafely(markdown: input)
+            let html = await HTMLRenderer.renderSafely(markdown: input).html
             #expect(html.hasPrefix(HTMLRenderer.tooDeeplyNestedNotice), "\(name) should fall back to plain text")
         }
     }

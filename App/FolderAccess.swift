@@ -17,6 +17,10 @@ import OSLog
 final class FolderAccess {
     static let shared = FolderAccess()
 
+    /// Posted after a new grant, so open windows can show files they
+    /// couldn't before (spec 9.5: "without reopening the file").
+    static let didChange = Notification.Name("FolderAccessDidChange")
+
     private static let defaultsKey = "FolderAccessBookmarks"
     private static let log = Logger(subsystem: "com.inferly.mdview", category: "folder-access")
 
@@ -64,6 +68,7 @@ final class FolderAccess {
         for removed in before.subtracting(grants.folders) { bookmarks[removed] = nil }
         save()
         Self.log.info("granted a folder; \(self.grants.folders.count, privacy: .public) grants in all")
+        NotificationCenter.default.post(name: Self.didChange, object: self)
         return true
     }
 

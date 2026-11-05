@@ -2,6 +2,48 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 3.2, folder access bar and picker
+
+**Done**
+- Renderer now also returns the page's **local references**
+  (`RenderedPage.localReferences`): image sources and link destinations
+  that are relative paths, absolute paths or `file:` URLs, in order,
+  without repeats. Not `#anchors`, web, mail or unsafe links.
+- `MDViewCore/Files/LocalReferences`: resolves a reference against the
+  document (percent-encoded or plain, `file:` URLs, drops `#fragment` and
+  `?query`); suggests the closest folder holding the document and every
+  file it needs (`../images/a.png` → the folder above).
+- `PreviewController`: after each render, works out which references
+  aren't the document itself and aren't in a granted folder, and reports
+  the folder to offer (or none). New `reload()` re-renders in the same
+  web view.
+- `DocumentWindowController`: the bar "Allow mdview to show images and
+  linked files in this folder." with **Allow…** and **Not Now** (spec
+  9.5, 9.7). Allow… opens the standard folder picker as a sheet at the
+  suggested folder; any folder can be chosen (the message explains a
+  higher folder covers more). After a grant, `FolderAccess` posts a
+  notification and every window that needed something re-renders, so
+  nothing has to be reopened. Not Now hides the bar for that window.
+- Images still show alt text until 3.3, so a grant doesn't visibly change
+  them yet; links to other files work once 3.5 lands.
+
+**Checked**
+- 150 tests pass (8 new: references collected in order without repeats
+  and without web/mail/anchor/unsafe links; elements.md's 3 references;
+  resolving 10 kinds of reference; suggested folder cases).
+- In the app, with a temporary hook (removed): elements.md showed the bar
+  with both buttons; valid.md (no references) showed none; latin1.md
+  only its UTF-8 notice. Allow… put an `NSOpenPanel` sheet on the
+  window; closing it left the bar; Not Now removed it.
+- Debug and Release build with no warnings.
+- **Not tested: actually choosing a folder** (needs a person at the
+  picker). To try: open `fixtures/elements.md` with `build/mdview.app`,
+  click Allow…, choose the `fixtures` folder. The bar should disappear,
+  and stay away after quitting and reopening the file.
+
+**Next**
+- Roadmap 3.3: `AssetSchemeHandler` serving local images.
+
 ## 2026-11-05: Roadmap 3.1, remembering folder grants
 
 **Done**

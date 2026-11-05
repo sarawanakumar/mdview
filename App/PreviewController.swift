@@ -4,10 +4,16 @@ import WebKit
 
 /// Shows a document's rendered preview in a locked-down web view.
 ///
-/// Roadmap 1.5: renders once when the window opens. Later tasks add reload
-/// (M4), zoom, print and find (M5).
+/// Renders when the window opens and again on `reload()` (after a folder
+/// grant; on file changes in M4). Zoom, print and find come in M5.
 @MainActor
 final class PreviewController: NSViewController, WKNavigationDelegate {
+    /// After each render: the folder to offer when the page refers to local
+    /// files mdview can't read yet (spec 9.5), or nil when it can read
+    /// everything it needs.
+    var onFolderAccessNeeded: ((URL?) -> Void)?
+
+    private weak var document: MarkdownDocument?
     private var webView: WKWebView?
     private var page: String?
     /// Our page's navigation, so a spare's blank page finishing doesn't
@@ -20,28 +26,57 @@ final class PreviewController: NSViewController, WKNavigationDelegate {
 
     /// Renders the document off the main thread, then shows it.
     func show(_ document: MarkdownDocument) {
+        self.document = document
+        render()
+    }
+
+    /// Renders and shows the document again, in the same web view.
+    func reload() {
+        render()
+    }
+
+    private func render() {
+        guard let document else { return }
         let text = document.text
         let isMarkdown = document.isMarkdown
         let title = document.displayName ?? ""
+        let fileURL = document.fileURL
         let configuration = PreviewConfiguration.shared()
 
         Task {
             // Markdown goes through renderSafely: a large stack, and a plain
             // text fallback for files nested too deeply to parse (spec 10.4).
-            let body = isMarkdown
+            let rendered = isMarkdown
                 ? await HTMLRenderer.renderSafely(markdown: text)
-                : await Task.detached { HTMLRenderer.render(plainText: text) }.value
+                : RenderedPage(html: await Task.detached { HTMLRenderer.render(plainText: text) }.value, localReferences: [])
             Signposts.signposter.emitEvent("documentRendered")
+            onFolderAccessNeeded?(fileURL.flatMap { Self.folderNeeded(for: rendered.localReferences, document: $0) })
             do {
                 let config = try await configuration.value
-                load(PageShell.page(title: title, body: body), with: config)
+                load(PageShell.page(title: title, body: rendered.html), with: config)
             } catch {
                 showError(error)
             }
         }
     }
 
+    /// The folder to suggest if the page refers to local files that aren't
+    /// the document itself and aren't in a granted folder.
+    private static func folderNeeded(for references: [String], document: URL) -> URL? {
+        let documentFile = document.standardizedFileURL
+        let unreadable = references
+            .compactMap { LocalReferences.resolve($0, relativeTo: document) }
+            .filter { $0 != documentFile && !FolderAccess.shared.covers($0) }
+        guard !unreadable.isEmpty else { return nil }
+        return LocalReferences.suggestedFolder(for: document, needing: unreadable)
+    }
+
     private func load(_ page: String, with config: WKWebViewConfiguration) {
+        self.page = page
+        if let webView {
+            pageNavigation = webView.loadHTMLString(page, baseURL: PageShell.baseURL)
+            return
+        }
         let webView = PreviewConfiguration.takeWebView(with: config)
         // A brand-new web view is white until its first page loads; keep it
         // hidden until then so dark mode never flashes white. (A spare
@@ -53,7 +88,6 @@ final class PreviewController: NSViewController, WKNavigationDelegate {
         webView.setAccessibilityLabel("Preview")
         view.addSubview(webView)
         self.webView = webView
-        self.page = page
         pageNavigation = webView.loadHTMLString(page, baseURL: PageShell.baseURL)
     }
 

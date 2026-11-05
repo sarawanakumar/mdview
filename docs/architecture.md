@@ -61,6 +61,7 @@ Packages/MDViewCore/        local Swift package, no AppKit
   HeadingSlugger            GitHub-style heading anchors (spec 4.3)
   Highlighter/              tokenizer + one small rule set per language (ADR 0004)
   Files/FolderGrantList     which folders are granted (pure path rules, spec 9.6)
+  Files/LocalReferences     resolves a page's local references; suggests a folder
   Tests/                    unit tests, run with `swift test`
 fixtures/                   the test Markdown files listed in spec.md
 ```

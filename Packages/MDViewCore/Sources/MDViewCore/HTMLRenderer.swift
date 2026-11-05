@@ -17,13 +17,33 @@ import Markdown
 /// HTML (as text), links and bare web addresses. Front matter is hidden.
 /// Images show their alt text for now (roadmap 3.3); code isn't
 /// highlighted yet (M6).
+/// A rendered body plus what the page refers to on disk.
+public struct RenderedPage: Equatable, Sendable {
+    public let html: String
+    /// Local image sources and link destinations, as written in the file
+    /// (relative paths, absolute paths, `file:` URLs), in order, without
+    /// repeats. The app checks whether it can read them (spec 9.5).
+    public let localReferences: [String]
+
+    public init(html: String, localReferences: [String]) {
+        self.html = html
+        self.localReferences = localReferences
+    }
+}
+
 public enum HTMLRenderer {
     /// Renders Markdown text: front matter hidden (spec 2.13), smart
     /// punctuation off (spec 2.15).
     public static func render(markdown: String) -> String {
+        renderPage(markdown: markdown).html
+    }
+
+    /// Like `render(markdown:)`, plus the local files the page refers to.
+    public static func renderPage(markdown: String) -> RenderedPage {
         let document = Document(parsing: FrontMatter.strip(markdown), options: [.disableSmartOpts])
         var visitor = HTMLVisitor()
-        return visitor.visit(document)
+        let html = visitor.visit(document)
+        return RenderedPage(html: html, localReferences: visitor.localReferences)
     }
 
     /// Shows a non-Markdown file as plain text (spec 10.5).
@@ -37,13 +57,13 @@ public enum HTMLRenderer {
     /// a notice. Everything else renders on a thread with a 64 MB stack,
     /// because swift-markdown's recursion needs far more than the 512 KB a
     /// Swift task's thread has.
-    public static func renderSafely(markdown: String) async -> String {
+    public static func renderSafely(markdown: String) async -> RenderedPage {
         if NestingGuard.isTooDeep(markdown) {
-            return tooDeeplyNestedNotice + render(plainText: markdown)
+            return RenderedPage(html: tooDeeplyNestedNotice + render(plainText: markdown), localReferences: [])
         }
         return await withCheckedContinuation { continuation in
             let thread = Thread {
-                continuation.resume(returning: render(markdown: markdown))
+                continuation.resume(returning: renderPage(markdown: markdown))
             }
             thread.stackSize = renderStackSize
             thread.qualityOfService = .userInitiated
@@ -68,6 +88,14 @@ struct HTMLVisitor: MarkupVisitor {
     /// linked there. Counted while walking, because asking a node for its
     /// parents is slow in swift-markdown.
     private var linkDepth = 0
+    /// Local files the page refers to (see `RenderedPage`).
+    private(set) var localReferences: [String] = []
+    private var seenReferences: Set<String> = []
+
+    private mutating func noteReference(_ destination: String) {
+        guard Self.isLocalDestination(destination), seenReferences.insert(destination).inserted else { return }
+        localReferences.append(destination)
+    }
 
     // MARK: Containers
 
@@ -308,11 +336,13 @@ struct HTMLVisitor: MarkupVisitor {
         guard let destination = link.destination, Self.isSafeDestination(destination) else {
             return content
         }
+        noteReference(destination)
         return anchor(href: destination, content: content)
     }
 
     /// Images show their alt text for now (roadmap 3.3).
     mutating func visitImage(_ image: Image) -> String {
+        if let source = image.source, Self.isSafeDestination(source) { noteReference(source) }
         linkDepth += 1
         defer { linkDepth -= 1 }
         return visitChildren(of: image)
@@ -320,6 +350,18 @@ struct HTMLVisitor: MarkupVisitor {
 
     private func anchor(href: String, content: String) -> String {
         "<a href=\"\(escape(href))\" title=\"\(escape(href))\">\(content)</a>"
+    }
+
+    /// A file on disk: a relative or absolute path, or a `file:` URL. Not
+    /// `#anchors` (same page) or web and mail links.
+    static func isLocalDestination(_ destination: String) -> Bool {
+        let trimmed = destination.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty, !trimmed.hasPrefix("#") else { return false }
+        if let colon = trimmed.firstIndex(of: ":"),
+           !trimmed[..<colon].contains(where: { "/?#".contains($0) }) {
+            return trimmed[..<colon].lowercased() == "file"
+        }
+        return true
     }
 
     /// Relative paths, `#anchors`, and http, https, mailto and file URLs.
