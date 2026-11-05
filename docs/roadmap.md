@@ -57,7 +57,7 @@ screen.
 **Done when:** double-clicking a `.md` file opens a window showing its
 headings and paragraphs, and section 1 of the spec passes.
 
-## M2. Render all of Markdown
+## M2. Render all of Markdown (done 2026-11-05)
 
 All in `MDViewCore`, test-first against fixture files.
 
@@ -78,7 +78,7 @@ All in `MDViewCore`, test-first against fixture files.
       light and dark colours. *(6.3, 6.4)*
 - [x] **2.9** Fuzz test: random and truncated input never crashes or
       hangs. *(10.4)*
-- [ ] **2.10** Look over `elements.md` and `front-matter.md` in the app
+- [x] **2.10** Look over `elements.md` and `front-matter.md` in the app
       (light and dark), then record their expected HTML
       (`MDVIEW_RECORD_EXPECTED=1`) so later changes are caught.
       Re-measure memory with `typical.md` (spec 8.5). *(2.16)*
@@ -155,7 +155,10 @@ see colours sooner.*
 - [ ] **7.1** Write `fixtures/typical.md`, `fixtures/large.md` and the
       `edge/` files; a timing script for double-click → first paint.
 - [ ] **7.2** Measure everything in spec section 8; fix anything that
-      misses. *(8.1–8.6)* Memory: measure each process's
+      misses. *(8.1–8.6)* Memory is over target (see progress.md,
+      2026-11-05): about 70 MB is fixed overhead before any content.
+      Options include dropping the refilled spare (−9 MB), trimming what
+      WebKit keeps per page, or revisiting the 100 MB target. Measure each process's
       `phys_footprint` after at least 10 s (WebKit's GPU process has a
       start-up peak of ~135 MB) and add them up, several runs.
 - [ ] **7.3** Privacy check: network monitor during a test session, check

@@ -2,6 +2,48 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 2.10, expected HTML recorded; M2 done
+
+**Done**
+- Owner looked over `elements.md` and `front-matter.md` in the app
+  (light and dark): looks good.
+- Recorded expected HTML for all 6 fixtures in `fixtures/expected/`
+  (`elements.html` 8,856 bytes, `front-matter.html`, and the 4 edge
+  files). From now on any rendering change shows up as a test failure
+  until it's re-recorded on purpose.
+- M2 is done: every spec section 2 criterion is rendered and tested.
+
+**Checked**
+- Recorded HTML contains only mdview's own tags (the 3 `<div>`s are
+  table wrappers); no `<script>`, `<style>`, `<iframe>`, `<img>`,
+  `<span>` or `<b>` from the sources.
+- Normal test run compares against them: 134 tests pass (6 fixture
+  comparisons).
+
+**Memory** (Release, one file open plus the 9 MB spare, each process
+added up after 12 s, 3 runs each; machine quieter now, load average 3,
+so runs agree within 2 MB)
+
+| File | Total | Page process |
+|---|---|---|
+| valid.md (79 bytes) | 71 MB | 19 MB |
+| prose.md (50 KB) | 95–98 MB | 45 MB |
+| elements.md (6 KB, every element) | 98–100 MB | 47 MB |
+| typical.md (50 KB, lists/tables/code) | **118–119 MB** | 63 MB |
+
+- **Spec 8.5 (< 100 MB) fails for typical.md and is borderline for the
+  others.** Up from 2.6 (page process 49 MB then), most likely from 2.8's
+  16 px text and larger default window (more for WebKit to draw).
+- About 70 MB is fixed before any content: app 26, GPU 13, networking 4,
+  an empty page 19, the spare 9. That leaves ~30 MB for content.
+- Not fixed here: noted as options under roadmap 7.2 (drop the refilled
+  spare, trim WebKit's per-page memory, or revisit the target). Needs a
+  decision then.
+
+**Next**
+- Roadmap M3, task 3.1: `FolderAccess`, saving and restoring folder
+  grants.
+
 ## 2026-11-04: Roadmap 2.9, fuzz testing (found 2 crashes and 2 hangs)
 
 **Found and fixed**

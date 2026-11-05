@@ -1,0 +1,236 @@
+<h1 id="elements">Elements</h1>
+<p>The reference file for spec section 2: every element mdview renders, plus
+nested combinations. Each section names the spec criterion it checks.</p>
+<h2 id="headings-21">Headings (2.1)</h2>
+<h1 id="heading-level-1">Heading level 1</h1>
+<h2 id="heading-level-2">Heading level 2</h2>
+<h3 id="heading-level-3">Heading level 3</h3>
+<h4 id="heading-level-4">Heading level 4</h4>
+<h5 id="heading-level-5">Heading level 5</h5>
+<h6 id="heading-level-6">Heading level 6</h6>
+<h1 id="setext-heading-level-1">Setext heading level 1</h1>
+<h2 id="setext-heading-level-2">Setext heading level 2</h2>
+<h2 id="heading-with-emphasis-and-code">Heading with <em>emphasis</em> and <code>code</code></h2>
+<h2 id="duplicate-heading">Duplicate heading</h2>
+<h2 id="duplicate-heading-1">Duplicate heading</h2>
+<h2 id="punctuation-quotes--ampersands-brackets">Punctuation: &quot;quotes&quot;, &amp; ampersands, (brackets)!</h2>
+<h2 id="paragraphs-and-line-breaks-22">Paragraphs and line breaks (2.2)</h2>
+<p>This is one paragraph. It continues on the next line
+without a blank line, so it stays in the same paragraph.</p>
+<p>This paragraph ends its first line with two spaces<br>
+so this text starts on a new line (a hard break).</p>
+<p>A backslash at the end of a line also makes a hard break<br>
+like this.</p>
+<h2 id="emphasis-23">Emphasis (2.3)</h2>
+<p>Text with <em>italic</em>, <em>also italic</em>, <strong>bold</strong>, <strong>also bold</strong>, <em><strong>bold italic</strong></em>,
+<del>strikethrough</del> and <del>single-tilde strikethrough</del>.</p>
+<p>Nested: <strong>bold with <em>italic</em> inside</strong> and <em>italic with <strong>bold</strong> inside</em>.</p>
+<p>Not emphasis: 2 * 3 * 4, snake_case_name, and *escaped asterisks*.</p>
+<h2 id="lists-24">Lists (2.4)</h2>
+<ul>
+<li>Bulleted item one</li>
+<li>Bulleted item two
+<ul>
+<li>Nested level 2
+<ul>
+<li>Nested level 3
+<ul>
+<li>Nested level 4</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Bulleted item three</li>
+</ul>
+<ul>
+<li>Star bullets</li>
+</ul>
+<ul>
+<li>Plus bullets</li>
+</ul>
+<ol>
+<li>Numbered one</li>
+<li>Numbered two
+<ol>
+<li>Nested numbered</li>
+<li>Nested numbered</li>
+</ol>
+</li>
+<li>Numbered three</li>
+</ol>
+<p>A separate list that starts at seven (a sentence in between, or it would
+continue the list above):</p>
+<ol start="7">
+<li>Starts at seven</li>
+<li>Then eight</li>
+</ol>
+<ul>
+<li><p>Loose list item with two paragraphs.</p>
+<p>Second paragraph of the same item.</p></li>
+<li><p>Next loose item.</p></li>
+</ul>
+<h2 id="task-lists-25">Task lists (2.5)</h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> Open task</li>
+<li class="task-list-item"><input type="checkbox" disabled checked> Done task</li>
+<li class="task-list-item"><input type="checkbox" disabled checked> Done task with a capital X</li>
+<li class="task-list-item"><input type="checkbox" disabled> Task with <strong>bold</strong> and a <a href="https://example.com" title="https://example.com">link</a>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled checked> Nested done task</li>
+</ul>
+</li>
+</ul>
+<h2 id="blockquotes-26">Blockquotes (2.6)</h2>
+<blockquote>
+<p>A simple quote.</p>
+</blockquote>
+<blockquote>
+<p>A quote with two paragraphs.</p>
+<p>Second paragraph.</p>
+</blockquote>
+<blockquote>
+<p>Outer quote</p>
+<blockquote>
+<p>Nested quote</p>
+<blockquote>
+<p>Third level</p>
+</blockquote>
+</blockquote>
+<ul>
+<li>A list in a quote</li>
+<li>Second item</li>
+</ul>
+<pre><code class="language-swift">let insideQuote = true</code></pre>
+</blockquote>
+<h2 id="inline-code-27">Inline code (2.7)</h2>
+<p>Use <code>let x = 1</code> inline, or <code>code with a ` backtick</code> inside.</p>
+<p>Characters stay literal in code: <code>&lt;div&gt;</code>, <code>&amp;amp;</code>, <code>**not bold**</code>.</p>
+<h2 id="code-blocks-28">Code blocks (2.8)</h2>
+<pre><code class="language-swift">// Fenced, with a language tag.
+struct Greeting {
+    let text = &quot;Hello, world!&quot;
+}</code></pre>
+<pre><code>Fenced, no language tag.</code></pre>
+<pre><code class="language-python"># Tilde fence.
+print(&quot;hi&quot;)</code></pre>
+<pre><code>Indented code block (four spaces).
+Second line.</code></pre>
+<pre><code class="language-text">A very long line that should scroll sideways inside its own box rather than wrapping or widening the window: 0123456789 0123456789 0123456789 0123456789 0123456789</code></pre>
+<h2 id="tables-29">Tables (2.9)</h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th class="align-left">Left</th>
+<th class="align-center">Centre</th>
+<th class="align-right">Right</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="align-left">a</td>
+<td class="align-center">b</td>
+<td class="align-right">c</td>
+<td>d</td>
+</tr>
+<tr>
+<td class="align-left"><strong>bold</strong></td>
+<td class="align-center"><code>code</code></td>
+<td class="align-right"><a href="https://example.com" title="https://example.com">link</a></td>
+<td><del>strike</del></td>
+</tr>
+<tr>
+<td class="align-left">escaped | pipe</td>
+<td class="align-center"></td>
+<td class="align-right">empty cell left</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<div class="table"><table>
+<thead>
+<tr>
+<th>A very wide table</th>
+<th>with many columns</th>
+<th>so that it is wider than the window</th>
+<th>and has to scroll sideways</th>
+<th>on its own</th>
+<th>without widening</th>
+<th>the page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="horizontal-rules-210">Horizontal rules (2.10)</h2>
+<p>Above three dashes.</p>
+<hr>
+<p>Above three asterisks.</p>
+<hr>
+<p>Above three underscores.</p>
+<hr>
+<h2 id="links-211">Links (2.11)</h2>
+<p>An <a href="https://example.com" title="https://example.com">inline link</a>, one <a href="https://example.com" title="https://example.com">with a title</a>,
+a <a href="https://example.com/reference" title="https://example.com/reference">reference link</a>, a <a href="https://example.com/collapsed" title="https://example.com/collapsed">collapsed reference</a>, and an angle-bracket
+autolink: <a href="https://example.com/angle" title="https://example.com/angle">https://example.com/angle</a>. Email: <a href="mailto:someone@example.com" title="mailto:someone@example.com">mailto:someone@example.com</a>.</p>
+<p>A <a href="other.md" title="other.md">relative link to another file</a>, an <a href="#tables-29" title="#tables-29">anchor link</a> and a
+<a href="other.md#section" title="other.md#section">link to a heading in another file</a>.</p>
+<h2 id="bare-web-addresses-214">Bare web addresses (2.14)</h2>
+<p>Plain <a href="https://example.com/plain" title="https://example.com/plain">https://example.com/plain</a> and <a href="http://example.com/http" title="http://example.com/http">http://example.com/http</a> and <a href="http://www.example.com" title="http://www.example.com">www.example.com</a>
+become links. Trailing punctuation stays outside: <a href="https://example.com/end" title="https://example.com/end">https://example.com/end</a>.
+And in brackets (<a href="https://example.com/bracketed" title="https://example.com/bracketed">https://example.com/bracketed</a>), or with a comma, <a href="https://example.com/comma" title="https://example.com/comma">https://example.com/comma</a>, here.</p>
+<p>Not in code: <code>https://example.com/in-code</code> stays plain.</p>
+<h2 id="punctuation-as-written-215">Punctuation as written (2.15)</h2>
+<p>&quot;Straight double quotes&quot;, &#39;straight single quotes&#39;, two dashes -- and three ---,
+and three dots... all stay exactly as typed.</p>
+<h2 id="images-section-3">Images (section 3)</h2>
+<p>A local image</p>
+<p>A remote image is never downloaded</p>
+<h2 id="html-is-shown-not-rendered-212">HTML is shown, not rendered (2.12)</h2>
+<p>Inline &lt;b&gt;bold tag&lt;/b&gt;, &lt;span style=&quot;color: red&quot;&gt;a span&lt;/span&gt; and</p>
+<pre class="html-source">&lt;script&gt;alert(&quot;never runs&quot;)&lt;/script&gt; all appear as text.</pre>
+<pre class="html-source">&lt;div class=&quot;block&quot;&gt;
+An HTML block also appears as text.
+&lt;/div&gt;</pre>
+<h2 id="escapes-and-entities">Escapes and entities</h2>
+<p># Not a heading, - not a list, [not a link](nope).</p>
+<p>Entities: © &amp; &lt;tag&gt; © 😀</p>
+<h2 id="mixed-nesting">Mixed nesting</h2>
+<ol>
+<li><p>A numbered item with a quote:</p>
+<blockquote>
+<p>Quoted inside a list.</p>
+</blockquote>
+</li>
+<li><p>A numbered item with code:</p>
+<pre><code class="language-json">{ &quot;nested&quot;: true }</code></pre>
+</li>
+<li><p>A numbered item with a table:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>x</th>
+<th>y</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table></div>
+</li>
+</ol>
+<p>The end.</p>
