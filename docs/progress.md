@@ -2,6 +2,37 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 8.11, v1.1 measured again; checklist section 12
+
+**Done**
+- Committed 8.10 (`58bedbd`).
+- checklist.md: section 12 (10 rows) and hand check 13 (File → New, the
+  links before saving, the save panel); measured rows updated.
+- README lists File → New.
+- Measured on the v1.1.0 release build (5,032,330 bytes, under 6 MB):
+  - 271 core tests pass
+  - `time-open.swift`: cold 483 ms (465–494), warm 124 ms (112–137),
+    large 1,105 ms (1,098–1,128): pass
+  - `check-offline.zsh`: pass; entitlements unchanged
+  - memory, typical.md: 103–105 MB; idle CPU 0–0.03 s over 30 s
+  - 11.5: 22–52 ms; 5 MB in edit mode: switch 281 ms, keystroke 305 ms
+    median (max 344), page down 311 ms, back to preview 1,307 ms (each
+    including a ~177 ms `osascript` round trip): no hang
+- Left the app with no windows and quit normally, so nothing from the
+  tests is restored in the owner's copy.
+
+**Hand checks:** the owner ran 12 (edit mode) and 13 (new file): both
+pass. With these, spec sections 11 and 12 pass and every v1 criterion
+still does, so 8.11 and milestone M8 are done.
+
+**Released**
+- Annotated tag `v1.1` on this commit; `main` and the tag pushed to
+  `origin` (https://github.com/sarawanakumar/mdview).
+
+**Open**
+- The rough edge from 8.3 (closing a gone file's window and choosing
+  Save offers a "Save As…" that does nothing). Safe; for a later version.
+
 ## 2026-11-05: Roadmap 8.10, a new file after its first save
 
 **Done**

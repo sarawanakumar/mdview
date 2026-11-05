@@ -102,11 +102,11 @@ in the app during a roadmap task (see progress.md), ✋ = by hand.
 
 | AC | How | Last checked |
 |---|---|---|
-| 8.1–8.3 Cold, warm, large | S: `time-open.swift` | 8.7: 468 / 110 / 1,140 ms |
+| 8.1–8.3 Cold, warm, large | S: `time-open.swift` | 8.11: 483 / 124 / 1,105 ms |
 | 8.3 Smooth scrolling | ✋ 11 | 7.2 (owner) |
-| 8.4 Bundle under 6 MB | S: add up the bundle's file sizes (below) | 8.7: 5,029,274 bytes |
-| 8.5 Memory under 110 MB | footprint of each process after 12 s (7.2 method; quit MDView normally first, or restored windows count too) | 8.7: 104–106 MB |
-| 8.6 Idle CPU | CPU time of every process over 30 s (7.2 method) | 8.7: 0.01 s |
+| 8.4 Bundle under 6 MB | S: add up the bundle's file sizes (below) | 8.11: 5,032,330 bytes |
+| 8.5 Memory under 110 MB | footprint of each process after 12 s (7.2 method; quit MDView normally first, or restored windows count too) | 8.11: 103–105 MB |
+| 8.6 Idle CPU | CPU time of every process over 30 s (7.2 method) | 8.11: 0–0.03 s |
 
 Bundle size: `find build/mdview.app -type f -exec stat -f %z {} + | awk '{s+=$1} END {print s}'`
 
@@ -114,7 +114,7 @@ Bundle size: `find build/mdview.app -type f -exec stat -f %z {} + | awk '{s+=$1}
 
 | AC | How | Last checked |
 |---|---|---|
-| 9.1 No network | S: `check-offline.zsh`; T: `OfflineProtectionTests` | 8.7: pass |
+| 9.1 No network | S: `check-offline.zsh`; T: `OfflineProtectionTests` | 8.11: pass |
 | 9.2 Sandbox | `codesign -d --entitlements -` (user-selected read-write, ADR 0008); `sandbox_check` (7.3); writes only on Save A (8.3) | 8.7 |
 | 9.3 No telemetry | Code and binary search (7.3) | 7.3 |
 | 9.4 Only swift-markdown | `Package.resolved` (7.3) | 7.3 |
@@ -136,19 +136,34 @@ Bundle size: `find build/mdview.app -type f -exec stat -f %z {} + | awk '{s+=$1}
 | AC | How | Last checked |
 |---|---|---|
 | 11.1 View → Edit Mode, ⌘/, check mark, Print dimmed | A (8.4) | 8.4 |
-| 11.2 Opens in preview; open times unchanged | S: `time-open.swift` | 8.7: 468 / 110 ms |
-| 11.3 Monospaced, wraps, no substitutions | A (8.4) typed text saved exactly; ✋ 12 light/dark | 8.4 |
+| 11.2 Opens in preview; open times unchanged | S: `time-open.swift` | 8.11: 483 / 124 ms |
+| 11.3 Monospaced, wraps, no substitutions | A (8.4) typed text saved exactly; ✋ 12 light/dark | 8.11 (owner) |
 | 11.4 Undo, Redo, Cut, Copy, Paste, Select All | A (8.4, 8.6) | 8.6 |
-| 11.5 Preview after editing under 0.2 s | `previewRequested` → `documentVisible` signposts (8.7) | 8.7: 24–25 ms |
+| 11.5 Preview after editing under 0.2 s | `previewRequested` → `documentVisible` signposts (8.7) | 8.11: 22–52 ms |
 | 11.6 Edited marker; Save only on ⌘S, dimmed when clean | A (8.3, 8.4) | 8.4 |
 | 11.7 Close / quit question | A (8.3) | 8.3 |
-| 11.8 UTF-8, byte order mark, line endings | T: `UTF8TextEncodeTests` (every fixture round-trips); A (8.3) | 8.7: 271 tests |
+| 11.8 UTF-8, byte order mark, line endings | T: `UTF8TextEncodeTests` (every fixture round-trips); A (8.3) | 8.11: 271 tests |
 | 11.9 Find in the source | A (8.5) | 8.5 |
 | 11.10 Dimmed for bad bytes | T: `latin1.md`, `utf16.md` reported; A (8.4) | 8.4 |
 | 11.11 Outside changes, own saves | A (8.6) | 8.6 |
 | 11.12 Save errors: locked, read-only, gone | A (8.3) | 8.3 |
-| 11.13 Keyboard and VoiceOver | A (8.5) focus and roles; ✋ 12 VoiceOver | 8.5 |
-| 11.14 5 MB file in edit mode; size | A (8.7) switch, type, page with no hang; ✋ 12 scrolling | 8.7 |
+| 11.13 Keyboard and VoiceOver | A (8.5) focus and roles; ✋ 12 VoiceOver | 8.11 (owner) |
+| 11.14 5 MB file in edit mode; size | A (8.7, 8.11) switch, type, page with no hang; ✋ 12 scrolling | 8.11 |
+
+## 12. New files (v1.1)
+
+| AC | How | Last checked |
+|---|---|---|
+| 12.1 File → New, Untitled, edit mode | A (8.8); ✋ 13 | 8.11 (owner) |
+| 12.2 No untitled window by itself | A (8.8): launch and reopen show the Open panel | 8.8 |
+| 12.3 `.md`-only save panel, name, folder, extension | A (8.9): "notes" → `notes.md`, "notes.txt" → `notes.txt.md`, title shows `.md`; ✋ 13 | 8.9 |
+| 12.4 Replace question | A (8.9): Cancel keeps the file, Replace overwrites | 8.9 |
+| 12.5 Cancel in the panel | A (8.9) | 8.9 |
+| 12.6 After the first save | A (8.10): title, Open Recent, folder bar, watcher, restored | 8.10 |
+| 12.7 UTF-8, no byte order mark | A (8.9): bytes as typed | 8.9 |
+| 12.8 Close / quit an untitled window; not restored | A (8.9) Delete panel, review dialog; A (8.10) restoration (wait ~30 s before a force quit) | 8.10 |
+| 12.9 Preview before the first save | A (8.10) placeholder, no bar; ✋ 13 the links | 8.10 |
+| 12.10 No save panel for opened files | A (8.9): gone file, ⌘S and the close question | 8.9 |
 
 ## Hand checks
 
@@ -197,3 +212,10 @@ Use the release build: `open -a build/mdview.app <file>`.
     (made by `time-open.swift`), press ⌘/, scroll quickly to the end and
     type a few words: no stutter or spinning cursor. Close without
     saving (Don't Save).
+13. **New file (12.1, 12.3, 12.9).** Press ⌘N: an "Untitled" window opens
+    with the cursor in the editor. Type a heading, a web link
+    (`[web](https://example.com)`) and a link to a local file, then ⌘/:
+    clicking the web link opens the browser, the local one does nothing.
+    ⌘S: the save panel has no file format menu; save as "scratch" in a
+    test folder: the file is `scratch.md` and the title shows it. Delete
+    the test file afterwards.

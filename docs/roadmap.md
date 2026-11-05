@@ -220,7 +220,7 @@ ADR 0008 accepted 2026-11-05.
       with an untitled window; the preview before saving. Untitled windows
       must not be restored (today they come back empty after a force
       quit). *(12.6, 12.8, 12.9)*
-- [ ] **8.11** Measure again (open times, size, memory, offline); add
+- [x] **8.11** Measure again (open times, size, memory, offline); add
       section 12 to `checklist.md`; hand checks 12 and a new one for File →
       New; tag v1.1 and push. *(8.1–8.6, 9.1, 11.14, 12.x)*
 

@@ -17,6 +17,7 @@ under half a second. Native AppKit, fully offline, no settings.
 - Find, zoom, print, Reveal in Finder, Open in Editor
 - Edit mode for small fixes (View → Edit Mode, ⌘/): the plain source in
   the same window, saved only when you press ⌘S
+- New files (File → New, ⌘N), saved as `.md`
 - Sandboxed, and never touches the network. Its only package is Apple's
   `swift-markdown`.
 
