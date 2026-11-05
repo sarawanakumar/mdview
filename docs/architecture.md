@@ -226,8 +226,14 @@ Don't Save / Cancel question on close and quit. `MarkdownDocument` adds:
 Viewer role), `data(ofType:)` through `UTF8Text.encode`, Save dimmed when
 nothing changed or the file had bad bytes (`canEdit`), its own alert when
 the file is gone, and `prepareSavePanel` returning false so no save panel
-ever opens. While there are unsaved edits, changes on disk aren't reloaded
-(roadmap 8.6 adds the question).
+ever opens. With unsaved edits, it asks Keep My Edits or Reload from Disk (spec 11.11).
+The document remembers the bytes it last read or saved; a change on disk
+with the same bytes (our own save, or the file coming back unchanged) only
+updates `fileModificationDate`, so there's no reload and the undo history
+stays. Keep My Edits remembers the other app's bytes and date, so it isn't
+asked again and Save doesn't add NSDocument's own "changed by another
+application" warning. Saving calls `breakUndoCoalescing`, so typing after
+a save counts as a new change.
 
 **Edit mode** (spec 11, ADR 0008). View ▸ Edit Mode ⌘/ hides the preview and
 shows a `SourceEditor` in the same place in the window's stack; the editor

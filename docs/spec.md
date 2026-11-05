@@ -135,7 +135,7 @@ using the [test files](#test-files).
 | 8.1 | **Cold open:** app not running, double-click a typical file in Finder → rendered text visible in **under 0.5 s**. |
 | 8.2 | **Warm open:** app already running, open a typical file → rendered text visible in **under 0.2 s**. |
 | 8.3 | **Large file:** a 5 MB Markdown file opens with text visible in under 2 s, and scrolling stays smooth (no spinning cursor). |
-| 8.4 | **Bundle size:** the built `.app` is **under 5 MB**. |
+| 8.4 | **Bundle size:** the built `.app` is **under 6 MB**. (Raised from 5 MB in roadmap 8.6, the owner's choice: v1.1's edit mode took the unstripped release build to 5,029,274 bytes. Stripping symbols would have saved about 1.7 MB instead; the owner preferred to keep builds as they are.) |
 | 8.5 | **Memory:** a single open typical file uses under 110 MB, adding up mdview and its WebKit processes. (Raised from 100 MB in roadmap 7.2: about 70 MB is fixed WebKit and AppKit overhead, and the spare web view that keeps warm opens under 0.2 s costs 9 MB of the rest.) |
 | 8.6 | **Idle:** with files open and nothing changing, the app uses ~0% CPU. |
 
@@ -183,7 +183,7 @@ is written unless the user saves.
 | 11.11 | When the file changes on disk and there are no unsaved edits, it reloads as in section 5, in either mode. With unsaved edits, an alert says the file was changed by another app and offers **Keep My Edits** or **Reload from Disk**. MDView's own saves never cause a reload or this alert, and the file keeps being watched after them (5.3). |
 | 11.12 | If the file can't be saved, an alert names the file and the reason, and the edits stay in the window. A locked or read-only file gets the standard "The file is locked" alert, whose **Save Anyway** saves it and leaves it locked. A file that has been deleted or moved away is never written back or saved somewhere else: Save says it's no longer available, and no save panel ever appears. |
 | 11.13 | The editor is reachable by keyboard and readable with VoiceOver, as a standard text view. |
-| 11.14 | A 5 MB file (8.3) can be switched to edit mode, scrolled and typed in without a spinning cursor. The app is still under 5 MB (8.4). |
+| 11.14 | A 5 MB file (8.3) can be switched to edit mode, scrolled and typed in without a spinning cursor. The app is still under the size limit (8.4). |
 
 ---
 

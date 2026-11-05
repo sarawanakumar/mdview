@@ -62,6 +62,7 @@ final class MarkdownDocument: NSDocument {
             text = decoded.text
             hadInvalidBytes = decoded.hadInvalidBytes
             hadByteOrderMark = decoded.hadByteOrderMark
+            bytesOnDisk = data
             Self.log.info("""
                 read document: type=\(typeName, privacy: .public) bytes=\(data.count, privacy: .public) \
                 invalidUTF8=\(decoded.hadInvalidBytes, privacy: .public) markdown=\(self.isMarkdown, privacy: .public)
@@ -76,7 +77,28 @@ final class MarkdownDocument: NSDocument {
     override nonisolated func data(ofType typeName: String) throws -> Data {
         try MainActor.assumeIsolated {
             guard canEdit else { throw CocoaError(.fileWriteInapplicableStringEncoding) }
-            return Data(UTF8Text.encode(text, byteOrderMark: hadByteOrderMark))
+            let data = Data(UTF8Text.encode(text, byteOrderMark: hadByteOrderMark))
+            bytesBeingSaved = data
+            return data
+        }
+    }
+
+    /// Once a save has worked, its bytes are what's on disk, so the watcher
+    /// seeing our own save changes nothing (spec 11.11): no reload, and the
+    /// undo history stays.
+    override func save(
+        to url: URL, ofType typeName: String, for saveOperation: NSDocument.SaveOperationType,
+        completionHandler: @escaping (Error?) -> Void
+    ) {
+        // Typing after the save must count as a new change, not join the
+        // typing that was just saved (as TextEdit does).
+        for case let controller as DocumentWindowController in windowControllers {
+            controller.documentWillSave()
+        }
+        super.save(to: url, ofType: typeName, for: saveOperation) { [weak self] error in
+            if error == nil, let self, let saved = self.bytesBeingSaved { self.bytesOnDisk = saved }
+            self?.bytesBeingSaved = nil
+            completionHandler(error)
         }
     }
 
@@ -152,6 +174,11 @@ final class MarkdownDocument: NSDocument {
     // MARK: Changes on disk (spec section 5)
 
     private var watcher: FileWatcher?
+    /// The file's bytes as last read or saved by MDView.
+    private var bytesOnDisk: Data?
+    private var bytesBeingSaved: Data?
+    /// The Keep / Reload question is showing; further changes wait for it.
+    private var isAskingAboutChange = false
 
     private func startWatching() {
         guard watcher == nil, let url = fileURL else { return }
@@ -162,20 +189,33 @@ final class MarkdownDocument: NSDocument {
         watcher.start()
     }
 
-    /// The file was saved by another app (or came back): read it again and
-    /// show the new content. If it can't be read right now, keep showing
-    /// what we have; the next change will try again.
+    /// The file was saved by another app (or came back). If its bytes are
+    /// what MDView last read or saved, nothing changed. Otherwise show the
+    /// new content, or, with unsaved edits, ask first (spec 11.11). If it
+    /// can't be read right now, keep what we have; the next change will try
+    /// again.
     private func fileDidChange(_ event: FileWatcher.Event) {
         guard let url = fileURL, let type = fileType else { return }
         switch event {
         case .changed:
-            // Never throw away unsaved edits. Asking what to do comes in
-            // roadmap 8.6 (spec 11.11).
-            guard !isDocumentEdited else {
-                Self.log.info("changed on disk with unsaved edits: not reloaded")
+            for case let controller as DocumentWindowController in windowControllers {
+                controller.documentIsAvailable()
+            }
+            guard let data = try? Data(contentsOf: url) else {
+                Self.log.info("changed on disk but couldn't be read")
                 return
             }
-            reread(from: url, ofType: type)
+            if data == bytesOnDisk {
+                // Our own save, or the same file back again. Keep NSDocument's
+                // date in step, so Save doesn't warn about another app.
+                fileModificationDate = Self.modificationDate(of: url)
+                return
+            }
+            if isDocumentEdited {
+                askAboutOutsideChange(url: url, type: type, data: data)
+            } else {
+                reread(from: url, ofType: type)
+            }
         case .disappeared:
             // Spec 5.4: deleted or moved away (including to the Trash). Keep
             // the last content and say the file is gone. The watcher keeps
@@ -185,6 +225,40 @@ final class MarkdownDocument: NSDocument {
                 controller.documentDidDisappear()
             }
         }
+    }
+
+    /// Unsaved edits and a different file on disk: Keep My Edits (saving
+    /// later overwrites the other app's version) or Reload from Disk.
+    private func askAboutOutsideChange(url: URL, type: String, data: Data) {
+        guard !isAskingAboutChange else { return }
+        isAskingAboutChange = true
+        let alert = NSAlert()
+        alert.messageText = "“\(displayName ?? "This file")” was changed by another app."
+        alert.informativeText = "You have unsaved edits in MDView. Keep them, or reload the file from disk and lose them?"
+        alert.addButton(withTitle: "Keep My Edits")
+        alert.addButton(withTitle: "Reload from Disk")
+        let answered: @MainActor (NSApplication.ModalResponse) -> Void = { [weak self] response in
+            guard let self else { return }
+            self.isAskingAboutChange = false
+            if response == .alertSecondButtonReturn {
+                self.reread(from: url, ofType: type)
+            } else {
+                // Don't ask again about this version (or a newer one that
+                // came while asking), and let Save write over it without
+                // NSDocument's own warning.
+                self.bytesOnDisk = (try? Data(contentsOf: url)) ?? data
+                self.fileModificationDate = Self.modificationDate(of: url)
+            }
+        }
+        if let window = windowForSheet {
+            alert.beginSheetModal(for: window) { response in MainActor.assumeIsolated { answered(response) } }
+        } else {
+            answered(alert.runModal())
+        }
+    }
+
+    private static func modificationDate(of url: URL) -> Date? {
+        try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
     }
 
     private func reread(from url: URL, ofType type: String) {

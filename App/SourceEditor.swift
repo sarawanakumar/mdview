@@ -77,6 +77,12 @@ final class SourceEditor: NSViewController, NSTextViewDelegate {
         .monospacedSystemFont(ofSize: (NSFont.systemFontSize * zoom).rounded(), weight: .regular)
     }
 
+    /// Ends the current run of typing, so the next keystroke is a new undo
+    /// step (and a new change for the document's edited state).
+    func breakUndoCoalescing() {
+        textView.breakUndoCoalescing()
+    }
+
     func focus(in window: NSWindow?) {
         window?.makeFirstResponder(textView)
     }

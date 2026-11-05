@@ -2,6 +2,61 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 8.6, outside changes while editing; size limit raised
+
+**Done**
+- Committed 8.5 (`9a6477b`).
+- `MarkdownDocument` remembers the file's bytes as last read or saved
+  (`bytesOnDisk`, set in `read` and after a save works). On a change from
+  the watcher it reads the file once:
+  - same bytes (our own save, or the file back unchanged): no reload,
+    only `fileModificationDate` updated, so undo history stays and Save
+    doesn't warn
+  - different, no unsaved edits: reload as before (editor too)
+  - different, unsaved edits: a sheet, "“c.md” was changed by another
+    app." with **Keep My Edits** (default) or **Reload from Disk**. Only
+    one at a time. Keep remembers the file's bytes and date at the moment
+    of answering.
+- "No longer available" notice now goes when the file is back, even if
+  unchanged (it used to go with the reload).
+- **Bug found and fixed:** after a save, further typing didn't mark the
+  document edited, so a reload could silently replace it. NSTextView
+  had coalesced the new typing into the undo group already counted as
+  saved. Saving now calls `breakUndoCoalescing()` first, as TextEdit does.
+- Checked on a release build with System Events and shell writes:
+  - clean + outside change: editor shows the new text
+  - our own save: no read in the log, Undo Typing still enabled
+  - watcher still works after our save (5.3)
+  - typing after a save: edited again
+  - unsaved + outside change: the sheet; a second change while it shows
+    adds no second sheet; Keep leaves the edits; the same version written
+    again doesn't ask; Save then writes our text with no other alert
+  - Reload from Disk: editor and preview show the disk text, not edited
+  - the same question in the preview with unsaved edits
+  - deleted, then put back with the same bytes: the notice goes, no read
+  - Undo still works after saving
+- 271 core tests pass; release build, no warnings.
+
+**Size**
+- After 8.6 the bundle was **5,029,274 bytes**, over spec 8.4's 5 MB
+  (8.5: 4,969,450). The release build isn't stripped: plain `xcodebuild
+  build` keeps local symbols (only archive and install strip). Stripping
+  measured about 845 KB less per architecture (arm64 2,408,048 →
+  1,562,256), so about 3.3 MB in all.
+- The owner chose to raise the limit rather than strip or cut code. Spec
+  8.4 is now **under 6 MB**, with the reason in the spec; vision.md's
+  table notes it.
+
+**Open**
+- Still the rough edge from 8.3: closing a window whose file is gone and
+  choosing Save offers NSDocument's "Save As…", which does nothing.
+- Testing note: with System Events, pause about 0.3 s after the End key
+  before typing, or keystrokes can go missing.
+
+**Next**
+- 8.7: measure (open times, preview after editing, 5 MB file in edit
+  mode, size, offline), checklist section 11, version 1.1.0, tag and push.
+
 ## 2026-11-05: Roadmap 8.5, find and zoom in edit mode
 
 **Done**

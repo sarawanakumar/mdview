@@ -199,7 +199,7 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
     /// The file changed on disk (or came back) and has been read again
     /// (spec 5.1, 5.4).
     func documentDidChangeOnDisk() {
-        removeMissingNotice()
+        documentIsAvailable()
         if let document = document as? MarkdownDocument { editor?.setText(document.text) }
         preview.reload()
     }
@@ -221,6 +221,11 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
         NSAccessibility.post(element: bar, notification: .announcementRequested, userInfo: [
             .announcement: message, .priority: NSAccessibilityPriorityLevel.high.rawValue,
         ])
+    }
+
+    /// The file is there again (spec 5.4), whether or not it changed.
+    func documentIsAvailable() {
+        removeMissingNotice()
     }
 
     private func removeMissingNotice() {
@@ -259,6 +264,10 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
             editor.view.isHidden = false
             editor.focus(in: window)
         }
+    }
+
+    func documentWillSave() {
+        editor?.breakUndoCoalescing()
     }
 
     private func makeEditor(for document: MarkdownDocument) -> SourceEditor {

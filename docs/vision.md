@@ -36,7 +36,7 @@ Concretely, v1 is successful when:
 |---|---|
 | Double-click a typical file (< 100 KB) in Finder, app not running → preview visible | under 0.5 s |
 | Same, app already running | feels instant (under 0.2 s) |
-| App bundle size | under 5 MB |
+| App bundle size | under 5 MB (6 MB since v1.1, spec 8.4) |
 | Third-party dependencies | zero (Apple's `swift-markdown` is the one allowed package) |
 | Network requests | zero, ever |
 | Daily use | I've set it as my default app for `.md` and don't miss anything |

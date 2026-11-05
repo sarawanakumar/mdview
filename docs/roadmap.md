@@ -199,7 +199,7 @@ ADR 0008 accepted 2026-11-05.
       *(11.1–11.5, 11.10)*
 - [x] **8.5** Find and zoom in edit mode; keyboard and VoiceOver.
       *(6.6, 6.7, 11.9, 11.13)*
-- [ ] **8.6** Outside changes while editing: reload when clean, Keep My
+- [x] **8.6** Outside changes while editing: reload when clean, Keep My
       Edits / Reload from Disk when not, ignore our own saves (today the
       reload after our own save clears the undo history). *(11.11, 11.4)*
 - [ ] **8.7** Measure: open times unchanged, 5 MB file in edit mode, app
