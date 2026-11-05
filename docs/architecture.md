@@ -276,8 +276,9 @@ cost on a cold launch.
   (spec 7.6, 10.4).
 - **Fuzz-style test**: random and truncated Markdown is rendered in a loop
   to check nothing crashes or hangs.
-- **App checks**: a written checklist in `fixtures/` covering spec sections
-  1, 4, 5 and 6 that need a real window, run before each release.
+- **Release checklist**: [checklist.md](checklist.md) lists every spec
+  criterion with how it's checked (tests, scripts, or by hand), run
+  before each release.
 - **Performance**: the timing script above, against spec section 8.
 
 ## Risks to check first

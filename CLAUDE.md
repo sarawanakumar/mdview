@@ -12,7 +12,8 @@ use. Speed and simplicity beat features.
    changing anything.
 
 Other docs: `docs/vision.md` (why), `docs/architecture.md` (how),
-`docs/adr/` (decisions).
+`docs/adr/` (decisions), `docs/checklist.md` (every spec criterion and how
+it's checked, run before a release).
 
 ## End of every session
 

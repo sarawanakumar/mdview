@@ -2,6 +2,39 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 7.6, release checklist (in progress)
+
+**Done**
+- `docs/checklist.md`: all 82 spec criteria, each with how it's checked
+  (unit tests, a script, an earlier in-app check, or by hand) and when
+  it last passed, plus 11 numbered hand checks with steps. It replaces
+  the "checklist in `fixtures/`" the architecture doc planned. A `.md`
+  there would have been picked up as a test file. CLAUDE.md and
+  architecture.md point to it.
+- Run today on the release build:
+  - 264 core tests pass
+  - `check-offline.zsh` passes (18 files, 23 processes, no sockets)
+  - `time-open.swift`: cold 484 ms, warm 133 ms, large 1,115 ms
+  - Open With offers MDView for `.md`, `.markdown`, `.mdown` and `.mkd`
+- Found and fixed a side effect of my own: the temporary comparison
+  builds from 7.2 (`build/ab/`) had been registered with Launch Services,
+  and one had become the default app for `.mdown` and `.mkd`. They're
+  now unregistered and deleted. Those two extensions now default to
+  `build/mdview.app`, where before (roadmap 1.2) they defaulted to VS
+  Code. I didn't change the owner's defaults back; that's theirs to do
+  (Finder → Get Info → Open with → Change All).
+
+**Open: hand checks** (checklist items 1–10; 11 passed in 7.2)
+- Never checked so far: Dock drop (1.5), link hover (4.5), ⌘-click title
+  path menu (6.1).
+- Tested in parts, the rest needs a person: a real folder grant (9.5),
+  web and mail links (4.1), GUI editors' own windows (5.1), the Window
+  menu's tab items (6.2), live dark mode (6.4), the print panel (6.8),
+  the editor picker (6.10), VoiceOver (6.14).
+
+**Next**
+- The owner runs the hand checks; fix anything that fails; then tick 7.6.
+
 ## 2026-11-05: Roadmap 7.5, distribution (ADR 0007)
 
 **Done**
