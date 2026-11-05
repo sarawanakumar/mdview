@@ -162,7 +162,7 @@ see colours sooner.*
       start-up peak of ~135 MB) and add them up, several runs.
 - [x] **7.3** Privacy check: network monitor during a test session, check
       entitlements, confirm the only package. *(9.1–9.4)*
-- [ ] **7.4** App icon and About box.
+- [x] **7.4** App icon and About box.
 - [ ] **7.5** Decide distribution (build from source, or notarised
       GitHub release) and write it up as an ADR.
 - [ ] **7.6** Go through every spec criterion with the written checklist;

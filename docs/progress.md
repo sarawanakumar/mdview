@@ -2,6 +2,48 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 7.4, app icon and About box
+
+**Done**
+- **Icon:** `scripts/make-icon.swift` draws it with Core Graphics: a blue
+  rounded square on the macOS icon grid (824 of 1024), a white page with
+  a folded corner, and the Markdown "M↓" mark. It writes the ten sizes
+  into `App/Resources/Assets.xcassets/AppIcon.appiconset`, and the build
+  uses it (`ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon`). There's no
+  design tool or image file to keep in step; edit the script and run it.
+- The first version had a gradient and soft shadows. Those compress
+  badly, and the app grew to 5,207,101 bytes, over spec 8.4. The flat
+  version adds about 87 KB.
+- **About box:** the standard panel, from a new `showAbout` action. It
+  shows:
+  - the icon
+  - "MDView" (the bundle name is "mdview", so the name is passed in)
+  - version 0.1.0 (1)
+  - "Copyright © 2026 Saravanakumar Selladurai" (from the git author;
+    `NSHumanReadableCopyright`)
+  - two lines of credits: what mdview is, and that it uses swift-markdown
+    (Apache 2.0) and swift-cmark (BSD 2-Clause)
+
+  It was checked in the release app with a temporary hook, since
+  removed, that drew the panel to an image.
+
+**Measurements**
+- Bundle: 4,936,346 bytes (spec 8.4: under 5 MB, about 64 KB left).
+  Assets.car is 76 KB and AppIcon.icns 11 KB.
+- Timing unchanged: cold 480 ms, warm 118 ms, large 1,144 ms (3 runs).
+- All 264 core tests pass, and both builds have no warnings.
+
+**Open**
+- Any binary release must ship the full license texts of swift-markdown
+  (Apache 2.0, with its NOTICE) and swift-cmark (BSD 2-Clause and the
+  other notices in its COPYING). For roadmap 7.5 and 7.8.
+- The icon design is a first proposal; easy to change in the script.
+- Size headroom is small (64 KB). Anything added to the bundle from now
+  on should be measured.
+
+**Next**
+- 7.5: decide distribution (an ADR).
+
 ## 2026-11-05: Roadmap 7.3, privacy check
 
 **Done** (release build from 7.2, unchanged)

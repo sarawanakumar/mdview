@@ -52,7 +52,7 @@ App/                        the macOS app target (AppKit)
   FolderAccess              stores and restores folder access grants (ADR 0005)
   mdview.entitlements       sandbox, user-selected read-only, app-scoped bookmarks,
                             outgoing network
-  Resources/                preview.css, Info.plist, app icon
+  Resources/                preview.css, Info.plist, Assets.xcassets (app icon)
 Packages/MDViewCore/        local Swift package, no AppKit
   UTF8Text                  bytes → text, bad bytes replaced and reported (spec 10.2)
   FrontMatter               strips a leading YAML block (spec 2.13)
@@ -73,6 +73,7 @@ Packages/MDViewCore/        local Swift package, no AppKit
 fixtures/                   the test Markdown files listed in spec.md
 scripts/time-open.swift     times opening files against spec section 8
 scripts/check-offline.zsh   checks no mdview process touches the network (spec 9.1)
+scripts/make-icon.swift     draws the app icon into Assets.xcassets
 ```
 
 Everything that knows about Markdown lives in `MDViewCore`, along with any

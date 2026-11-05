@@ -32,7 +32,7 @@ enum MainMenu {
 
     private static func appMenu() -> NSMenu {
         let menu = NSMenu(title: "MDView")
-        menu.addItem(item("About MDView", #selector(NSApplication.orderFrontStandardAboutPanel(_:))))
+        menu.addItem(item("About MDView", #selector(AppDelegate.showAbout(_:))))
         menu.addItem(.separator())
 
         let services = NSMenu(title: "Services")

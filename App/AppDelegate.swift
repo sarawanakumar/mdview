@@ -46,6 +46,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return false
     }
 
+    /// The standard About panel: icon, version and copyright come from the
+    /// bundle; the credits say what mdview is and what it uses.
+    @objc func showAbout(_ sender: Any?) {
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
+        let credits = NSAttributedString(
+            string: """
+                A fast, read-only Markdown viewer that never goes online.
+
+                Uses Apple’s swift-markdown (Apache License 2.0, © Apple Inc. \
+                and the Swift project authors) and swift-cmark (BSD 2-Clause, \
+                © John MacFarlane and others).
+                """,
+            attributes: [
+                .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize),
+                .foregroundColor: NSColor.secondaryLabelColor,
+                .paragraphStyle: paragraph,
+            ]
+        )
+        // The bundle name is "mdview"; the name people see is MDView.
+        NSApp.orderFrontStandardAboutPanel(options: [.applicationName: "MDView", .credits: credits])
+    }
+
     /// A viewer has nothing to create.
     func applicationShouldOpenUntitledFile(_ sender: NSApplication) -> Bool {
         false
