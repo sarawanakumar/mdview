@@ -25,6 +25,12 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
     private var pageNavigation: WKNavigation?
     /// An `#anchor` to scroll to once the page has loaded (spec 4.3).
     private var pendingFragment: String?
+    /// True once our page has finished loading; later renders swap the body
+    /// in place instead of loading a new page (spec 5.2).
+    private var hasShownPage = false
+    /// Numbers each render, so a slow older render never replaces a newer
+    /// one.
+    private var renderGeneration = 0
 
     override func loadView() {
         view = NSView()
@@ -49,6 +55,8 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
         let fileURL = document.fileURL
         let configuration = PreviewConfiguration.shared()
         let locateImage = ImageAccess.locator(for: fileURL, grants: FolderAccess.shared.snapshot)
+        renderGeneration += 1
+        let generation = renderGeneration
 
         Task {
             // Markdown goes through renderSafely: a large stack, and a plain
@@ -56,15 +64,41 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
             let rendered = isMarkdown
                 ? await HTMLRenderer.renderSafely(markdown: text, locateImage: locateImage)
                 : RenderedPage(html: await Task.detached { HTMLRenderer.render(plainText: text) }.value, localReferences: [])
+            guard generation == renderGeneration else { return }  // a newer render is on its way
             Signposts.signposter.emitEvent("documentRendered")
             onFolderAccessNeeded?(fileURL.flatMap { Self.folderNeeded(for: rendered.localReferences, document: $0) })
+            let page = PageShell.page(title: title, body: rendered.html)
+            if hasShownPage, await swapBody(rendered.html, title: title, page: page, generation: generation) {
+                return
+            }
             do {
                 let config = try await configuration.value
-                load(PageShell.page(title: title, body: rendered.html), base: PageShell.baseURL(for: fileURL?.resolvingSymlinksInPath()), with: config)
+                load(page, base: PageShell.baseURL(for: fileURL?.resolvingSymlinksInPath()), with: config)
             } catch {
                 showError(error)
             }
         }
+    }
+
+    /// Replaces the page's content in place, so the scroll position stays
+    /// where it was (spec 5.2; the browser keeps it within the new length).
+    /// Uses the app's own script with the HTML passed as an argument; page
+    /// JavaScript stays off. Returns false if it couldn't, so the caller
+    /// loads the page instead.
+    private func swapBody(_ body: String, title: String, page: String, generation: Int) async -> Bool {
+        guard let webView, pageNavigation == nil else { return false }
+        do {
+            _ = try await webView.callAsyncJavaScript(
+                "document.body.innerHTML = body; document.title = title;",
+                arguments: ["body": body, "title": title], contentWorld: .defaultClient
+            )
+        } catch {
+            return false
+        }
+        guard generation == renderGeneration else { return true }
+        self.page = page
+        Signposts.signposter.emitEvent("documentVisible")
+        return true
     }
 
     /// The folder to suggest if the page refers to local files that aren't
@@ -183,6 +217,7 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         guard navigation == pageNavigation else { return }
         pageNavigation = nil
+        hasShownPage = true
         webView.isHidden = false
         Signposts.signposter.emitEvent("documentVisible")
         if let fragment = pendingFragment {

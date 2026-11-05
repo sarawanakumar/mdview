@@ -2,6 +2,38 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 4.2, keeping your place on reload; changed images
+
+**Done**
+- After the first load, a re-render (file changed, or a folder grant)
+  swaps the page body in place with the app's own script, the HTML passed
+  as an argument; page JavaScript stays off. Scroll position is kept
+  (spec 5.2). Renders are numbered so a slow older one never replaces a
+  newer one; a failed swap falls back to loading the page.
+- Image URLs now carry the image file's modification time (`?v=…`): a
+  changed image is fetched again on the next render, unchanged ones stay
+  in WebKit's cache (spec 5.5). The scheme handler only looks at the path.
+
+**Checked** (temporary hook, removed; long test page scrolled to 3,000 px)
+
+| Edit from outside | scrollY | Content | Image |
+|---|---|---|---|
+| none | 3000 | 201 paragraphs | 48 px, v=…358 |
+| append at end (in place) | 3000 | 202, new last line | same version (cached) |
+| 10 lines inserted at top (replace) | 3000 | 212, new title | same version |
+| image file swapped, page re-saved | 3000 | 213 | **2400 px, v=…433** |
+
+- Reload speed with a 50 KB file: 59–62 ms in place, 112–116 ms save by
+  replace (target < 500 ms).
+- 192 tests pass; Debug and Release build with no warnings.
+- Not checked: a page that gets much shorter (the browser keeps the scroll
+  within the new length; spec 5.2 "as close as the new content allows").
+  An image that changes *without* the page being saved isn't noticed until
+  the page's next reload; spec 5.5 only asks for that.
+
+**Next**
+- Roadmap 4.3: the file disappearing and coming back.
+
 ## 2026-11-05: Roadmap 4.1, watching files for changes
 
 **Done**

@@ -189,10 +189,14 @@ and are routed the same way; no new web view is made.
   on close). A change re-reads the file with `revert(toContentsOf:)` and
   tells its window to render again.
 - On reload, the new HTML body is swapped into the existing page with a
-  small app-side script instead of reloading the page. That keeps the scroll
-  position (spec 5.2) and is faster than a full load.
-- Image URLs get a changing query value on each reload, so changed images
-  refresh (spec 5.5).
+  small app-side script (`document.body.innerHTML`, the HTML passed as an
+  argument) instead of reloading the page. That keeps the scroll position
+  (spec 5.2) and is faster than a full load. Renders are numbered so an
+  older one never replaces a newer one; if the swap fails, the page is
+  loaded normally.
+- Image URLs carry the image file's modification time (`?v=`), so a
+  changed image gets a new URL and is fetched again, while unchanged ones
+  stay cached (spec 5.5).
 - If the file is gone, the window keeps the last content and shows a notice;
   the watcher keeps checking for it to come back (spec 5.4).
 

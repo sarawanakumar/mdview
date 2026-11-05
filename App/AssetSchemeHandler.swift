@@ -56,8 +56,16 @@ enum ImageAccess {
         { source in
             guard let document, let file = LocalReferences.resolve(source, relativeTo: document),
                   canShow(file, grants: grants) else { return nil }
-            return url(for: file)?.absoluteString
+            return url(for: file, version: modificationVersion(of: file))?.absoluteString
         }
+    }
+
+    /// The image file's modification time in milliseconds. Added to the
+    /// image's URL, so an image that changed gets a new URL and is fetched
+    /// again on the next render, while unchanged ones stay cached (spec 5.5).
+    static func modificationVersion(of file: URL) -> String? {
+        let date = try? file.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
+        return date.map { String(Int64($0.timeIntervalSince1970 * 1000)) }
     }
 
     /// An image file that exists, inside a granted folder.
@@ -66,11 +74,14 @@ enum ImageAccess {
         return grants.covers(FolderAccess.path(of: file)) && FileManager.default.isReadableFile(atPath: file.path)
     }
 
-    static func url(for file: URL) -> URL? {
+    /// `mdview-file://document/<path>[?v=<version>]`. The scheme handler
+    /// only looks at the path.
+    static func url(for file: URL, version: String? = nil) -> URL? {
         var components = URLComponents()
         components.scheme = PreviewConfiguration.scheme
         components.host = host
         components.path = file.path(percentEncoded: false)
+        if let version { components.queryItems = [URLQueryItem(name: "v", value: version)] }
         return components.url
     }
 
