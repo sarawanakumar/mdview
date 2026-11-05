@@ -17,13 +17,16 @@ final class SourceEditor: NSViewController, NSTextViewDelegate {
         super.init(nibName: nil, bundle: nil)
         view = scrollView
 
-        textView.font = .monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        textView.font = Self.font(zoom: 1)
         textView.textColor = .textColor
         textView.backgroundColor = .textBackgroundColor
         textView.textContainerInset = NSSize(width: 16, height: 16)
         textView.isRichText = false
         textView.importsGraphics = false
         textView.allowsUndo = true
+        // The standard find bar, above the text (spec 11.9). Not incremental:
+        // with incremental searching on, Find Next stayed on the first match.
+        textView.usesFindBar = true
         // What's typed is what's saved (spec 11.3).
         textView.smartInsertDeleteEnabled = false
         textView.isAutomaticQuoteSubstitutionEnabled = false
@@ -55,6 +58,23 @@ final class SourceEditor: NSViewController, NSTextViewDelegate {
         textView.string = text
         let length = (text as NSString).length
         textView.setSelectedRange(NSRange(location: min(selection.location, length), length: 0))
+    }
+
+    /// Find, Find Next / Previous and Use Selection for Find, done by the
+    /// text view's own find bar. It reads the action from the sender's tag.
+    func performFind(_ action: NSTextFinder.Action) {
+        let sender = NSMenuItem()
+        sender.tag = action.rawValue
+        textView.performTextFinderAction(sender)
+    }
+
+    /// The window's zoom (spec 6.7), as a scale of the text size.
+    func setZoom(_ zoom: Double) {
+        textView.font = Self.font(zoom: zoom)
+    }
+
+    private static func font(zoom: Double) -> NSFont {
+        .monospacedSystemFont(ofSize: (NSFont.systemFontSize * zoom).rounded(), weight: .regular)
     }
 
     func focus(in window: NSWindow?) {

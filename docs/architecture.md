@@ -236,7 +236,11 @@ the window. Each change goes straight to `MarkdownDocument.updateText`, so
 Save and the preview always see the editor's text; the preview re-renders
 on the way back only if something changed. The text view uses the window's
 undo manager, which is the document's, so `NSDocument` keeps the edited
-marker in step with undo and redo without any code of ours.
+marker in step with undo and redo without any code of ours. In edit mode
+the Find menu drives the text view's own standard find bar
+(`performTextFinderAction`, not incremental: with incremental searching
+on, Find Next stayed on the first match), and the window's one zoom level
+also scales the editor's font (spec 6.6, 6.7, 11.9).
 
 | Spec | How |
 |---|---|

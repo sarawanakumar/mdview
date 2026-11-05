@@ -263,6 +263,7 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
 
     private func makeEditor(for document: MarkdownDocument) -> SourceEditor {
         let editor = SourceEditor(text: document.text)
+        editor.setZoom(preview.zoom)
         editor.onChange = { [weak self, weak document] text in
             document?.updateText(text)
             self?.previewIsStale = true
@@ -284,6 +285,7 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
     private var isFindBarShown = false
 
     @objc func showFindBar(_ sender: Any?) {
+        if isEditing, let editor { return editor.performFind(.showFindInterface) }  // spec 11.9
         if !isFindBarShown {
             stack.insertArrangedSubview(findBar.view, at: 0)
             findBar.view.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
@@ -301,15 +303,18 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
 
     /// Find Next / Previous: with nothing searched yet, open the bar instead.
     @objc func findNextMatch(_ sender: Any?) {
+        if isEditing, let editor { return editor.performFind(.nextMatch) }
         findBar.searchText.isEmpty ? showFindBar(sender) : findBar.findNext()
     }
 
     @objc func findPreviousMatch(_ sender: Any?) {
+        if isEditing, let editor { return editor.performFind(.previousMatch) }
         findBar.searchText.isEmpty ? showFindBar(sender) : findBar.findPrevious()
     }
 
     /// Searches for whatever is selected in the page.
     @objc func useSelectionForFind(_ sender: Any?) {
+        if isEditing, let editor { return editor.performFind(.setSearchString) }
         Task {
             guard let text = await preview.selectedText() else { return }
             if !isFindBarShown { showFindBar(sender) }
@@ -345,15 +350,21 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
     // MARK: Zoom (spec 6.7)
 
     @objc func zoomIn(_ sender: Any?) {
-        if let next = ZoomLevels.zoomedIn(from: preview.zoom) { preview.setZoom(next) }
+        if let next = ZoomLevels.zoomedIn(from: preview.zoom) { setZoom(next) }
     }
 
     @objc func zoomOut(_ sender: Any?) {
-        if let next = ZoomLevels.zoomedOut(from: preview.zoom) { preview.setZoom(next) }
+        if let next = ZoomLevels.zoomedOut(from: preview.zoom) { setZoom(next) }
     }
 
     @objc func actualSize(_ sender: Any?) {
-        preview.setZoom(ZoomLevels.actualSize)
+        setZoom(ZoomLevels.actualSize)
+    }
+
+    /// One zoom per window, for the preview and the editor alike.
+    private func setZoom(_ zoom: Double) {
+        preview.setZoom(zoom)
+        editor?.setZoom(zoom)
     }
 
     /// A grant anywhere may cover what this window needs: render again.
@@ -371,12 +382,6 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
         case #selector(toggleEditMode(_:)):
             item.state = isEditing ? .on : .off
             return isEditing || (document as? MarkdownDocument)?.canEdit == true
-        case #selector(showFindBar(_:)), #selector(findNextMatch(_:)), #selector(findPreviousMatch(_:)),
-             #selector(useSelectionForFind(_:)):
-            return !isEditing  // find in the source comes in roadmap 8.5
-        case #selector(zoomIn(_:)) where isEditing, #selector(zoomOut(_:)) where isEditing,
-             #selector(actualSize(_:)) where isEditing:
-            return false  // editor zoom comes in roadmap 8.5
         case #selector(zoomIn(_:)):
             return ZoomLevels.zoomedIn(from: preview.zoom) != nil
         case #selector(zoomOut(_:)):

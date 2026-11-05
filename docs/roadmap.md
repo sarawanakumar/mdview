@@ -197,7 +197,7 @@ ADR 0008 accepted 2026-11-05.
       the unsaved text; Edit menu gains Undo, Redo, Cut, Paste. Check Edit
       Mode is dimmed for `latin1.md` and `utf16.md` (`canEdit`, 8.3).
       *(11.1–11.5, 11.10)*
-- [ ] **8.5** Find and zoom in edit mode; keyboard and VoiceOver.
+- [x] **8.5** Find and zoom in edit mode; keyboard and VoiceOver.
       *(6.6, 6.7, 11.9, 11.13)*
 - [ ] **8.6** Outside changes while editing: reload when clean, Keep My
       Edits / Reload from Disk when not, ignore our own saves (today the

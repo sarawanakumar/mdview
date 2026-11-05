@@ -2,6 +2,45 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 8.5, find and zoom in edit mode
+
+**Done**
+- Committed 8.4 (`5aee938`).
+- Find in edit mode uses the text view's own standard find bar
+  (`usesFindBar`). Find…, Find Next, Find Previous and Use Selection for
+  Find go to `SourceEditor.performFind`, which calls
+  `performTextFinderAction` with the action as the sender's tag. In the
+  preview, our `FindBar` works as before.
+- Incremental searching is off. With it on, Find Next and Previous stayed
+  on the first match (checked through the menu and with ⌘G).
+- Zoom: one level per window. Zoom In / Out / Actual Size set the preview
+  and the editor together; the editor's font is the system size × zoom,
+  rounded. A new editor starts at the window's zoom.
+- Checked on a release build with System Events:
+  - ⌘F in edit mode opens the standard bar (AXSearchField focused).
+    Return selects the first "apple"; Find Next steps through all three
+    and wraps; Find Previous goes back; Find Next works with the bar
+    closed; Esc returns focus to the editor.
+  - Use Selection for Find puts the selected word in the search field.
+  - Zoom on a 120-line file: the text's height goes 1847 → 1968 → 2089
+    → 2210 pt for 90 / 100 / 110 / 125 %, and back to 1968 on Actual
+    Size, also when that's chosen in the preview.
+  - Keyboard and VoiceOver: switching to edit mode focuses the editor,
+    an AXTextArea announced as "Markdown source"; switching back focuses
+    the preview's AXWebArea. Every command has a menu item and shortcut.
+    A full VoiceOver pass is left for the 8.7 checklist (hand check, as
+    for spec 6.14).
+- Release build, no warnings.
+
+**Measurements**
+- Bundle: **4,969,450 bytes**, about 30 KB under spec 8.4's 5 MB
+  (5,000,000 bytes). v1.0 was 4,936,346, so edit mode has cost 33 KB so
+  far (both architectures). `du -sk` says 4,868. 8.6 must stay small.
+
+**Next**
+- 8.6: outside changes while editing (ignore our own saves, then Keep My
+  Edits / Reload from Disk).
+
 ## 2026-11-05: Roadmap 8.4, the editor and the Edit Mode toggle
 
 **Done**
