@@ -22,6 +22,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
         // Start WebKit's setup now, so it's ready when the first file arrives.
         PreviewConfiguration.shared()
+        // Folders the user allowed earlier (spec 9.6), before any file opens.
+        FolderAccess.shared.restore()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

@@ -88,7 +88,7 @@ section 2 passes.
 
 ## M3. Images, links and folder access
 
-- [ ] **3.1** `FolderAccess`: save and restore folder grants as
+- [x] **3.1** `FolderAccess`: save and restore folder grants as
       security-scoped bookmarks. *(9.6)*
 - [ ] **3.2** Folder access bar and picker; reload images once granted.
       *(9.5, 9.7)*

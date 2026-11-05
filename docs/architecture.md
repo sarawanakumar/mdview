@@ -48,7 +48,8 @@ App/                        the macOS app target (AppKit)
   FileWatcher               notices when the file changes on disk (spec section 5)
   EditorLauncher            "Open in Editor" and the remembered editor (spec 6.10–6.12)
   FolderAccess              stores and restores folder access grants (ADR 0005)
-  mdview.entitlements       sandbox, user-selected read-only, outgoing network
+  mdview.entitlements       sandbox, user-selected read-only, app-scoped bookmarks,
+                            outgoing network
   Resources/                preview.css, Info.plist, app icon
 Packages/MDViewCore/        local Swift package, no AppKit
   UTF8Text                  bytes → text, bad bytes replaced and reported (spec 10.2)
@@ -59,12 +60,15 @@ Packages/MDViewCore/        local Swift package, no AppKit
   HTMLRenderer              swift-markdown tree → HTML string
   HeadingSlugger            GitHub-style heading anchors (spec 4.3)
   Highlighter/              tokenizer + one small rule set per language (ADR 0004)
+  Files/FolderGrantList     which folders are granted (pure path rules, spec 9.6)
   Tests/                    unit tests, run with `swift test`
 fixtures/                   the test Markdown files listed in spec.md
 ```
 
-Everything that knows about Markdown lives in `MDViewCore`. The app target
-only knows about windows, files and the web view.
+Everything that knows about Markdown lives in `MDViewCore`, along with any
+other logic that doesn't need AppKit or WebKit (such as the folder-grant
+rules), so it can be unit tested. The app target only knows about windows,
+files, bookmarks and the web view.
 
 ## How a file gets on screen
 

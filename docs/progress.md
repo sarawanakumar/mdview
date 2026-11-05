@@ -2,6 +2,45 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 3.1, remembering folder grants
+
+**Done**
+- `MDViewCore/Files/FolderGrantList`: pure rules for which folders are
+  granted. A grant covers the folder and everything inside; "/a/bc" isn't
+  inside "/a/b"; granting a covered folder does nothing; granting a
+  folder above existing grants replaces them. 8 tests.
+- `App/FolderAccess.swift`: saves each grant as a security-scoped
+  bookmark in the app's settings; at launch resolves them, starts access
+  for the session, refreshes stale bookmarks and drops ones that no
+  longer resolve. Paths are compared after resolving symlinks. Logs
+  counts only, no paths.
+- Restored in `applicationWillFinishLaunching`, before any file opens.
+- New entitlement `com.apple.security.files.bookmarks.app-scope`
+  (needed for bookmarks; ADR 0005 already planned them).
+- Architecture: `MDViewCore` now also holds logic that needs no AppKit
+  or WebKit (like these path rules), so it can be unit tested.
+
+**Checked**
+- 142 tests pass; Debug and Release build with no warnings; Release
+  entitlements: sandbox, user-selected read-only, app-scoped bookmarks,
+  network client.
+- End to end with a temporary hook (removed): the folder picker comes in
+  3.2, so this used a file macOS had already given access to.
+  - Before any grant: `plain.txt` and `valid.md` both **denied** by the
+    sandbox.
+  - Opened `plain.txt` and granted it; quit.
+  - Relaunched with nothing opened: `plain.txt` covered and **read
+    (72 bytes)**; `valid.md` still denied. Log: "restored 1 of 1".
+  - Test grant cleared afterwards.
+- Not tested: a real folder grant (needs 3.2's picker), and a stale
+  bookmark being refreshed.
+- Known limit: ad hoc signed builds can't use bookmarks from a previous
+  build, so rebuilding forgets grants (same as the recent-files list).
+
+**Next**
+- Roadmap 3.2: the folder access bar and picker; reload images once
+  granted.
+
 ## 2026-11-05: Roadmap 2.10, expected HTML recorded; M2 done
 
 **Done**
