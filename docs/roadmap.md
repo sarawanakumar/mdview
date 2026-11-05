@@ -137,7 +137,7 @@ section 2 passes.
 
 - [x] **6.1** Scanner and the rule-table format; tests for the four token
       kinds and malformed input. *(7.2, 7.6, ADR 0004)*
-- [ ] **6.2** Rule tables for Swift, Python, JavaScript/TypeScript.
+- [x] **6.2** Rule tables for Swift, Python, JavaScript/TypeScript.
 - [ ] **6.3** Rule tables for shell, JSON, YAML, HTML, CSS.
 - [ ] **6.4** Language tag aliases; unknown/untagged blocks stay plain.
       *(7.1, 7.4)*

@@ -2,6 +2,36 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 6.2, Swift, Python, JavaScript, TypeScript
+
+**Done**
+- `MDViewCore/Highlighter/Languages.swift`:
+  - **Swift**: reserved words plus common contextual ones (`async`,
+    `await`, `some`, `any`, `mutating`, `get`/`set`, …); `//`, nesting
+    `/* */`; `"…"`, `"""…"""`, raw `#"…"#` and `#"""…"""#`.
+  - **Python**: all keywords incl. `match`/`case`/`type`; `#`; single,
+    double and triple-quoted strings (a prefix like `f` or `r` stays
+    plain, the string is coloured).
+  - **JavaScript**: keywords; `//`, `/* */`; single and double quotes,
+    and template literals over several lines; `$` is part of names.
+  - **TypeScript**: JavaScript plus `interface`, `type`, `readonly`,
+    `keyof`, the built-in type names, and the rest of its keywords.
+  - Not handled, by design (ADR 0004): JavaScript regular expression
+    literals, string interpolation contents, type and function names.
+
+**Checked**
+- 12 new tests (231 total): a typical snippet per language with the exact
+  keywords, strings, comments and numbers expected (Swift interpolation
+  stays inside its string; Python docstring over two lines; JS template
+  over a line break; `$`-names; TypeScript words not coloured as
+  JavaScript); raw and multi-line strings; nested comments; type names
+  not keywords; `#` inside a Python string not a comment; an unclosed
+  template; and 300 random inputs per language keeping exactly their text.
+- Not used by the renderer yet (6.4).
+
+**Next**
+- Roadmap 6.3: shell, JSON, YAML, HTML, CSS.
+
 ## 2026-11-05: Roadmap 6.1, the highlighter's scanner
 
 **Done**
