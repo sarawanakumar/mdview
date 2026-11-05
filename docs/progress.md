@@ -2,6 +2,62 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 8.3, saving the document
+
+**Done**
+- Committed 8.2 (`391b137`).
+- `MarkdownDocument` can now be saved, though nothing edits it until the
+  editor comes in 8.4:
+  - `updateText(_:)` for the editor; the edited state will come from the
+    window's undo manager, which is the document's.
+  - `canEdit` (false for files with bad bytes, spec 11.10).
+  - `writableTypes(for:)` returns the file's own type for a plain save.
+    Info.plist keeps the Viewer role; this was simpler than changing how
+    Launch Services sees the app.
+  - `data(ofType:)` through `UTF8Text.encode`, refusing if `!canEdit`.
+  - File ▸ Save ⌘S, dimmed unless there are unsaved edits, so ⌘S in the
+    preview never touches a file.
+  - Save of a file that's gone shows our alert; `prepareSavePanel`
+    returns false, so no route ever opens a save panel (no Save As).
+  - While there are unsaved edits, a change on disk isn't reloaded (so it
+    can't throw edits away). 8.6 adds the Keep / Reload question.
+- Checked on a release build with a temporary hook (env variable) that
+  marked the document edited, driving the app with System Events. The
+  hook is removed; it isn't in the commit.
+  - Edited marker: the close button's `AXEdited` is true; File ▸ Save is
+    enabled, then dimmed again after saving.
+  - `bom.md`: saved with the byte order mark and original bytes intact,
+    plus the new line. `crlf.md`: CRLF bytes intact.
+  - Close with edits: the standard Save / Don't Save / Cancel sheet.
+    Cancel keeps the window and the file unchanged; Don't Save closes
+    without writing; Save on Quit wrote the file, then quit.
+  - Locked (`chflags uchg`) and read-only (`chmod 444`) files: NSDocument's
+    "The file is locked" alert with Save Anyway / Cancel. Save Anyway works
+    in the sandbox and leaves the lock and permissions as they were. I
+    kept it (standard behaviour, an explicit choice); spec 11.12 now says
+    so.
+  - Deleted file: menu Save shows "“gone.md” can't be saved because it's
+    no longer available." Before the fix NSDocument offered Save As.
+  - `latin1.md` with edits: Save stays dimmed.
+- spec 11.6 (Save dimmed when nothing to save), 11.8 and 11.12 reworded
+  to match. architecture.md describes the saving rules.
+- Release build, no warnings; 271 core tests pass; app 4,828 KB
+  (`du -sk`, +20 KB).
+
+**Open**
+- Rough edge: closing a window whose file is gone, then choosing Save in
+  the close question, gets NSDocument's "location cannot be determined"
+  alert with a Save As… button. Pressing it does nothing (the panel is
+  refused) and the window stays open with its edits. Safe, but the button
+  is misleading. Could be handled with the disappeared state in 8.6.
+- When driving the app with System Events, set it frontmost first:
+  after one window closes, the next isn't key, and Close does nothing.
+- Edit Mode being dimmed for bad-byte files is checked in 8.4, once the
+  menu item exists.
+
+**Next**
+- 8.4: the editor and the View → Edit Mode toggle.
+
 ## 2026-11-05: Roadmap 8.2, saving text back as bytes
 
 **Done**

@@ -189,12 +189,14 @@ ADR 0008 accepted 2026-11-05.
 - [x] **8.2** `UTF8Text.encode` in `MDViewCore` (text back to bytes, byte
       order mark restored), with round-trip tests over `fixtures/edge/`.
       *(11.8)*
-- [ ] **8.3** Editable `MarkdownDocument`: `data(ofType:)`, edited state,
+- [x] **8.3** Editable `MarkdownDocument`: `data(ofType:)`, edited state,
       File → Save, the close and quit question, save errors, dimmed for
       files with bad bytes. *(11.6, 11.7, 11.10, 11.12)*
 - [ ] **8.4** The editor and toggle: View → Edit Mode (Cmd+/), plain
       `NSTextView` made on first use, substitutions off, preview renders
-      the unsaved text; Edit menu gains Undo, Redo, Cut, Paste. *(11.1–11.5)*
+      the unsaved text; Edit menu gains Undo, Redo, Cut, Paste. Check Edit
+      Mode is dimmed for `latin1.md` and `utf16.md` (`canEdit`, 8.3).
+      *(11.1–11.5, 11.10)*
 - [ ] **8.5** Find and zoom in edit mode; keyboard and VoiceOver.
       *(6.6, 6.7, 11.9, 11.13)*
 - [ ] **8.6** Outside changes while editing: reload when clean, Keep My

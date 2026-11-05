@@ -64,6 +64,8 @@ enum MainMenu {
         menu.addItem(item("Change Editor…", #selector(DocumentWindowController.changeEditor(_:))))
         menu.addItem(.separator())
         menu.addItem(item("Close", #selector(NSWindow.performClose(_:)), "w"))
+        // Spec 11.6; NSDocument handles it, dimmed when nothing has changed.
+        menu.addItem(item("Save", #selector(NSDocument.save(_:)), "s"))
         // Spec 6.8; NSDocument handles both (it's in the responder chain).
         menu.addItem(.separator())
         menu.addItem(item("Page Setup…", #selector(NSDocument.runPageLayout(_:)), "p", [.command, .shift]))

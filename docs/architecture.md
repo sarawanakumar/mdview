@@ -38,7 +38,7 @@ App/                        the macOS app target (AppKit)
   MainMenu                  the menu bar, built in code
   RecentDocumentsMenu       fills File → Open Recent (spec 1.7)
   MarkdownDocumentController  opens every file as a MarkdownDocument (spec 10.5)
-  MarkdownDocument          NSDocument subclass: reads the file, read-only
+  MarkdownDocument          NSDocument subclass: reads the file; saves it only on File ▸ Save (ADR 0008)
   DocumentWindowController  one window per file; owns the preview and find bar
   FindBar                   the find bar (spec 6.6)
   PreviewConfiguration      the shared locked-down web view setup (block list, JS off),
@@ -218,7 +218,15 @@ and are routed the same way; no new web view is made.
 `NSDocument` gives us, with little code: one window per file, opening an
 already-open file brings it forward, Open Recent, window tabs, the title
 bar path menu, state restoration, and the open panel at launch (spec 1, 6).
-The document is read-only: no saving, no autosave, no "edited" dot.
+The document is saved only by File ▸ Save ⌘S (ADR 0008): no autosave, no
+Versions, no Save As. `NSDocument` gives the edited marker and the Save /
+Don't Save / Cancel question on close and quit. `MarkdownDocument` adds:
+`writableTypes(for:)` (the file's own type, since Info.plist keeps the
+Viewer role), `data(ofType:)` through `UTF8Text.encode`, Save dimmed when
+nothing changed or the file had bad bytes (`canEdit`), its own alert when
+the file is gone, and `prepareSavePanel` returning false so no save panel
+ever opens. While there are unsaved edits, changes on disk aren't reloaded
+(roadmap 8.6 adds the question).
 
 | Spec | How |
 |---|---|
