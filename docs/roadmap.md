@@ -121,7 +121,7 @@ section 2 passes.
 
 ## M5. Window features
 
-- [ ] **5.1** Find bar on `WKWebView.find`. *(6.6)*
+- [x] **5.1** Find bar on `WKWebView.find`. *(6.6)*
 - [ ] **5.2** Zoom in, zoom out, actual size. *(6.7)*
 - [ ] **5.3** Print and Save as PDF. *(6.8)*
 - [ ] **5.4** Reveal in Finder. *(6.9)*

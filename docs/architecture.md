@@ -38,6 +38,7 @@ App/                        the macOS app target (AppKit)
   MarkdownDocumentController  opens every file as a MarkdownDocument (spec 10.5)
   MarkdownDocument          NSDocument subclass: reads the file, read-only
   DocumentWindowController  one window per file; owns the preview and find bar
+  FindBar                   the find bar (spec 6.6)
   PreviewConfiguration      the shared locked-down web view setup (block list, JS off),
                             plus the one spare web view
   Signposts                 timing points for Instruments
@@ -212,7 +213,7 @@ The document is read-only: no saving, no autosave, no "edited" dot.
 
 | Spec | How |
 |---|---|
-| Find (6.6) | A slim find bar at the top of the window (search field, next/previous, match count) driving `WKWebView.find(_:configuration:)`. WebKit doesn't provide AppKit's standard find bar, so this is ours, styled to match it. |
+| Find (6.6) | `FindBar`: a slim bar at the top of the window (search field, previous/next, match count, Done) driving `WKWebView.find(_:configuration:)`, case-insensitive and wrapping. Typing searches from the top; Return / Shift-Return step; Esc closes. Edit ▸ Find: Find… ⌘F, Find Next ⌘G, Find Previous ⇧⌘G, Use Selection for Find ⌘E, handled by the document window. The match count and selected text come from the app's own script (search text passed as an argument). WebKit doesn't provide AppKit's standard find bar, so this is ours. |
 | Zoom (6.7) | `WKWebView.pageZoom`, per window |
 | Print (6.8) | `WKWebView.printOperation(with:)` with the standard print panel |
 | Reveal in Finder (6.9) | `NSWorkspace.activateFileViewerSelecting` |

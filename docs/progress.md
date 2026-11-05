@@ -2,6 +2,40 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 5.1, find
+
+**Done**
+- `App/FindBar.swift`: search field, previous/next, match count ("3
+  matches" / "1 match" / "Not found", the last also announced to
+  VoiceOver), Done. Typing searches from the top as you type
+  (case-insensitive, wraps); Return next, Shift-Return previous, Esc
+  closes and puts the focus back on the page.
+- `PreviewController` implements `FindTarget`: `WKWebView.find` for the
+  search; the app's own script (search text as an argument) for the
+  count, clearing the selection and reading the selected text.
+- Edit ▸ Find: Find… ⌘F, Find Next ⌘G, Find Previous ⇧⌘G, Use Selection
+  for Find ⌘E, all handled by the document window through the responder
+  chain. Find Next with nothing searched yet opens the bar.
+
+**Checked** (temporary hook on elements.md, removed)
+
+| Step | Result |
+|---|---|
+| ⌘F | bar shown, cursor in the field |
+| type "table" | "3 matches", first selected (y 3546) |
+| ⌘G, ⌘G | next (3776), next (5478) |
+| ⇧⌘G | previous (3776) |
+| type nonsense | "Not found", selection cleared |
+| select "Blockquotes", ⌘E | field filled, "1 match", selected |
+| menu actions | all 4 reach DocumentWindowController |
+| Esc in the field | bar closed, focus back on the page |
+
+- 192 tests pass; Debug and Release build with no warnings.
+- Not checked visually (how the bar looks, light and dark).
+
+**Next**
+- Roadmap 5.2: zoom in, zoom out, actual size.
+
 ## 2026-11-05: Roadmap 4.4, real editors and save methods; M4 done
 
 **Done**

@@ -64,6 +64,15 @@ enum MainMenu {
         let menu = NSMenu(title: "Edit")
         menu.addItem(item("Copy", #selector(NSText.copy(_:)), "c"))
         menu.addItem(item("Select All", #selector(NSText.selectAll(_:)), "a"))
+        menu.addItem(.separator())
+
+        // Spec 6.6. Handled by the document window (in the responder chain).
+        let find = NSMenu(title: "Find")
+        find.addItem(item("Find…", #selector(DocumentWindowController.showFindBar(_:)), "f"))
+        find.addItem(item("Find Next", #selector(DocumentWindowController.findNextMatch(_:)), "g"))
+        find.addItem(item("Find Previous", #selector(DocumentWindowController.findPreviousMatch(_:)), "g", [.command, .shift]))
+        find.addItem(item("Use Selection for Find", #selector(DocumentWindowController.useSelectionForFind(_:)), "e"))
+        menu.addItem(submenuItem(find))
         return menu
     }
 

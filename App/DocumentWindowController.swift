@@ -224,6 +224,50 @@ final class DocumentWindowController: NSWindowController {
         missingNotice = nil
     }
 
+    // MARK: Find (spec 6.6)
+
+    private lazy var findBar: FindBar = {
+        let bar = FindBar()
+        bar.target = preview
+        bar.onClose = { [weak self] in self?.hideFindBar() }
+        return bar
+    }()
+    private var isFindBarShown = false
+
+    @objc func showFindBar(_ sender: Any?) {
+        if !isFindBarShown {
+            stack.insertArrangedSubview(findBar.view, at: 0)
+            findBar.view.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
+            isFindBarShown = true
+        }
+        findBar.focus(in: window)
+    }
+
+    private func hideFindBar() {
+        guard isFindBarShown else { return }
+        findBar.view.removeFromSuperview()
+        isFindBarShown = false
+        window?.makeFirstResponder(preview.view.subviews.first)
+    }
+
+    /// Find Next / Previous: with nothing searched yet, open the bar instead.
+    @objc func findNextMatch(_ sender: Any?) {
+        findBar.searchText.isEmpty ? showFindBar(sender) : findBar.findNext()
+    }
+
+    @objc func findPreviousMatch(_ sender: Any?) {
+        findBar.searchText.isEmpty ? showFindBar(sender) : findBar.findPrevious()
+    }
+
+    /// Searches for whatever is selected in the page.
+    @objc func useSelectionForFind(_ sender: Any?) {
+        Task {
+            guard let text = await preview.selectedText() else { return }
+            if !isFindBarShown { showFindBar(sender) }
+            findBar.search(for: text)
+        }
+    }
+
     /// A grant anywhere may cover what this window needs: render again.
     @objc private func folderAccessDidChange() {
         guard suggestedFolder != nil else { return }

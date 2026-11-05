@@ -7,7 +7,7 @@ import WebKit
 /// Renders when the window opens and again on `reload()` (after a folder
 /// grant; on file changes in M4). Zoom, print and find come in M5.
 @MainActor
-final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDelegate {
+final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDelegate, FindTarget {
     /// After each render: the folder to offer when the page refers to local
     /// files mdview can't read yet (spec 9.5), or nil when it can read
     /// everything it needs.
@@ -205,6 +205,45 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
             if route != .scrollInPage { onLink?(route) }
         }
         return nil
+    }
+
+    // MARK: Find (spec 6.6)
+
+    func find(_ text: String, backwards: Bool) async -> Bool {
+        guard let webView else { return false }
+        let configuration = WKFindConfiguration()
+        configuration.backwards = backwards
+        configuration.caseSensitive = false
+        configuration.wraps = true
+        return await withCheckedContinuation { continuation in
+            webView.find(text, configuration: configuration) { result in
+                continuation.resume(returning: result.matchFound)
+            }
+        }
+    }
+
+    /// Counted with the app's own script; the search text is an argument,
+    /// never run as code.
+    func countMatches(of text: String) async -> Int {
+        guard let webView, !text.isEmpty else { return 0 }
+        let script = """
+            const haystack = document.body.innerText.toLocaleLowerCase();
+            const needle = text.toLocaleLowerCase();
+            let count = 0, at = haystack.indexOf(needle);
+            while (at !== -1) { count += 1; at = haystack.indexOf(needle, at + needle.length); }
+            return count;
+            """
+        let result = try? await webView.callAsyncJavaScript(script, arguments: ["text": text], contentWorld: .defaultClient)
+        return (result as? NSNumber)?.intValue ?? 0
+    }
+
+    func clearSelection() async {
+        _ = try? await webView?.callAsyncJavaScript("window.getSelection().removeAllRanges();", arguments: [:], contentWorld: .defaultClient)
+    }
+
+    func selectedText() async -> String? {
+        let result = try? await webView?.callAsyncJavaScript("return window.getSelection().toString();", arguments: [:], contentWorld: .defaultClient)
+        return (result as? String).flatMap { $0.isEmpty ? nil : $0 }
     }
 
     /// The document's real path (symlinks resolved, e.g. /tmp → /private/tmp),
