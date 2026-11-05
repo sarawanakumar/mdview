@@ -107,14 +107,14 @@ section 2 passes.
 
 **Done when:** spec sections 3 and 4 and criteria 9.5–9.7 pass.
 
-## M4. Automatic reload
+## M4. Automatic reload (done 2026-11-05; UI editors to try by hand, see progress.md)
 
 - [x] **4.1** `FileWatcher` with `DispatchSource`, debouncing, and
       re-watching after save-by-replace. *(5.1, 5.3)*
 - [x] **4.2** Swap in new content while keeping the scroll position;
       refresh changed images. *(5.2, 5.5)*
 - [x] **4.3** Handle the file disappearing and coming back. *(5.4)*
-- [ ] **4.4** Test with a few real editors (for example TextEdit, Xcode,
+- [x] **4.4** Test with a few real editors (for example TextEdit, Xcode,
       VS Code, vim).
 
 **Done when:** spec section 5 passes with each tested editor.

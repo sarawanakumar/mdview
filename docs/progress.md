@@ -2,6 +2,49 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 4.4, real editors and save methods; M4 done
+
+**Done**
+- Installed here: vim 9.1, nano, VS Code, Xcode 26.6 / 27.0, TextEdit.
+- vim driven for real (headless) in its four save modes. TextEdit and
+  Xcode save through AppKit's standard document save, so a small tool
+  (session scratchpad) reproduces exactly that: a new file in a
+  replacement folder, then `FileManager.replaceItemAt` under a file
+  coordinator. Plus other common ways files change.
+
+**Results** (Release app, file open, saved twice each way; "shown" is
+until MDView's page updated; every read matched the bytes on disk; none
+was wrongly reported as gone)
+
+| How it was saved | Shown after |
+|---|---|
+| vim, defaults | 97–105 ms |
+| vim `backupcopy=no` (rename + new file) | 96–97 ms |
+| vim `backupcopy=yes` (in place) | 42–43 ms |
+| vim `nobackup nowritebackup` | 47 ms |
+| TextEdit / Xcode style (`replaceItemAt`, coordinated) | 85–88 ms after the file changed |
+| `sed -i` | 84–87 ms |
+| `cp` over the file | 30–32 ms |
+| git style (delete, then create) | 78–86 ms |
+| Python `os.replace` | 82–83 ms |
+| slow two-step write (250 ms apart) | 31 ms, then again for the rest |
+
+- All under the 500 ms target (spec 5.1); save-by-replace in all its forms
+  keeps working (5.3).
+- The first TextEdit-style save measured 546 ms from launching the tool;
+  that was macOS checking the newly built tool on its first run. Measured
+  from the file's modification time it's 85–88 ms, every time.
+- A slow two-step write briefly shows the half-written file, then the
+  whole one. Expected: the file really was half written for 250 ms.
+
+**M4 is done.** To try by hand (needs the editors' windows):
+- Open a `.md` in MDView and in TextEdit (Format → Make Plain Text),
+  VS Code and Xcode; edit and save in each; MDView should update within
+  a moment and keep your scroll position.
+
+**Next**
+- Roadmap M5, task 5.1: find bar.
+
 ## 2026-11-05: App shown as "MDView"; roadmap 4.3, file gone and back
 
 **Name**
