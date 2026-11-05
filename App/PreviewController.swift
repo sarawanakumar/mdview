@@ -128,6 +128,7 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
         webView.autoresizingMask = [.width, .height]
         webView.navigationDelegate = self
         webView.uiDelegate = self
+        webView.pageZoom = zoom
         webView.setAccessibilityLabel("Preview")
         view.addSubview(webView)
         self.webView = webView
@@ -205,6 +206,16 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
             if route != .scrollInPage { onLink?(route) }
         }
         return nil
+    }
+
+    // MARK: Zoom (spec 6.7)
+
+    /// This window's zoom; kept when the page re-renders.
+    private(set) var zoom = ZoomLevels.actualSize
+
+    func setZoom(_ zoom: Double) {
+        self.zoom = zoom
+        webView?.pageZoom = zoom
     }
 
     // MARK: Find (spec 6.6)

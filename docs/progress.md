@@ -2,6 +2,31 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 5.2, zoom
+
+**Done**
+- `MDViewCore/ZoomLevels`: Safari's steps (50, 67, 75, 80, 90, 100, 110,
+  125, 150, 175, 200, 250, 300 %); any value moves to the next step in
+  the right direction. 5 tests.
+- View menu: Actual Size ⌘0, Zoom In ⌘= (plus a hidden ⌘+ so Shift-=
+  works), Zoom Out ⌘−. Handled by the document window, which greys out a
+  command that would do nothing (at the limits, or Actual Size at 100 %).
+- Zoom is `WKWebView.pageZoom`, per window, kept through re-renders
+  (file changes, folder grants). Not remembered once the window closes.
+
+**Checked** (temporary hooks, removed)
+- Steps and limits: 100 → 125 → … → 300 % (Zoom In greyed), → 100 %
+  (Actual Size greyed), → 50 % (Zoom Out greyed). A second window stayed
+  at 100 % throughout. Zoom stayed at 300 % after a re-render.
+- It really scales: the same 860 pt window is 860 CSS px wide at 100 %,
+  573 at 150 %, 286 at 300 %, 1,720 at 50 % (860 ÷ zoom). (A first check
+  measured a heading's height in CSS px, which zoom doesn't change; the
+  page's CSS width is the right measure.)
+- 197 tests pass; Debug and Release build with no warnings.
+
+**Next**
+- Roadmap 5.3: print and Save as PDF.
+
 ## 2026-11-05: Roadmap 5.1, find
 
 **Done**

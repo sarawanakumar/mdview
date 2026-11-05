@@ -15,6 +15,7 @@ enum MainMenu {
         mainMenu.addItem(submenuItem(appMenu()))
         mainMenu.addItem(submenuItem(fileMenu()))
         mainMenu.addItem(submenuItem(editMenu()))
+        mainMenu.addItem(submenuItem(viewMenu()))
 
         let window = windowMenu()
         mainMenu.addItem(submenuItem(window))
@@ -73,6 +74,20 @@ enum MainMenu {
         find.addItem(item("Find Previous", #selector(DocumentWindowController.findPreviousMatch(_:)), "g", [.command, .shift]))
         find.addItem(item("Use Selection for Find", #selector(DocumentWindowController.useSelectionForFind(_:)), "e"))
         menu.addItem(submenuItem(find))
+        return menu
+    }
+
+    /// Spec 6.7, per window; handled by the document window.
+    private static func viewMenu() -> NSMenu {
+        let menu = NSMenu(title: "View")
+        menu.addItem(item("Actual Size", #selector(DocumentWindowController.actualSize(_:)), "0"))
+        menu.addItem(item("Zoom In", #selector(DocumentWindowController.zoomIn(_:)), "="))
+        // ⌘+ too (Shift-= on most keyboards), without a second visible item.
+        let zoomInPlus = item("Zoom In", #selector(DocumentWindowController.zoomIn(_:)), "+")
+        zoomInPlus.isHidden = true
+        zoomInPlus.allowsKeyEquivalentWhenHidden = true
+        menu.addItem(zoomInPlus)
+        menu.addItem(item("Zoom Out", #selector(DocumentWindowController.zoomOut(_:)), "-"))
         return menu
     }
 

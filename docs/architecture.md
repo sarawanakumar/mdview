@@ -58,6 +58,7 @@ Packages/MDViewCore/        local Swift package, no AppKit
   FrontMatter               strips a leading YAML block (spec 2.13)
   Autolinker                finds bare web addresses, GitHub's rules (spec 2.14)
   NestingGuard              spots files nested too deeply to parse safely (spec 10.4)
+  ZoomLevels                zoom steps (spec 6.7)
   PageSecurity              block list, security policy and scheme name (ADR 0006)
   HTMLEscaping              escapes text for HTML
   HTMLRenderer              swift-markdown tree → HTML string
@@ -214,7 +215,7 @@ The document is read-only: no saving, no autosave, no "edited" dot.
 | Spec | How |
 |---|---|
 | Find (6.6) | `FindBar`: a slim bar at the top of the window (search field, previous/next, match count, Done) driving `WKWebView.find(_:configuration:)`, case-insensitive and wrapping. Typing searches from the top; Return / Shift-Return step; Esc closes. Edit ▸ Find: Find… ⌘F, Find Next ⌘G, Find Previous ⇧⌘G, Use Selection for Find ⌘E, handled by the document window. The match count and selected text come from the app's own script (search text passed as an argument). WebKit doesn't provide AppKit's standard find bar, so this is ours. |
-| Zoom (6.7) | `WKWebView.pageZoom`, per window |
+| Zoom (6.7) | `WKWebView.pageZoom`, per window, in Safari's steps (`ZoomLevels`, MDViewCore: 50–300 %). View menu: Actual Size ⌘0, Zoom In ⌘= (and ⌘+), Zoom Out ⌘−, greyed out when they'd do nothing. Kept when the page re-renders; not remembered after the window closes. |
 | Print (6.8) | `WKWebView.printOperation(with:)` with the standard print panel |
 | Reveal in Finder (6.9) | `NSWorkspace.activateFileViewerSelecting` |
 | Open in Editor (6.10–6.12) | Remembered app URL in `UserDefaults`; `NSWorkspace.open(_:withApplicationAt:)`. Picker is an `NSOpenPanel` limited to applications. |

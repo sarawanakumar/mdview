@@ -3,7 +3,7 @@ import MDViewCore
 import OSLog
 
 /// One window per file (spec 6.1): notice bars above the rendered preview.
-final class DocumentWindowController: NSWindowController {
+final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
     private static let log = Logger(subsystem: "com.inferly.mdview", category: "folder-access")
 
     private let preview = PreviewController()
@@ -268,10 +268,36 @@ final class DocumentWindowController: NSWindowController {
         }
     }
 
+    // MARK: Zoom (spec 6.7)
+
+    @objc func zoomIn(_ sender: Any?) {
+        if let next = ZoomLevels.zoomedIn(from: preview.zoom) { preview.setZoom(next) }
+    }
+
+    @objc func zoomOut(_ sender: Any?) {
+        if let next = ZoomLevels.zoomedOut(from: preview.zoom) { preview.setZoom(next) }
+    }
+
+    @objc func actualSize(_ sender: Any?) {
+        preview.setZoom(ZoomLevels.actualSize)
+    }
+
     /// A grant anywhere may cover what this window needs: render again.
     @objc private func folderAccessDidChange() {
         guard suggestedFolder != nil else { return }
         preview.reload()
+    }
+
+    // MARK: Menu validation
+
+    /// Greys out zoom commands that wouldn't change anything.
+    func validateMenuItem(_ item: NSMenuItem) -> Bool {
+        switch item.action {
+        case #selector(zoomIn(_:)): ZoomLevels.zoomedIn(from: preview.zoom) != nil
+        case #selector(zoomOut(_:)): ZoomLevels.zoomedOut(from: preview.zoom) != nil
+        case #selector(actualSize(_:)): !ZoomLevels.isActualSize(preview.zoom)
+        default: true
+        }
     }
 
     // MARK: Layout helpers
