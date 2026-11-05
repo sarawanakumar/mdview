@@ -57,6 +57,7 @@ Packages/MDViewCore/        local Swift package, no AppKit
   FrontMatter               strips a leading YAML block (spec 2.13)
   Autolinker                finds bare web addresses, GitHub's rules (spec 2.14)
   NestingGuard              spots files nested too deeply to parse safely (spec 10.4)
+  PageSecurity              block list, security policy and scheme name (ADR 0006)
   HTMLEscaping              escapes text for HTML
   HTMLRenderer              swift-markdown tree → HTML string
   HeadingSlugger            GitHub-style heading anchors (spec 4.3)

@@ -1,3 +1,5 @@
+import MDViewCore
+import OSLog
 import WebKit
 
 /// The web view setup every preview shares (ADR 0003, 0006).
@@ -10,17 +12,8 @@ import WebKit
 /// If the rule list can't be loaded, no page is shown (spec 9.8).
 @MainActor
 enum PreviewConfiguration {
-    nonisolated static let scheme = "mdview-file"
-
-    /// Change the version when `blockList` changes, so a stale compiled
-    /// copy is never reused.
-    private static let blockListID = "mdview-block-remote-v1"
-    private static let blockList = """
-    [
-      {"trigger": {"url-filter": ".*"}, "action": {"type": "block"}},
-      {"trigger": {"url-filter": "^mdview-file:"}, "action": {"type": "ignore-previous-rules"}}
-    ]
-    """
+    nonisolated static let scheme = PageSecurity.scheme
+    private static let log = Logger(subsystem: "com.inferly.mdview", category: "preview")
 
     private static var loading: Task<WKWebViewConfiguration, any Error>?
     private static let assets = AssetSchemeHandler()
@@ -81,13 +74,20 @@ enum PreviewConfiguration {
         guard let store = WKContentRuleListStore.default() else {
             throw PreviewError.blockListUnavailable
         }
+        // Any failure here means no page is shown (spec 9.8), with mdview's
+        // own message rather than WebKit's.
         let rules: WKContentRuleList?
-        if let cached = try? await store.contentRuleList(forIdentifier: blockListID) {
-            rules = cached
-        } else {
-            rules = try await store.compileContentRuleList(
-                forIdentifier: blockListID, encodedContentRuleList: blockList
-            )
+        do {
+            if let cached = try? await store.contentRuleList(forIdentifier: PageSecurity.blockListID) {
+                rules = cached
+            } else {
+                rules = try await store.compileContentRuleList(
+                    forIdentifier: PageSecurity.blockListID, encodedContentRuleList: PageSecurity.blockList
+                )
+            }
+        } catch {
+            log.error("block list unavailable: \(error.localizedDescription, privacy: .public)")
+            throw PreviewError.blockListUnavailable
         }
         guard let rules else { throw PreviewError.blockListUnavailable }
         config.userContentController.add(rules)

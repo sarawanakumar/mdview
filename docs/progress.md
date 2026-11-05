@@ -2,6 +2,46 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 3.4, proving the page stays offline
+
+**Done**
+- `MDViewCore/PageSecurity`: the block list, its ID, the page's Content
+  Security Policy and the scheme name, as plain values. The app's web
+  view setup and page shell use them, so tests check exactly what ships.
+- `Tests/MDViewCoreTests/OfflineProtectionTests.swift`: a real WKWebView
+  in the test process, set up like the app (JavaScript off,
+  non-persistent store, our scheme). The page tries every kind of remote
+  load: stylesheet, favicon, CSS background, web font, script tag, inline
+  script with `fetch`, image, `<picture>` source, iframe, video, audio,
+  object. They all point at a tiny HTTP server on 127.0.0.1 that counts
+  requests, so the test never leaves this Mac.
+- Spec 9.8: a failure preparing the block list now always shows
+  mdview's own message ("mdview couldn't set up its offline protection,
+  so this file isn't shown.") and logs the cause; before, a compile error
+  showed WebKit's raw "WKErrorDomain error 6".
+- Remote images as placeholders (spec 3.5) were done in 3.3.
+
+**Checked**
+- Offline tests (each a separate web view and server):
+
+| Setup | Requests reaching the server |
+|---|---|
+| Block list only | 0 |
+| Security policy only | 0 |
+| Both (as in the app) | 0 |
+| Neither (control) | > 0, so the test does see leaks |
+
+- Page script never ran (marker text unchanged); the block list compiles.
+- In the app with a temporary switch that compiled a broken block list
+  (removed): no web view created, no page shown, the message shown, the
+  cause logged. Normal launch still shows the page.
+- 166 tests pass (4 s, mostly the web view tests); Debug and Release
+  build with no warnings.
+- Not here: watching real network traffic with a monitor (roadmap 7.3).
+
+**Next**
+- Roadmap 3.5: `LinkRouter`, what clicking a link does.
+
 ## 2026-11-05: Roadmap 3.3, local images
 
 **Done**

@@ -52,7 +52,13 @@ layers:
 - The sandbox still limits file access (ADR 0005 points 2 and 3 stand).
 - Spec 9.1 is reworded to match. The network monitor check before
   release (roadmap 7.3) is now the main proof of "zero network requests".
-- An automated test should load a page with remote images and check
-  nothing remote arrives, so a regression in the rule list is caught.
+- Automated test (roadmap 3.4, `OfflineProtectionTests`): a real
+  WKWebView loads a page that tries every kind of remote load (image,
+  stylesheet, frame, media, CSS background, font, script, `fetch`)
+  against a local counting server on 127.0.0.1. The rule list alone, the
+  Content Security Policy alone, and both together each allow zero
+  requests; with neither, requests do arrive (control). Page scripts
+  never run. A broken rule list shows a message and no page (checked in
+  the app).
 - Only tested on macOS 26.6. macOS 15 might not need the entitlement, but
   one build has to work on both, so it stays.

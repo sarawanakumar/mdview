@@ -148,7 +148,7 @@ enum PageShell {
         <!doctype html>
         <html lang="en"><head>
         <meta charset="utf-8">
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src \(PreviewConfiguration.scheme):; style-src 'unsafe-inline'">
+        <meta http-equiv="Content-Security-Policy" content="\(PageSecurity.contentSecurityPolicy)">
         <meta name="color-scheme" content="light dark">
         <title>\(HTMLEscaping.escape(title))</title>
         <style>\(css)</style>
