@@ -1,0 +1,1474 @@
+<h1 id="ledgerline">Ledgerline</h1>
+<p>A small command-line tool for keeping accounts in plain text files. You write
+transactions in a simple format, and Ledgerline checks them, totals them and
+prints reports. Everything stays in files you own and can read without it.</p>
+<p><span class="image-placeholder" role="img" aria-label="Ledgerline&#39;s balance report in a terminal" title="images/sample.png">Ledgerline&#39;s balance report in a terminal</span></p>
+<blockquote>
+<p><strong>Status:</strong> stable. The file format hasn&#39;t changed since version 2.0, and
+any future change will come with a converter.</p>
+</blockquote>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#why-ledgerline" title="#why-ledgerline">Why Ledgerline</a></li>
+<li><a href="#install" title="#install">Install</a></li>
+<li><a href="#quick-start" title="#quick-start">Quick start</a></li>
+<li><a href="#the-file-format" title="#the-file-format">The file format</a></li>
+<li><a href="#configuration" title="#configuration">Configuration</a></li>
+<li><a href="#command-reference" title="#command-reference">Command reference</a></li>
+<li><a href="#recipes" title="#recipes">Recipes</a></li>
+<li><a href="#questions" title="#questions">Questions</a></li>
+<li><a href="#contributing" title="#contributing">Contributing</a></li>
+<li><a href="#changelog" title="#changelog">Changelog</a></li>
+<li><a href="#license" title="#license">License</a></li>
+</ul>
+<h2 id="why-ledgerline">Why Ledgerline</h2>
+<p>Most money apps keep your data in a database you can&#39;t open, sync it to a
+server you don&#39;t control, and change their export format every few years.
+Ledgerline takes the opposite approach:</p>
+<ul>
+<li><strong>Plain text.</strong> Your accounts are ordinary files. Any editor works, and
+version control gives you history for free.</li>
+<li><strong>Checked.</strong> Every transaction must balance. Typos in account names are
+caught, and so are dates that go backwards.</li>
+<li><strong>Fast.</strong> Ten years of household accounts (about 40,000 transactions)
+load in under a second on a laptop.</li>
+<li><strong>Quiet.</strong> No accounts, no telemetry, no network access at all.</li>
+</ul>
+<p>It isn&#39;t a replacement for a full accounting package. There is no payroll,
+no invoicing and no tax engine. It&#39;s for people who want to know where their
+money went, and who are happy typing.</p>
+<h2 id="install">Install</h2>
+<h3 id="macos">macOS</h3>
+<pre><code class="language-bash">brew install ledgerline
+ledgerline --version</code></pre>
+<h3 id="linux">Linux</h3>
+<p>Download the archive for your platform from the releases page, then:</p>
+<pre><code class="language-bash">tar -xzf ledgerline-3.<span class="tok-number">2.0</span>-linux-x86_64.tar.gz
+sudo install -m <span class="tok-number">755</span> ledgerline /usr/<span class="tok-keyword">local</span>/bin/</code></pre>
+<h3 id="from-source">From source</h3>
+<p>You need a recent Rust toolchain (1.80 or later).</p>
+<pre><code class="language-bash">git clone https://example.com/ledgerline.git
+<span class="tok-keyword">cd</span> ledgerline
+cargo build --release
+./target/release/ledgerline --help</code></pre>
+<p>The build has no network step after the first <code>cargo fetch</code>, so it works
+offline once the dependencies are cached.</p>
+<h2 id="quick-start">Quick start</h2>
+<p>Create a file called <code>2026.ledger</code>:</p>
+<pre><code>2026-01-01 Opening balances
+    assets:bank:current        1,250.00 GBP
+    assets:cash                   40.00 GBP
+    equity:opening
+
+2026-01-03 Corner shop
+    expenses:food:groceries       23.45 GBP
+    assets:cash
+
+2026-01-05 Salary
+    assets:bank:current        2,800.00 GBP
+    income:salary</code></pre>
+<p>Then ask for a balance:</p>
+<pre><code class="language-bash">ledgerline balance <span class="tok-number">2026</span>.ledger</code></pre>
+<pre><code>        4,026.55 GBP  assets
+        4,050.00 GBP    bank:current
+          -23.45 GBP    cash
+          23.45 GBP  expenses:food:groceries
+       -1,290.00 GBP  equity:opening
+       -2,800.00 GBP  income:salary
+--------------------
+               0</code></pre>
+<p>The total is zero because every transaction balances. If it isn&#39;t, Ledgerline
+tells you which transaction is wrong and by how much.</p>
+<h2 id="the-file-format">The file format</h2>
+<p>A transaction is a date, a description, and two or more postings. Each
+posting is an account name and an amount. One posting may leave its amount
+out; Ledgerline fills it in so the transaction balances.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th class="align-left">Part</th>
+<th class="align-left">Example</th>
+<th class="align-left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="align-left">Date</td>
+<td class="align-left"><code>2026-01-03</code></td>
+<td class="align-left">ISO format only. <code>2026/01/03</code> is rejected.</td>
+</tr>
+<tr>
+<td class="align-left">Status</td>
+<td class="align-left"><code>*</code> or <code>!</code></td>
+<td class="align-left">Optional. Cleared or pending.</td>
+</tr>
+<tr>
+<td class="align-left">Description</td>
+<td class="align-left"><code>Corner shop</code></td>
+<td class="align-left">Free text up to the end of the line.</td>
+</tr>
+<tr>
+<td class="align-left">Account</td>
+<td class="align-left"><code>expenses:food</code></td>
+<td class="align-left">Colon-separated. Spaces are allowed inside names.</td>
+</tr>
+<tr>
+<td class="align-left">Amount</td>
+<td class="align-left"><code>23.45 GBP</code></td>
+<td class="align-left">Commodity after the number. Commas are ignored.</td>
+</tr>
+<tr>
+<td class="align-left">Comment</td>
+<td class="align-left"><code>; receipt in drawer</code></td>
+<td class="align-left">Anything after a semicolon.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Indent postings by at least two spaces. Separate the account from the amount
+by at least two spaces too, since account names may contain single spaces.</p>
+<h3 id="comments-and-tags">Comments and tags</h3>
+<pre><code>2026-02-14 * Dinner out  ; :dining:celebration:
+    expenses:food:restaurants     64.00 GBP  ; split with Sam
+    liabilities:credit-card</code></pre>
+<p>Tags go between colons in a comment. Reports can filter on them with
+<code>tag:dining</code>.</p>
+<h3 id="prices-and-currencies">Prices and currencies</h3>
+<p>A posting can carry a price, so you can record a purchase in another
+currency:</p>
+<pre><code>2026-03-02 Train ticket, Paris
+    expenses:travel               45.00 EUR @ 0.86 GBP
+    liabilities:credit-card</code></pre>
+<p>Ledgerline keeps the original amount, and converts it only when a report
+asks for a single currency with <code>--value GBP</code>.</p>
+<h2 id="configuration">Configuration</h2>
+<p>Ledgerline reads <code>~/.config/ledgerline/config.yaml</code> if it exists. Every
+setting is optional.</p>
+<pre><code class="language-yaml"><span class="tok-comment"># Where to look when no file is given</span>
+default_file: ~/accounts/main.ledger
+
+<span class="tok-comment"># How amounts are printed</span>
+decimal_mark: <span class="tok-string">&quot;.&quot;</span>
+thousands_separator: <span class="tok-string">&quot;,&quot;</span>
+currency_position: after
+
+<span class="tok-comment"># Reports</span>
+week_starts_on: monday
+fiscal_year_start: <span class="tok-number">04</span>-06
+colour: auto</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>default_file</code></td>
+<td>none</td>
+<td>File used when no file is named on the command line.</td>
+</tr>
+<tr>
+<td><code>decimal_mark</code></td>
+<td><code>.</code></td>
+<td>Character between whole and fractional parts.</td>
+</tr>
+<tr>
+<td><code>thousands_separator</code></td>
+<td><code>,</code></td>
+<td>Character between groups of three digits.</td>
+</tr>
+<tr>
+<td><code>currency_position</code></td>
+<td><code>after</code></td>
+<td>Whether <code>GBP</code> goes before or after the number.</td>
+</tr>
+<tr>
+<td><code>week_starts_on</code></td>
+<td><code>monday</code></td>
+<td>First day of the week for weekly reports.</td>
+</tr>
+<tr>
+<td><code>fiscal_year_start</code></td>
+<td><code>01-01</code></td>
+<td>Month and day the reporting year begins.</td>
+</tr>
+<tr>
+<td><code>colour</code></td>
+<td><code>auto</code></td>
+<td><code>always</code>, <code>never</code>, or <code>auto</code> (only in a terminal).</td>
+</tr>
+</tbody>
+</table></div>
+<p>The environment variable <code>LEDGERLINE_FILE</code> overrides <code>default_file</code>.</p>
+<h2 id="command-reference">Command reference</h2>
+<p>Every command takes one or more files, or reads <code>default_file</code> when none is
+given. Common options:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th class="align-center">Short</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--begin DATE</code></td>
+<td class="align-center"><code>-b</code></td>
+<td>Ignore transactions before this date.</td>
+</tr>
+<tr>
+<td><code>--end DATE</code></td>
+<td class="align-center"><code>-e</code></td>
+<td>Ignore transactions on or after this date.</td>
+</tr>
+<tr>
+<td><code>--period TEXT</code></td>
+<td class="align-center"><code>-p</code></td>
+<td>A period such as <code>2026</code>, <code>2026-q1</code> or <code>last month</code>.</td>
+</tr>
+<tr>
+<td><code>--depth N</code></td>
+<td class="align-center"><code>-d</code></td>
+<td>Collapse accounts deeper than N levels.</td>
+</tr>
+<tr>
+<td><code>--value CUR</code></td>
+<td class="align-center"><code>-V</code></td>
+<td>Convert every amount to one currency.</td>
+</tr>
+<tr>
+<td><code>--output FILE</code></td>
+<td class="align-center"><code>-o</code></td>
+<td>Write to a file instead of the terminal.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="balance">balance</h3>
+<p>Shows the balance of each account. Prints the total of every posting to each account, with parent accounts summing their children.</p>
+<pre><code class="language-bash">ledgerline balance -p <span class="tok-number">2026</span> expenses</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--flat</code></td>
+<td>List accounts without indentation.</td>
+</tr>
+<tr>
+<td><code>--empty</code></td>
+<td>Include accounts with a zero balance.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Use <code>--depth 2</code> for a short overview, and leave it off to see everything.</p>
+<h4 id="how-it-works">How it works</h4>
+<p><code>balance</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output">Example output</h4>
+<pre><code>$ ledgerline balance -p 2026 expenses
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="register">register</h3>
+<p>Lists postings one per line, with a running total. Prints each matching posting in date order, with the running total in the last column.</p>
+<pre><code class="language-bash">ledgerline register expenses:food -p <span class="tok-string">&#39;last month&#39;</span></code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--wide</code></td>
+<td>Use the full terminal width for descriptions.</td>
+</tr>
+<tr>
+<td><code>--average</code></td>
+<td>Show a running average instead of a total.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The running total resets for each file unless you name the files together.</p>
+<h4 id="how-it-works-1">How it works</h4>
+<p><code>register</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-1">Example output</h4>
+<pre><code>$ ledgerline register expenses:food -p &#39;last month&#39;
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="print">print</h3>
+<p>Prints transactions back out, cleaned up. Prints the matching transactions with consistent spacing, missing amounts filled in, and accounts aligned.</p>
+<pre><code class="language-bash">ledgerline print -p <span class="tok-number">2026</span>-03 &gt; march.ledger</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--explicit</code></td>
+<td>Write out every amount, including the inferred one.</td>
+</tr>
+<tr>
+<td><code>--sort FIELD</code></td>
+<td>Sort by <code>date</code>, <code>payee</code> or <code>amount</code>.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Handy for splitting a large file by year.</p>
+<h4 id="how-it-works-2">How it works</h4>
+<p><code>print</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-2">Example output</h4>
+<pre><code>$ ledgerline print -p 2026-03 &gt; march.ledger
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="check">check</h3>
+<p>Checks files without printing a report. Prints nothing when everything is fine, and a list of problems otherwise.</p>
+<pre><code class="language-bash">ledgerline check --strict main.ledger</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--strict</code></td>
+<td>Require every account to be declared first.</td>
+</tr>
+<tr>
+<td><code>--dates</code></td>
+<td>Fail if dates go backwards within a file.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Run it from a pre-commit hook so mistakes never reach your history.</p>
+<h4 id="how-it-works-3">How it works</h4>
+<p><code>check</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-3">Example output</h4>
+<pre><code>$ ledgerline check --strict main.ledger
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="accounts">accounts</h3>
+<p>Lists every account name used. Prints one account name per line, in alphabetical order.</p>
+<pre><code class="language-bash">ledgerline accounts --tree</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--tree</code></td>
+<td>Indent child accounts under their parents.</td>
+</tr>
+<tr>
+<td><code>--unused</code></td>
+<td>Only accounts declared but never posted to.</td>
+</tr>
+</tbody>
+</table></div>
+<p>A quick way to spot a misspelt account.</p>
+<h4 id="how-it-works-4">How it works</h4>
+<p><code>accounts</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-4">Example output</h4>
+<pre><code>$ ledgerline accounts --tree
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="payees">payees</h3>
+<p>Lists every payee (transaction description). Prints one payee per line, with how many transactions each has.</p>
+<pre><code class="language-bash">ledgerline payees --count | head</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--count</code></td>
+<td>Sort by number of transactions.</td>
+</tr>
+<tr>
+<td><code>--since DATE</code></td>
+<td>Only payees seen since the date.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Descriptions are compared exactly, so <code>Tesco</code> and <code>TESCO</code> are different payees.</p>
+<h4 id="how-it-works-5">How it works</h4>
+<p><code>payees</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-5">Example output</h4>
+<pre><code>$ ledgerline payees --count | head
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="stats">stats</h3>
+<p>Summarises a file. Prints the date range, number of transactions, accounts, payees and commodities.</p>
+<pre><code class="language-bash">ledgerline stats --by-year</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--by-year</code></td>
+<td>One summary line for each year.</td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td>Print the summary as JSON.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Useful as a quick sanity check after importing.</p>
+<h4 id="how-it-works-6">How it works</h4>
+<p><code>stats</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-6">Example output</h4>
+<pre><code>$ ledgerline stats --by-year
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="import">import</h3>
+<p>Converts a bank&#39;s CSV export into transactions. Prints new transactions, skipping any already present in the target file.</p>
+<pre><code class="language-bash">ledgerline import --rules bank.rules statement.csv</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--rules FILE</code></td>
+<td>Rules that map columns and payees to accounts.</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>Show what would be added without writing anything.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Run with <code>--dry-run</code> first, at least until your rules settle down.</p>
+<h4 id="how-it-works-7">How it works</h4>
+<p><code>import</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-7">Example output</h4>
+<pre><code>$ ledgerline import --rules bank.rules statement.csv
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="close">close</h3>
+<p>Closes the books for a period. Prints transactions that zero the income and expense accounts into equity.</p>
+<pre><code class="language-bash">ledgerline close -e <span class="tok-number">2027</span>-01-01 --open</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--retain ACCOUNT</code></td>
+<td>Account that receives the result (default <code>equity:retained</code>).</td>
+</tr>
+<tr>
+<td><code>--open</code></td>
+<td>Also print opening balances for the next period.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Keep the closing transactions in their own file so they&#39;re easy to redo.</p>
+<h4 id="how-it-works-8">How it works</h4>
+<p><code>close</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-8">Example output</h4>
+<pre><code>$ ledgerline close -e 2027-01-01 --open
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="budget">budget</h3>
+<p>Compares spending with a budget. Prints each budgeted account with its budget, actual spending and the difference.</p>
+<pre><code class="language-bash">ledgerline budget -p <span class="tok-number">2026</span> --monthly</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--monthly</code></td>
+<td>One column for each month.</td>
+</tr>
+<tr>
+<td><code>--over</code></td>
+<td>Only accounts over budget.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Budgets are periodic transactions that start with <code>~</code>.</p>
+<h4 id="how-it-works-9">How it works</h4>
+<p><code>budget</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-9">Example output</h4>
+<pre><code>$ ledgerline budget -p 2026 --monthly
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="forecast">forecast</h3>
+<p>Projects balances forward. Prints future postings generated from periodic transactions, added to the register.</p>
+<pre><code class="language-bash">ledgerline forecast --until <span class="tok-number">2027</span>-06-30 assets:bank</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--until DATE</code></td>
+<td>How far ahead to project (default: one year).</td>
+</tr>
+<tr>
+<td><code>--only</code></td>
+<td>Show only the projected postings.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Forecasts never write to your files; they&#39;re computed each time.</p>
+<h4 id="how-it-works-10">How it works</h4>
+<p><code>forecast</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-10">Example output</h4>
+<pre><code>$ ledgerline forecast --until 2027-06-30 assets:bank
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="prices">prices</h3>
+<p>Lists commodity prices. Prints every price seen, from <code>P</code> directives and from postings with <code>@</code>.</p>
+<pre><code class="language-bash">ledgerline prices --latest</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--latest</code></td>
+<td>Only the most recent price for each pair.</td>
+</tr>
+<tr>
+<td><code>--inverse</code></td>
+<td>Also show the inverse of each price.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Prices are only ever read from your files; Ledgerline never fetches them.</p>
+<h4 id="how-it-works-11">How it works</h4>
+<p><code>prices</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-11">Example output</h4>
+<pre><code>$ ledgerline prices --latest
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="tags">tags</h3>
+<p>Lists tags and how often they&#39;re used. Prints each tag, with the number of transactions and the total amount.</p>
+<pre><code class="language-bash">ledgerline tags --sort count</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--values</code></td>
+<td>Also list the values given to <code>tag:value</code> tags.</td>
+</tr>
+<tr>
+<td><code>--sort count</code></td>
+<td>Sort by use instead of by name.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Tags are case-sensitive.</p>
+<h4 id="how-it-works-12">How it works</h4>
+<p><code>tags</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-12">Example output</h4>
+<pre><code>$ ledgerline tags --sort count
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="diff">diff</h3>
+<p>Compares two files. Prints transactions present in one file but not the other.</p>
+<pre><code class="language-bash">ledgerline diff bank-export.ledger main.ledger</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--ignore-status</code></td>
+<td>Treat cleared and pending the same.</td>
+</tr>
+<tr>
+<td><code>--by-amount</code></td>
+<td>Match transactions by date and amount only.</td>
+</tr>
+</tbody>
+</table></div>
+<p>A good way to reconcile against a statement.</p>
+<h4 id="how-it-works-13">How it works</h4>
+<p><code>diff</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-13">Example output</h4>
+<pre><code>$ ledgerline diff bank-export.ledger main.ledger
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="rewrite">rewrite</h3>
+<p>Adds postings to matching transactions. Prints the transactions with extra postings added, for example to split out tax.</p>
+<pre><code class="language-bash">ledgerline rewrite --query expenses:fuel --add <span class="tok-string">&#39;expenses:tax *0.2&#39;</span></code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--add &#39;ACCOUNT AMOUNT&#39;</code></td>
+<td>Posting to add. Amounts can be a fraction like <code>*0.2</code>.</td>
+</tr>
+<tr>
+<td><code>--query TEXT</code></td>
+<td>Which transactions to change.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Prints the result; it never edits a file in place.</p>
+<h4 id="how-it-works-14">How it works</h4>
+<p><code>rewrite</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-14">Example output</h4>
+<pre><code>$ ledgerline rewrite --query expenses:fuel --add &#39;expenses:tax *0.2&#39;
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="files">files</h3>
+<p>Lists the files that were read. Prints each file read, including those pulled in by <code>include</code>.</p>
+<pre><code class="language-bash">ledgerline files --tree</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--sizes</code></td>
+<td>Show file sizes.</td>
+</tr>
+<tr>
+<td><code>--tree</code></td>
+<td>Show which file included which.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Useful when a figure seems to come from nowhere.</p>
+<h4 id="how-it-works-15">How it works</h4>
+<p><code>files</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-15">Example output</h4>
+<pre><code>$ ledgerline files --tree
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="roi">roi</h3>
+<p>Works out return on investment. Prints the time-weighted and money-weighted return of an investment account.</p>
+<pre><code class="language-bash">ledgerline roi --inv assets:pension --pnl income:pension -p <span class="tok-number">2026</span></code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--inv ACCOUNT</code></td>
+<td>The investment account.</td>
+</tr>
+<tr>
+<td><code>--pnl ACCOUNT</code></td>
+<td>The account that records gains and losses.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Needs prices for the commodities held, at least at the start and end.</p>
+<h4 id="how-it-works-16">How it works</h4>
+<p><code>roi</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-16">Example output</h4>
+<pre><code>$ ledgerline roi --inv assets:pension --pnl income:pension -p 2026
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="activity">activity</h3>
+<p>Draws a simple histogram of postings. Prints one row for each period, with a bar of <code>*</code> showing how many postings it had.</p>
+<pre><code class="language-bash">ledgerline activity --weekly -p <span class="tok-number">2026</span></code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--weekly</code></td>
+<td>One row per week.</td>
+</tr>
+<tr>
+<td><code>--daily</code></td>
+<td>One row per day.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Gaps show up as rows with no bar.</p>
+<h4 id="how-it-works-17">How it works</h4>
+<p><code>activity</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-17">Example output</h4>
+<pre><code>$ ledgerline activity --weekly -p 2026
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="commodities">commodities</h3>
+<p>Lists every commodity used. Prints each commodity with its display precision and where it was first seen.</p>
+<pre><code class="language-bash">ledgerline commodities --undeclared</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--declared</code></td>
+<td>Only commodities declared with a <code>commodity</code> line.</td>
+</tr>
+<tr>
+<td><code>--undeclared</code></td>
+<td>Only commodities used but never declared.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Declare commodities to control how many decimal places they print with.</p>
+<h4 id="how-it-works-18">How it works</h4>
+<p><code>commodities</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-18">Example output</h4>
+<pre><code>$ ledgerline commodities --undeclared
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="notes">notes</h3>
+<p>Lists the notes part of descriptions. Prints the text after a <code>|</code> in each description, which many people use for details.</p>
+<pre><code class="language-bash">ledgerline notes --unique -p <span class="tok-number">2026</span></code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--with-payee</code></td>
+<td>Show the payee next to each note.</td>
+</tr>
+<tr>
+<td><code>--unique</code></td>
+<td>Drop repeated notes.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Descriptions without a <code>|</code> have no note and aren&#39;t listed.</p>
+<h4 id="how-it-works-19">How it works</h4>
+<p><code>notes</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-19">Example output</h4>
+<pre><code>$ ledgerline notes --unique -p 2026
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="aregister">aregister</h3>
+<p>Shows one account&#39;s register as a bank statement would. Prints each transaction touching the account, with the other accounts in a column and the account&#39;s running balance.</p>
+<pre><code class="language-bash">ledgerline aregister assets:bank:current -p <span class="tok-number">2026</span>-02</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--txn-dates</code></td>
+<td>Use transaction dates instead of posting dates.</td>
+</tr>
+<tr>
+<td><code>--cleared</code></td>
+<td>Only cleared transactions.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Easier to compare with a statement than <code>register</code>, since each transaction is one line.</p>
+<h4 id="how-it-works-20">How it works</h4>
+<p><code>aregister</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-20">Example output</h4>
+<pre><code>$ ledgerline aregister assets:bank:current -p 2026-02
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h3 id="incomestatement">incomestatement</h3>
+<p>Prints income and expenses side by side. Prints income accounts, then expense accounts, then the net result for the period.</p>
+<pre><code class="language-bash">ledgerline incomestatement -p <span class="tok-number">2026</span> --quarterly</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--quarterly</code></td>
+<td>One column for each quarter.</td>
+</tr>
+<tr>
+<td><code>--percent</code></td>
+<td>Show each account as a percentage of its section.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Signs are flipped for income so that both sections read as positive numbers.</p>
+<h4 id="how-it-works-21">How it works</h4>
+<p><code>incomestatement</code> reads every file first, so the order in which you name files only
+matters for the running totals. It then applies the date options, then any
+account or tag patterns, and only then works out what to print. Patterns are
+matched against the whole account name, so <code>food</code> matches
+<code>expenses:food:groceries</code> but <code>^food</code> doesn&#39;t.</p>
+<p>Amounts in different commodities are never added together. If an account
+holds both GBP and EUR, both appear on their own lines, unless you ask for
+<code>--value</code> with a price to convert with.</p>
+<h4 id="example-output-21">Example output</h4>
+<pre><code>$ ledgerline incomestatement -p 2026 --quarterly
+  2026-01-03  Corner shop        expenses:food:groceries     23.45 GBP     23.45 GBP
+  2026-01-10  Market             expenses:food:groceries     12.10 GBP     35.55 GBP
+  2026-01-17  Corner shop        expenses:food:groceries     18.90 GBP     54.45 GBP</code></pre>
+<p>See also: <a href="#command-reference" title="#command-reference">Command reference</a>, <a href="#recipes" title="#recipes">Recipes</a> and
+<a href="#the-file-format" title="#the-file-format">the file format</a>.</p>
+<h2 id="tutorial-a-year-of-household-accounts">Tutorial: a year of household accounts</h2>
+<p>This walk-through builds a realistic file for one household over a year. It
+takes about twenty minutes, and by the end you&#39;ll have used most commands.</p>
+<h3 id="1-decide-on-your-accounts">1. Decide on your accounts</h3>
+<p>Start small. You can always split an account later with <code>rewrite</code>, but
+merging lots of tiny accounts is tedious. A good first set:</p>
+<ol>
+<li><code>assets:bank:current</code> for the everyday account</li>
+<li><code>assets:bank:savings</code> for the savings account</li>
+<li><code>assets:cash</code> for the wallet</li>
+<li><code>liabilities:credit-card</code> for the one card you use</li>
+<li><code>income:salary</code> and <code>income:interest</code></li>
+<li><code>expenses:</code> followed by a handful of categories</li>
+</ol>
+<p>Declare them at the top of the file, so <code>check --strict</code> can catch typos:</p>
+<pre><code>account assets:bank:current
+account assets:bank:savings
+account assets:cash
+account liabilities:credit-card
+account income:salary
+account income:interest
+account expenses:food:groceries
+account expenses:food:restaurants
+account expenses:home:rent
+account expenses:home:energy
+account expenses:transport
+account expenses:fun
+account equity:opening</code></pre>
+<h3 id="2-record-opening-balances">2. Record opening balances</h3>
+<p>Look up each balance on the first day of the year and write one
+transaction. The equity posting has no amount; Ledgerline fills it in.</p>
+<pre><code>2026-01-01 Opening balances
+    assets:bank:current          1,250.00 GBP
+    assets:bank:savings          6,400.00 GBP
+    assets:cash                     40.00 GBP
+    liabilities:credit-card       -312.18 GBP
+    equity:opening</code></pre>
+<h3 id="3-add-regular-payments">3. Add regular payments</h3>
+<p>Rent, energy and the salary happen every month. Rather than typing them
+twelve times, write them once as periodic transactions and let <code>forecast</code>
+show the year ahead. When each one really happens, copy it in with the real
+date and amount.</p>
+<pre><code>~ monthly from 2026-01-01
+    expenses:home:rent             950.00 GBP
+    assets:bank:current
+
+~ monthly from 2026-01-15
+    expenses:home:energy            86.00 GBP
+    assets:bank:current</code></pre>
+<h3 id="4-import-the-card-statement">4. Import the card statement</h3>
+<p>Card statements are the most tedious part to type, so import them. Save a
+rules file next to your accounts:</p>
+<pre><code># card.rules
+skip 1
+fields date, description, amount
+date-format %d/%m/%Y
+currency GBP
+account1 liabilities:credit-card
+
+if TESCO|SAINSBURY|CO-OP
+  account2 expenses:food:groceries
+if TRAINLINE|TFL
+  account2 expenses:transport</code></pre>
+<p>Then try it:</p>
+<pre><code class="language-bash">ledgerline import --rules card.rules --dry-run statement-2026-01.csv</code></pre>
+<p>Anything the rules don&#39;t match goes to <code>expenses:unknown</code>. Add a rule for
+it, run the import again, and repeat until nothing is unknown.</p>
+<h3 id="5-check-and-look-around">5. Check and look around</h3>
+<pre><code class="language-bash">ledgerline check --strict <span class="tok-number">2026</span>.ledger
+ledgerline balance --depth <span class="tok-number">2</span>
+ledgerline register expenses:food -p <span class="tok-number">2026</span>-01
+ledgerline activity --weekly</code></pre>
+<p>If <code>check</code> complains, it names the file and line. The most common problems
+are a single space between the account and the amount, and a transaction
+that doesn&#39;t balance because of a missing minus sign.</p>
+<h3 id="6-close-the-year">6. Close the year</h3>
+<p>On the first of January, close the old year so the new file starts clean:</p>
+<pre><code class="language-bash">ledgerline close -e <span class="tok-number">2027</span>-01-01 --open <span class="tok-number">2026</span>.ledger &gt; <span class="tok-number">2027</span>-opening.ledger</code></pre>
+<h2 id="error-messages">Error messages</h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Message</th>
+<th>What it means</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>transaction does not balance</code></td>
+<td>The postings don&#39;t add up to zero.</td>
+<td>Check signs and amounts; the message shows the difference.</td>
+</tr>
+<tr>
+<td><code>two postings without amounts</code></td>
+<td>Only one posting may leave its amount out.</td>
+<td>Add an amount to one of them.</td>
+</tr>
+<tr>
+<td><code>unknown account</code></td>
+<td>With <code>--strict</code>, an account wasn&#39;t declared.</td>
+<td>Declare it, or fix the spelling.</td>
+</tr>
+<tr>
+<td><code>date goes backwards</code></td>
+<td>With <code>--dates</code>, a transaction is earlier than the one before it.</td>
+<td>Move it, or drop <code>--dates</code>.</td>
+</tr>
+<tr>
+<td><code>bad date</code></td>
+<td>The date isn&#39;t in <code>YYYY-MM-DD</code> form.</td>
+<td>Rewrite it in ISO format.</td>
+</tr>
+<tr>
+<td><code>single space before amount</code></td>
+<td>The account and amount are separated by one space.</td>
+<td>Use two or more spaces.</td>
+</tr>
+<tr>
+<td><code>unknown commodity</code></td>
+<td>With <code>--strict</code>, a commodity wasn&#39;t declared.</td>
+<td>Add a <code>commodity</code> line.</td>
+</tr>
+<tr>
+<td><code>include not found</code></td>
+<td>An <code>include</code> names a file that doesn&#39;t exist.</td>
+<td>Check the path; it&#39;s relative to the including file.</td>
+</tr>
+<tr>
+<td><code>price has no commodity</code></td>
+<td>An <code>@</code> price is a bare number.</td>
+<td>Write the commodity after the number.</td>
+</tr>
+<tr>
+<td><code>rules: no date field</code></td>
+<td>An import rules file doesn&#39;t say which column is the date.</td>
+<td>Add <code>date</code> to the <code>fields</code> line.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="recipes">Recipes</h2>
+<h3 id="monthly-spending-by-category">Monthly spending by category</h3>
+<pre><code class="language-bash">ledgerline balance expenses --depth <span class="tok-number">2</span> --monthly -p <span class="tok-number">2026</span> --empty</code></pre>
+<h3 id="find-big-purchases">Find big purchases</h3>
+<pre><code class="language-bash">ledgerline register expenses <span class="tok-string">&#39;amount:&gt;200&#39;</span> -p <span class="tok-string">&#39;this year&#39;</span></code></pre>
+<h3 id="keep-one-file-per-year">Keep one file per year</h3>
+<p>Put each year in its own file and a small main file that includes them:</p>
+<pre><code>include 2024.ledger
+include 2025.ledger
+include 2026.ledger</code></pre>
+<h3 id="a-pre-commit-hook">A pre-commit hook</h3>
+<pre><code class="language-bash"><span class="tok-comment">#!/bin/sh</span>
+<span class="tok-comment"># .git/hooks/pre-commit</span>
+<span class="tok-keyword">exec</span> ledgerline check --strict --dates main.ledger</code></pre>
+<h3 id="export-a-report-for-a-spreadsheet">Export a report for a spreadsheet</h3>
+<pre><code class="language-bash">ledgerline balance -p <span class="tok-number">2026</span> --output <span class="tok-number">2026</span>.csv</code></pre>
+<p>The output format follows the file extension: <code>.csv</code>, <code>.json</code>, <code>.html</code> and
+<code>.txt</code> are supported.</p>
+<h3 id="reading-the-json-output">Reading the JSON output</h3>
+<pre><code class="language-json">{
+  <span class="tok-string">&quot;account&quot;</span>: <span class="tok-string">&quot;expenses:food:groceries&quot;</span>,
+  <span class="tok-string">&quot;amounts&quot;</span>: [{ <span class="tok-string">&quot;commodity&quot;</span>: <span class="tok-string">&quot;GBP&quot;</span>, <span class="tok-string">&quot;quantity&quot;</span>: <span class="tok-number">1834.52</span> }],
+  <span class="tok-string">&quot;postings&quot;</span>: <span class="tok-number">147</span>,
+  <span class="tok-string">&quot;children&quot;</span>: []
+}</code></pre>
+<h3 id="using-it-from-python">Using it from Python</h3>
+<pre><code class="language-python"><span class="tok-keyword">import</span> json
+<span class="tok-keyword">import</span> subprocess
+
+<span class="tok-keyword">def</span> balance(account, period=<span class="tok-string">&quot;this year&quot;</span>):
+    <span class="tok-string">&quot;&quot;&quot;Return the balance of an account as a float, in GBP.&quot;&quot;&quot;</span>
+    result = subprocess.run(
+        [<span class="tok-string">&quot;ledgerline&quot;</span>, <span class="tok-string">&quot;balance&quot;</span>, account, <span class="tok-string">&quot;-p&quot;</span>, period, <span class="tok-string">&quot;--output&quot;</span>, <span class="tok-string">&quot;-.json&quot;</span>],
+        capture_output=<span class="tok-keyword">True</span>, text=<span class="tok-keyword">True</span>, check=<span class="tok-keyword">True</span>,
+    )
+    rows = json.loads(result.stdout)
+    <span class="tok-keyword">return</span> sum(a[<span class="tok-string">&quot;quantity&quot;</span>] <span class="tok-keyword">for</span> r <span class="tok-keyword">in</span> rows <span class="tok-keyword">for</span> a <span class="tok-keyword">in</span> r[<span class="tok-string">&quot;amounts&quot;</span>] <span class="tok-keyword">if</span> a[<span class="tok-string">&quot;commodity&quot;</span>] == <span class="tok-string">&quot;GBP&quot;</span>)
+
+print(f<span class="tok-string">&quot;Groceries so far: {balance(&#39;expenses:food:groceries&#39;):.2f}&quot;</span>)</code></pre>
+<h2 id="questions">Questions</h2>
+<p><strong>Does it work with files from other plain-text accounting tools?</strong>
+Mostly. The format is close to the common ledger dialects. Automated
+transactions and some directives aren&#39;t supported, and <code>check</code> tells you
+which lines it skipped.</p>
+<p><strong>Can several people edit the same file?</strong>
+Yes, the same way several people edit any text file. Version control and
+small, frequent commits work well. Transactions merge cleanly because each
+one is a separate block.</p>
+<p><strong>Why doesn&#39;t it download exchange rates or share prices?</strong>
+Ledgerline never uses the network, on purpose. Add <code>P</code> lines yourself, or
+generate them with a separate script and <code>include</code> the result.</p>
+<p><strong>How big can a file get?</strong>
+Files with a few hundred thousand transactions work, though reports take a
+few seconds. Splitting by year keeps everyday reports fast.</p>
+<p><strong>Is there a graphical app?</strong>
+No, and there are no plans for one. Several editors have syntax colouring
+for the format, which is most of what a graphical app would add.</p>
+<h2 id="design-notes">Design notes</h2>
+<p>These notes explain some choices that surprise people. They&#39;re here so that
+future changes can keep to the same ideas, or change them on purpose.</p>
+<h3 id="why-amounts-are-decimals-not-floats">Why amounts are decimals, not floats</h3>
+<p>Money adds up exactly or not at all. Every amount is stored as a whole
+number of the smallest unit seen for that commodity, together with the
+number of decimal places. Adding <code>0.10</code> ten times gives exactly <code>1.00</code>, and
+a report never shows <code>0.30000000000000004</code>. Prices are the exception: a
+price can have as many decimal places as you write, and conversions are
+rounded once, at the end, to the commodity&#39;s usual precision.</p>
+<h3 id="why-the-format-is-strict-about-spaces">Why the format is strict about spaces</h3>
+<p>Account names may contain single spaces, so <code>expenses:eating out</code> is a valid
+account. That means one space can&#39;t also separate the account from the
+amount, and the format asks for two. It&#39;s the most common mistake new users
+make, which is why <code>check</code> has a message for it that says exactly what to do.</p>
+<h3 id="why-theres-no-automatic-categorisation">Why there&#39;s no automatic categorisation</h3>
+<p>Guessing categories from descriptions is easy to get mostly right and very
+hard to get completely right. A wrong guess you don&#39;t notice is worse than
+no guess at all, because it quietly corrupts your reports. Import rules are
+explicit instead: every match is something you wrote, and anything that
+doesn&#39;t match is left in <code>expenses:unknown</code> where you&#39;ll see it.</p>
+<h3 id="why-reports-never-write-to-your-files">Why reports never write to your files</h3>
+<p>Commands such as <code>rewrite</code>, <code>close</code> and <code>print</code> produce text that looks like
+a ledger file, but they print it rather than saving it. You decide where it
+goes, usually with a shell redirect, and your version control shows exactly
+what changed. A tool that edits your only copy of your accounts in place
+needs to be perfect; one that prints doesn&#39;t.</p>
+<h3 id="why-it-never-touches-the-network">Why it never touches the network</h3>
+<p>Exchange rates and share prices are the obvious thing to fetch, and every
+fetch is a chance for something to go wrong: a changed API, a rate limit, a
+leak of what you own to whoever runs the server. Keeping the network out
+entirely means Ledgerline behaves the same on a plane as at home, and the
+same in five years as today.</p>
+<h3 id="performance">Performance</h3>
+<p>The parser reads files in a single pass and keeps transactions in date
+order as it goes, so most reports are a single walk over memory. On a 2024
+laptop, the numbers for a 40,000-transaction file are roughly:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th class="align-right">Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Read and parse</td>
+<td class="align-right">180 ms</td>
+</tr>
+<tr>
+<td>Check balances and accounts</td>
+<td class="align-right">25 ms</td>
+</tr>
+<tr>
+<td><code>balance</code> report</td>
+<td class="align-right">15 ms</td>
+</tr>
+<tr>
+<td><code>register</code> for one account</td>
+<td class="align-right">30 ms</td>
+</tr>
+<tr>
+<td><code>forecast</code> one year ahead</td>
+<td class="align-right">60 ms</td>
+</tr>
+</tbody>
+</table></div>
+<p>Startup itself is under 10 ms, so small files feel instant.</p>
+<h2 id="glossary">Glossary</h2>
+<ul>
+<li><strong>Account:</strong> a named place where amounts accumulate, such as
+<code>assets:bank:current</code>. Accounts form a tree through their colons.</li>
+<li><strong>Posting:</strong> one line of a transaction: an account and an amount.</li>
+<li><strong>Transaction:</strong> a dated group of postings that adds up to zero.</li>
+<li><strong>Commodity:</strong> what an amount is measured in: a currency, a share, or
+anything else you count, such as <code>hours</code>.</li>
+<li><strong>Price:</strong> how much of one commodity another is worth on a date.</li>
+<li><strong>Periodic transaction:</strong> a template starting with <code>~</code>, used for budgets
+and forecasts. It&#39;s never counted as a real transaction.</li>
+<li><strong>Cleared:</strong> a transaction marked <code>*</code>, meaning it has appeared on a
+statement.</li>
+<li><strong>Pending:</strong> a transaction marked <code>!</code>, meaning it&#39;s expected but not yet
+confirmed.</li>
+</ul>
+<h2 id="contributing">Contributing</h2>
+<p>Bug reports and small fixes are very welcome. Before starting anything
+larger, open an issue so we can agree on the approach.</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled checked> Write a failing test that shows the bug</li>
+<li class="task-list-item"><input type="checkbox" disabled checked> Keep changes focused: one fix or feature per pull request</li>
+<li class="task-list-item"><input type="checkbox" disabled> Run <code>cargo fmt</code> and <code>cargo clippy</code> before pushing</li>
+<li class="task-list-item"><input type="checkbox" disabled> Update this README if behaviour changes</li>
+</ul>
+<p>The test suite runs with <code>cargo test</code>. Report tests compare output with
+files in <code>tests/expected/</code>; set <code>LEDGERLINE_BLESS=1</code> to rewrite them after a
+deliberate change, then check the diff.</p>
+<h3 id="project-layout">Project layout</h3>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>What&#39;s in it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/parse/</code></td>
+<td>The file format parser and its error messages.</td>
+</tr>
+<tr>
+<td><code>src/query/</code></td>
+<td>Account, date and tag filters.</td>
+</tr>
+<tr>
+<td><code>src/report/</code></td>
+<td>One module per command.</td>
+</tr>
+<tr>
+<td><code>src/output/</code></td>
+<td>Text, CSV, JSON and HTML writers.</td>
+</tr>
+<tr>
+<td><code>tests/</code></td>
+<td>Integration tests and their expected output.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="changelog">Changelog</h2>
+<h3 id="320-2026-09-14">3.2.0 (2026-09-14)</h3>
+<ul>
+<li><code>activity</code> gains <code>--daily</code>.</li>
+<li><code>import</code> now remembers the last row it saw, so re-running it is faster.</li>
+<li>Fixed: <code>close --open</code> used the wrong date for the opening transaction.</li>
+</ul>
+<h3 id="310-2026-05-02">3.1.0 (2026-05-02)</h3>
+<ul>
+<li>New <code>roi</code> command.</li>
+<li><code>budget --over</code> lists only overspent accounts.</li>
+<li>Account names may now contain digits at the start.</li>
+</ul>
+<h3 id="300-2026-01-10">3.0.0 (2026-01-10)</h3>
+<ul>
+<li>Reports can write CSV, JSON and HTML with <code>--output</code>.</li>
+<li><strong>Breaking:</strong> <code>--format</code> is removed; use <code>--output</code> with a file extension.</li>
+<li>Minimum Rust version is now 1.80.</li>
+</ul>
+<h3 id="261-2025-10-21">2.6.1 (2025-10-21)</h3>
+<ul>
+<li>Fixed a crash when a file ended in the middle of a transaction.</li>
+<li>Fixed: tags with hyphens were split in two.</li>
+</ul>
+<h3 id="260-2025-08-03">2.6.0 (2025-08-03)</h3>
+<ul>
+<li>New <code>diff</code> command for reconciling against statements.</li>
+<li><code>register --average</code> shows a running average.</li>
+</ul>
+<h3 id="250-2025-04-17">2.5.0 (2025-04-17)</h3>
+<ul>
+<li><code>forecast</code> can project up to ten years ahead.</li>
+<li>Faster loading of files with many <code>include</code> lines (about 3x).</li>
+</ul>
+<h3 id="240-2025-01-06">2.4.0 (2025-01-06)</h3>
+<ul>
+<li>New <code>rewrite</code> command.</li>
+<li><code>check --dates</code> reports dates that go backwards.</li>
+</ul>
+<h3 id="230-2024-11-12">2.3.0 (2024-11-12)</h3>
+<ul>
+<li><code>import</code> rules can match on amount ranges.</li>
+<li><code>payees --since</code> lists only recent payees.</li>
+<li>Fixed: <code>--depth 1</code> hid the total line.</li>
+</ul>
+<h3 id="220-2024-08-25">2.2.0 (2024-08-25)</h3>
+<ul>
+<li>HTML output uses the system font and follows dark mode.</li>
+<li><code>balance --flat</code> lists accounts without indentation.</li>
+</ul>
+<h3 id="210-2024-06-01">2.1.0 (2024-06-01)</h3>
+<ul>
+<li>New <code>tags</code> command.</li>
+<li>Comments may start with <code>#</code> as well as <code>;</code>.</li>
+</ul>
+<h3 id="200-2024-03-30">2.0.0 (2024-03-30)</h3>
+<ul>
+<li>The file format is now stable.</li>
+<li><strong>Breaking:</strong> dates must be in ISO format.</li>
+</ul>
+<h2 id="license">License</h2>
+<p>Ledgerline is released under the MIT License. See <code>LICENSE</code> for the full
+text.</p>
+<hr>
+<p><em>This file is a made-up README used to test mdview. Ledgerline isn&#39;t a real
+project.</em></p>

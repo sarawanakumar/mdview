@@ -1,0 +1,2 @@
+# Test files whose bytes matter: never convert line endings.
+fixtures/edge/crlf.md -text

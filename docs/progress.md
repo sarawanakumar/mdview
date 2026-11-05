@@ -2,6 +2,66 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 7.1, performance and edge fixtures, timing script
+
+**Done**
+- `fixtures/typical.md` (49 KB): a made-up README for a command-line
+  tool. It has headings, lists, 22 command sections, 28 tables, 67 code
+  blocks in several languages, a task list, links and one local image.
+  Its expected HTML is recorded.
+- `large.md` isn't stored. The timing script makes it (5.0 MB, typical.md
+  repeated 104 times) in the git-ignored `build/timing/`, so the repo
+  doesn't carry 5 MB of copies. `spec.md` "Test files" now says so.
+- New files in `fixtures/edge/`:
+  - `bom.md`: the heading still renders
+  - `utf16.md`: garbled, with the notice, as spec 10.2 says
+  - `crlf.md`: the same as LF line endings
+  - `control-characters.md`: NUL becomes U+FFFD
+  - `unclosed.md`: emphasis, a link, an HTML comment and a fence left
+    open; the comment swallows the rest as source text, as CommonMark
+    says
+  - `long-lines.md`: a 22 KB paragraph line and an 8 KB code line
+  - `deep-nesting.md`: 1,500 nested quotes, which get the plain-text
+    notice
+
+  Their expected HTML was recorded and reviewed.
+- The fixture tests now render through `renderSafely`, the app's own
+  path, so a deliberately deep file can be a fixture. The "real files
+  aren't flagged as deep" test skips that one file.
+- `scripts/time-open.swift`: a Swift script with no extra tools. It does
+  one uncounted run first, to cover the signature check after a rebuild.
+  Then each run:
+  - quits mdview
+  - opens typical.md cold
+  - opens three copies warm
+  - opens the 5 MB file
+
+  It reads the documentVisible signpost and prints each median against
+  spec 8.1–8.3. CLAUDE.md and architecture.md say how to run it.
+
+**Measurements** (the 6.6 release build, unchanged app code; load
+average about 4)
+
+| Spec | Result | Target |
+|---|---|---|
+| 8.1 cold, typical.md | median 503 ms (491–513, n=5) | under 500 ms: **miss** |
+| 8.2 warm, typical.md | median 157 ms (129–197, n=15) | under 200 ms: pass |
+| 8.3 large, 5.0 MB | median 1,162 ms (1,130–1,207, n=5) | under 2 s: pass |
+
+- Cold open misses by a few milliseconds under this load, as earlier
+  measurements predicted. Roadmap 7.2 deals with it.
+- 8.3's "scrolling stays smooth" isn't measured by the script; it needs
+  a hand check in 7.2.
+
+**Not checked**
+- I didn't look at the new edge files in the app window. Their HTML is
+  checked, and the notices come from code tested earlier.
+- A file that can't be read (spec 10.3) can't be stored in git with its
+  permissions, so it stays a manual check for the 7.6 checklist.
+
+**Next**
+- 7.2: measure all of spec section 8; fix cold open and memory.
+
 ## 2026-11-05: Roadmap 6.6, code.md and a 2,000-line block (M6 done)
 
 **Done**

@@ -79,6 +79,8 @@ criteria pass. Record measurements (timings, app size) with the numbers.
   (entitlements, Info.plist) are listed as exceptions in the project.
 - Before saying something works, run the tests or the app and say what you
   checked. If something couldn't be checked, say so.
+- Open timing (spec section 8): copy a release build to `build/mdview.app`,
+  then run `swift scripts/time-open.swift` from the repository root.
 - Colour changes in `preview.css` are checked by `ContrastTests` (every
   text colour at least 4.5:1, light and dark).
 

@@ -191,8 +191,13 @@ A folder of Markdown files kept in the repo for checking the criteria above
 - `code.md`: one block per supported language, plus untagged, unknown and
   malformed blocks
 - `typical.md`: about 50 KB of realistic README-style content (performance)
-- `large.md`: about 5 MB (performance)
-- `edge/`: empty, non-UTF-8 and pathological files
+- `large.md`: about 5 MB (performance). It isn't stored in the repo: the
+  timing script makes it by repeating `typical.md`, so the repo doesn't
+  carry 5 MB of copies.
+- `edge/`: empty, non-UTF-8 (Latin-1, UTF-16), plain-text, byte order
+  mark, Windows line endings and control-character files, plus
+  pathological ones: things left unclosed, very long lines, and nesting
+  too deep to parse (spec 10.4)
 - `expected/`: the expected HTML for each file above, used by the tests
 
 ## Open questions

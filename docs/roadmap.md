@@ -152,7 +152,7 @@ see colours sooner.*
 
 ## M7. Speed, polish and v1 release
 
-- [ ] **7.1** Write `fixtures/typical.md`, `fixtures/large.md` and the
+- [x] **7.1** Write `fixtures/typical.md`, `fixtures/large.md` and the
       `edge/` files; a timing script for double-click → first paint.
 - [ ] **7.2** Measure everything in spec section 8; fix anything that
       misses. *(8.1–8.6)* Memory is over target (see progress.md,

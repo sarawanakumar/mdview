@@ -32,13 +32,18 @@ enum Fixtures {
             .sorted()
     }()
 
-    static func render(_ relativePath: String) throws -> String {
+    /// Renders a fixture the way the app does: Markdown through
+    /// `renderSafely`, so deliberately deep files get the plain-text notice.
+    static func render(_ relativePath: String) async throws -> String {
         let data = try Data(contentsOf: directory.appending(path: relativePath))
         let text = UTF8Text.decode(data).text
         return relativePath.hasSuffix(".md")
-            ? HTMLRenderer.render(markdown: text)
+            ? await HTMLRenderer.renderSafely(markdown: text).html
             : HTMLRenderer.render(plainText: text)
     }
+
+    /// Fixtures that are nested too deeply on purpose (spec 10.4).
+    static let deliberatelyDeep: Set<String> = ["edge/deep-nesting.md"]
 
     static func expectedURL(for relativePath: String) -> URL {
         let html = (relativePath as NSString).deletingPathExtension + ".html"
@@ -59,8 +64,8 @@ struct FixtureTests {
 
     /// Spec 10.4: any input renders something and never crashes.
     @Test(arguments: Fixtures.files)
-    func rendersWithoutCrashing(_ file: String) throws {
-        let html = try Fixtures.render(file)
+    func rendersWithoutCrashing(_ file: String) async throws {
+        let html = try await Fixtures.render(file)
         let source = try Data(contentsOf: Fixtures.directory.appending(path: file))
         if !source.isEmpty { #expect(!html.isEmpty) }
     }
@@ -68,8 +73,8 @@ struct FixtureTests {
     /// Output matches `fixtures/expected/<file>.html` when that file exists.
     /// With MDVIEW_RECORD_EXPECTED set, writes it instead.
     @Test(arguments: Fixtures.files)
-    func matchesExpectedHTML(_ file: String) throws {
-        let html = try Fixtures.render(file)
+    func matchesExpectedHTML(_ file: String) async throws {
+        let html = try await Fixtures.render(file)
         let expectedURL = Fixtures.expectedURL(for: file)
 
         if Fixtures.isRecording {

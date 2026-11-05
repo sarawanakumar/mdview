@@ -71,6 +71,7 @@ Packages/MDViewCore/        local Swift package, no AppKit
   Files/FileWatcher         notices when a file changes on disk (spec section 5)
   Tests/                    unit tests, run with `swift test`
 fixtures/                   the test Markdown files listed in spec.md
+scripts/time-open.swift     times opening files against spec section 8
 ```
 
 Everything that knows about Markdown lives in `MDViewCore`, along with any
@@ -256,8 +257,9 @@ cost on a cold launch.
 - **Show text first.** Images load after the page is shown (spec 3.7).
 - **Measure.** Points of interest are marked with `os_signpost` (launch,
   file read, parse done, HTML done, first paint), so Instruments shows where
-  time goes. A small script times "double-click to first paint" on the
-  fixture files.
+  time goes. `scripts/time-open.swift` times "open the file → text
+  visible" (the documentVisible signpost) for cold, warm and large opens.
+  It's a Swift script, so it needs nothing beyond Xcode.
 
 ## Testing
 

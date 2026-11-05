@@ -133,7 +133,7 @@ struct FuzzTests {
         #expect(NestingGuard.estimatedDepth(input) >= minimum)
     }
 
-    @Test(arguments: Fixtures.files.filter { $0.hasSuffix(".md") })
+    @Test(arguments: Fixtures.files.filter { $0.hasSuffix(".md") && !Fixtures.deliberatelyDeep.contains($0) })
     func realFilesAreNotFlagged(_ file: String) throws {
         let depth = NestingGuard.estimatedDepth(try Fixtures.text(file))
         #expect(depth < 50, "\(file) estimated \(depth) levels deep")
