@@ -2,6 +2,25 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 7.5, distribution (ADR 0007)
+
+**Done**
+- Checked what each option means on macOS 26.6:
+  - **A fresh clone** builds a universal release in 31 s. It's ad-hoc
+    signed with the hardened runtime and has no quarantine flag, so it
+    opens and runs from wherever it's built.
+  - **The same app downloaded** would be quarantined. `spctl` rejects
+    it: Gatekeeper needs a Developer ID and notarisation.
+- Wrote ADR 0007, status **Proposed**: v1 is build-from-source only,
+  with README install steps in 7.8. A notarised GitHub release (needs a
+  paid developer membership, plus the license texts in the bundle) stays
+  open for later. An un-notarised zip is rejected.
+- The owner accepted ADR 0007, so 7.5 is ticked. Roadmap 7.8 now says
+  what "publish" means.
+
+**Next**
+- 7.6: go through every spec criterion with the written checklist.
+
 ## 2026-11-05: Roadmap 7.4, app icon and About box
 
 **Done**

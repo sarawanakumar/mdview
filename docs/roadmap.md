@@ -163,14 +163,15 @@ see colours sooner.*
 - [x] **7.3** Privacy check: network monitor during a test session, check
       entitlements, confirm the only package. *(9.1–9.4)*
 - [x] **7.4** App icon and About box.
-- [ ] **7.5** Decide distribution (build from source, or notarised
+- [x] **7.5** Decide distribution (build from source, or notarised
       GitHub release) and write it up as an ADR.
 - [ ] **7.6** Go through every spec criterion with the written checklist;
       fix what fails.
 - [ ] **7.7** Set mdview as the default `.md` app and use it daily for a
       week. *(Vision success measure.)*
-- [ ] **7.8** Tag v1.0 and publish as decided in 7.5. Add a license and
-      update the README with install steps.
+- [ ] **7.8** Tag v1.0 and publish as decided in 7.5 (ADR 0007: build
+      from source, so "publish" means pushing the tagged repository). Add
+      a license and update the README with install steps.
 
 **Done when:** every spec criterion passes and mdview has replaced
 whatever you used before.

@@ -15,6 +15,7 @@ the pieces fit.
 | [0004](adr/0004-in-project-code-highlighter.md) | Small hand-written highlighter, run in Swift while building the HTML | Accepted |
 | [0005](adr/0005-sandbox-and-file-access.md) | App Sandbox on; local files served to the page through a custom URL scheme; one-time folder access grants | Accepted (point 1 changed by 0006) |
 | [0006](adr/0006-outgoing-network-entitlement-for-webkit.md) | Grant the outgoing-network entitlement, because WebKit can't run in the sandbox without it; offline is enforced by the layers below | Accepted |
+| [0007](adr/0007-distribution.md) | v1 is build-from-source only; no published binary, so no signing or notarisation | Accepted |
 
 ## Technology
 

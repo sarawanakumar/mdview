@@ -94,5 +94,5 @@ Concretely, v1 is successful when:
 - **Rendering approach.** Native text views versus the system's built-in
   `WKWebView` with local HTML. Both are Apple SDKs; the choice trades
   fidelity against launch speed and memory. Also an ADR.
-- **Distribution.** A GitHub release of a signed app, a Homebrew cask, or
-  build-from-source only.
+- **Distribution.** Decided in ADR 0007: build from source for v1. A
+  notarised release can come later if others want one.
