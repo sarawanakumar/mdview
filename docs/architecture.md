@@ -57,7 +57,8 @@ App/                        the macOS app target (AppKit)
                             outgoing network
   Resources/                preview.css, Info.plist, Assets.xcassets (app icon)
 Packages/MDViewCore/        local Swift package, no AppKit
-  UTF8Text                  bytes → text, bad bytes replaced and reported (spec 10.2)
+  UTF8Text                  bytes → text, bad bytes replaced and reported (spec 10.2);
+                            text → bytes for saving, byte order mark put back (spec 11.8)
   FrontMatter               strips a leading YAML block (spec 2.13)
   Autolinker                finds bare web addresses, GitHub's rules (spec 2.14)
   NestingGuard              spots files nested too deeply to parse safely (spec 10.4)

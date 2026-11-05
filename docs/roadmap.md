@@ -186,7 +186,7 @@ ADR 0008 accepted 2026-11-05.
       file with `NSDocument` inside the sandbox, both one opened from
       Finder and one opened through an old read-only folder grant; check
       the file watcher keeps working after our own save. *(9.2, 11.11)*
-- [ ] **8.2** `UTF8Text.encode` in `MDViewCore` (text back to bytes, byte
+- [x] **8.2** `UTF8Text.encode` in `MDViewCore` (text back to bytes, byte
       order mark restored), with round-trip tests over `fixtures/edge/`.
       *(11.8)*
 - [ ] **8.3** Editable `MarkdownDocument`: `data(ofType:)`, edited state,

@@ -2,6 +2,33 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 8.2, saving text back as bytes
+
+**Done**
+- Committed 8.1 and the v1.1 plan (`49a0f48`).
+- `UTF8Text.encode(_:byteOrderMark:)` in MDViewCore: text → UTF-8 bytes,
+  with the byte order mark first if the file had one. It returns
+  `[UInt8]`, like `decode` takes any byte collection, so MDViewCore
+  stays Foundation-free here; the app will wrap it in `Data`.
+- `DecodedText` gains `hadByteOrderMark` (defaults to false, so existing
+  callers are unchanged). `decode` now sets it.
+- Tests (7 new, 271 in all, all pass):
+  - plain UTF-8, empty, byte order mark put back
+  - mixed line endings (`\r\n`, `\n`, `\r`) written exactly as in the text
+  - an edit to one line of a CRLF file changes only that line
+  - every fixture (18) that decodes cleanly saves back to exactly its own
+    bytes; `latin1.md` and `utf16.md` are reported as invalid, which is
+    what will dim Edit Mode for them (spec 11.10)
+  - `bom.md` and `crlf.md` really do have a mark and CRLF, so the
+    round-trip covers them
+- App (debug) builds with no warnings; nothing in the app uses `encode`
+  yet.
+
+**Next**
+- 8.3: editable `MarkdownDocument` (`data(ofType:)` through
+  `UTF8Text.encode`, edited state, Save, close question, save errors,
+  dimmed for files with bad bytes).
+
 ## 2026-11-05: Roadmap 8.1, edit mode accepted; sandbox save spike
 
 **Done**
