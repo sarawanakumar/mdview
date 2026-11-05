@@ -2,6 +2,39 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 6.5, code colours
+
+**Done**
+- `preview.css`: token colours as variables, GitHub's palette, set for
+  light, dark and print (print always uses the light set).
+
+| Token | Light (on #f6f8fa) | Dark (on #151b23) |
+|---|---|---|
+| keyword | #cf222e | #ff7b72 |
+| string | #0a3069 | #a5d6ff |
+| comment | #59636e | #9198a1 |
+| number | #0550ae | #79c0ff |
+
+- `Tests/MDViewCoreTests/ContrastTests.swift`: reads the real
+  `App/Resources/preview.css` and checks WCAG contrast for every text
+  colour against what it's drawn on, light and dark: the four token
+  colours, text and muted on the code background; text, muted and links
+  on the page (white / the system's dark Canvas, rgb(30, 30, 30)); text
+  on striped rows. Also checks print uses the light colours.
+
+**Checked**
+- Contrast, light / dark: keyword 5.0 / 6.9, string 12.0 / 11.3, comment
+  5.7 / 5.9, number 7.1 / 8.9; text, muted and link as measured in 2.8
+  (15.8 / 14.1, 6.1 / 5.7, 5.3 / 5.9). All at least 4.5:1 (spec 7.5).
+- In the app (temporary hook, removed): elements.md's tokens computed to
+  exactly these colours in light and dark, on the expected code
+  backgrounds; 10 coloured spans on the page.
+- 258 tests pass; Debug and Release build with no warnings.
+
+**Next**
+- Roadmap 6.6: `fixtures/code.md`; a 2,000-line block against the speed
+  targets.
+
 ## 2026-11-05: Roadmap 6.4, code blocks coloured by language tag
 
 **Done**

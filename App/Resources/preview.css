@@ -13,6 +13,11 @@
   --stripe: #f6f8fa;
   --check: #0969da;
   --link: #0068da;            /* macOS link colour, light */
+  /* Code colours (spec 7.5), GitHub's; each at least 4.5:1 on --code-bg. */
+  --tok-keyword: #cf222e;
+  --tok-string: #0a3069;
+  --tok-comment: #59636e;
+  --tok-number: #0550ae;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,6 +29,10 @@
     --stripe: #151b23;
     --check: #4493f8;
     --link: #419cff;          /* macOS link colour, dark */
+    --tok-keyword: #ff7b72;
+    --tok-string: #a5d6ff;
+    --tok-comment: #9198a1;
+    --tok-number: #79c0ff;
   }
 }
 
@@ -143,6 +152,12 @@ pre > code {
   white-space: pre;
 }
 
+/* Highlighted code (spec section 7). */
+.tok-keyword { color: var(--tok-keyword); }
+.tok-string { color: var(--tok-string); }
+.tok-comment { color: var(--tok-comment); }
+.tok-number { color: var(--tok-number); }
+
 /* ---- Tables (2.9): natural width; a wide one scrolls in its own box ---- */
 
 .table { overflow-x: auto; margin: 0 0 1em; }
@@ -185,6 +200,10 @@ p.notice {                    /* e.g. a file nested too deeply (10.4) */
     --stripe: #f6f8fa;
     --check: #0969da;
     --link: #0068da;
+    --tok-keyword: #cf222e;
+    --tok-string: #0a3069;
+    --tok-comment: #59636e;
+    --tok-number: #0550ae;
   }
   html { background: white; }
   body { max-width: none; padding: 0; }
