@@ -160,7 +160,7 @@ see colours sooner.*
       2026-11-05). Measure each process's
       `phys_footprint` after at least 10 s (WebKit's GPU process has a
       start-up peak of ~135 MB) and add them up, several runs.
-- [ ] **7.3** Privacy check: network monitor during a test session, check
+- [x] **7.3** Privacy check: network monitor during a test session, check
       entitlements, confirm the only package. *(9.1–9.4)*
 - [ ] **7.4** App icon and About box.
 - [ ] **7.5** Decide distribution (build from source, or notarised

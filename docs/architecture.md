@@ -72,6 +72,7 @@ Packages/MDViewCore/        local Swift package, no AppKit
   Tests/                    unit tests, run with `swift test`
 fixtures/                   the test Markdown files listed in spec.md
 scripts/time-open.swift     times opening files against spec section 8
+scripts/check-offline.zsh   checks no mdview process touches the network (spec 9.1)
 ```
 
 Everything that knows about Markdown lives in `MDViewCore`, along with any

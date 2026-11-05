@@ -81,6 +81,9 @@ criteria pass. Record measurements (timings, app size) with the numbers.
   checked. If something couldn't be checked, say so.
 - Open timing (spec section 8): copy a release build to `build/mdview.app`,
   then run `swift scripts/time-open.swift` from the repository root.
+- Offline check (spec 9.1): `zsh scripts/check-offline.zsh` opens every
+  fixture while `nettop` watches, and fails if any mdview process had a
+  socket.
 - Colour changes in `preview.css` are checked by `ContrastTests` (every
   text colour at least 4.5:1, light and dark).
 

@@ -2,6 +2,47 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 7.3, privacy check
+
+**Done** (release build from 7.2, unchanged)
+- **9.1, network:** while mdview opened all 18 fixture files, `nettop`
+  recorded every socket on the Mac for 60 s. The files included
+  images.md's remote and unsafe images and links.md's web links. Then
+  images.md was edited, so it reloaded with two more remote images, and
+  the 5 MB file was opened. mdview's 23 processes (the app, GPU,
+  Networking and 20 WebContent) never appeared in nettop's output, and
+  `lsof` found no internet sockets for them. In the same window, nettop
+  saw Chrome, Slack, Bitrise and others.
+  - Controls: a local `curl` to 127.0.0.1 showed up in nettop (498 bytes
+    in, 77 out), and the script's checks find Chrome's open connection.
+  - The system DNS service's log shows lookups by sharingd, rapportd and
+    Python (the control), and none by mdview or its WebKit processes.
+- **9.2, sandbox:** the signed build has exactly four entitlements:
+  app-sandbox, user-selected read-only, app-scope bookmarks and
+  network.client. There is no network.server. The kernel's
+  `sandbox_check` says the running app is sandboxed, and says no for a
+  shell, as a control. File access itself was tested in M3.
+- **9.3, no telemetry:** no networking, analytics, crash-report or
+  update code in `App/` or `MDViewCore`, and none in the two packages'
+  sources. The binary imports no networking symbols and links only system
+  libraries. Info.plist has no update feed, and the bundle holds only the
+  executable, Info.plist and preview.css.
+- **9.4, packages:** both `Package.resolved` files pin exactly
+  swift-markdown 0.9.0 and swift-cmark 0.9.0. The Xcode project has one
+  package reference, the local MDViewCore.
+- `scripts/check-offline.zsh` repeats the 9.1 session: it copies the
+  fixtures to `build/`, opens them all, edits one, and fails if any
+  mdview process had a socket. It passed. Noted in CLAUDE.md and
+  architecture.md.
+
+**Observed, not a task**
+- Each window gets its own WebContent process (20 for 19 windows). That
+  fits spec 8.5, which is about one file, but many open windows cost
+  roughly 30–50 MB each.
+
+**Next**
+- 7.4: app icon and About box.
+
 ## 2026-11-05: Roadmap 7.2, measuring spec section 8
 
 **Done**
