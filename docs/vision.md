@@ -6,7 +6,8 @@ Offline Markdown viewers for macOS tend to cost money and come loaded with
 features I never use: editors, sync, export pipelines, plugin systems. I just
 want to *read* a Markdown file, instantly, without opening an IDE or a browser.
 
-mdview is an ultra-lightweight, incredibly simple Markdown viewer for macOS.
+mdview (shown to users as **MDView**) is an ultra-lightweight, incredibly
+simple Markdown viewer for macOS.
 It does one thing: open a `.md` file and show a clean, readable preview, fast.
 
 ## For whom

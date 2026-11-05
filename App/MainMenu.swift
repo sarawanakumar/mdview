@@ -30,8 +30,8 @@ enum MainMenu {
     // MARK: Menus
 
     private static func appMenu() -> NSMenu {
-        let menu = NSMenu(title: "mdview")
-        menu.addItem(item("About mdview", #selector(NSApplication.orderFrontStandardAboutPanel(_:))))
+        let menu = NSMenu(title: "MDView")
+        menu.addItem(item("About MDView", #selector(NSApplication.orderFrontStandardAboutPanel(_:))))
         menu.addItem(.separator())
 
         let services = NSMenu(title: "Services")
@@ -39,11 +39,11 @@ enum MainMenu {
         NSApp.servicesMenu = services
         menu.addItem(.separator())
 
-        menu.addItem(item("Hide mdview", #selector(NSApplication.hide(_:)), "h"))
+        menu.addItem(item("Hide MDView", #selector(NSApplication.hide(_:)), "h"))
         menu.addItem(item("Hide Others", #selector(NSApplication.hideOtherApplications(_:)), "h", [.command, .option]))
         menu.addItem(item("Show All", #selector(NSApplication.unhideAllApplications(_:))))
         menu.addItem(.separator())
-        menu.addItem(item("Quit mdview", #selector(NSApplication.terminate(_:)), "q"))
+        menu.addItem(item("Quit MDView", #selector(NSApplication.terminate(_:)), "q"))
         return menu
     }
 

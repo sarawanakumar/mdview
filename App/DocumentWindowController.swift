@@ -68,7 +68,7 @@ final class DocumentWindowController: NSWindowController {
         }
         guard folderBar == nil else { return }
         let bar = Self.noticeBar(
-            message: "Allow mdview to show images and linked files in this folder.",
+            message: "Allow MDView to show images and linked files in this folder.",
             buttons: [
                 Self.button("Allow…", action: #selector(allowFolder), target: self, isDefault: true),
                 Self.button("Not Now", action: #selector(dismissFolderBar), target: self, isDefault: false),
@@ -107,7 +107,7 @@ final class DocumentWindowController: NSWindowController {
         panel.canCreateDirectories = false
         panel.directoryURL = folder
         panel.prompt = "Allow"
-        panel.message = "mdview can show images and open linked files in the folder you choose and every folder inside it. Choosing a folder higher up, such as your home folder, means you won’t be asked again for anything in it."
+        panel.message = "MDView can show images and open linked files in the folder you choose and every folder inside it. Choosing a folder higher up, such as your home folder, means you won’t be asked again for anything in it."
         panel.beginSheetModal(for: window) { response in
             MainActor.assumeIsolated {
                 guard response == .OK, let chosen = panel.url else { return done(false) }
@@ -169,7 +169,7 @@ final class DocumentWindowController: NSWindowController {
     private func openFile(_ file: URL) {
         guard FileManager.default.fileExists(atPath: file.path) else { return showNotFound(file) }
         if !NSWorkspace.shared.open(file) {
-            showBriefNotice("mdview couldn’t open “\(file.lastPathComponent)”.")
+            showBriefNotice("MDView couldn’t open “\(file.lastPathComponent)”.")
         }
     }
 

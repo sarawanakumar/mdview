@@ -99,6 +99,6 @@ enum PreviewError: LocalizedError {
     case blockListUnavailable
 
     var errorDescription: String? {
-        "mdview couldn’t set up its offline protection, so this file isn’t shown."
+        "MDView couldn’t set up its offline protection, so this file isn’t shown."
     }
 }

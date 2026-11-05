@@ -1,6 +1,8 @@
 # mdview
 
-An ultra-lightweight, read-only Markdown viewer for macOS 15 and later.
+**MDView** is an ultra-lightweight, read-only Markdown viewer for macOS 15
+and later. (The app is shown as "MDView"; the project, code and bundle ID
+use `mdview`.)
 Native AppKit, fully offline. Early development: see
 [docs/roadmap.md](docs/roadmap.md) for where things stand.
 
