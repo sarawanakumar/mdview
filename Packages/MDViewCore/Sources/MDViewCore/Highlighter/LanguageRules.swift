@@ -23,12 +23,20 @@ public struct LanguageRules: Sendable {
         /// Whether the string can run over several lines. If not, an
         /// unclosed string stops at the end of its line.
         public var spansLines: Bool
+        /// Only a string right after this character (spaces between are
+        /// fine). HTML uses `=`, so attribute values are strings but an
+        /// apostrophe in text isn't.
+        public var onlyAfter: Character?
 
-        public init(open: String, close: String? = nil, escape: Character? = "\\", spansLines: Bool = false) {
+        public init(
+            open: String, close: String? = nil, escape: Character? = "\\",
+            spansLines: Bool = false, onlyAfter: Character? = nil
+        ) {
             self.open = open
             self.close = close ?? open
             self.escape = escape
             self.spansLines = spansLines
+            self.onlyAfter = onlyAfter
         }
     }
 
@@ -43,6 +51,9 @@ public struct LanguageRules: Sendable {
     /// shell (`$#` and `a#b` aren't comments).
     public var lineCommentNeedsSpaceBefore: Bool
     public var highlightsNumbers: Bool
+    /// HTML and XML: a word right after `<` or `</` is a keyword (the tag
+    /// name), whatever `keywords` says.
+    public var tagNamesAreKeywords: Bool
 
     public init(
         keywords: Set<String> = [],
@@ -51,7 +62,8 @@ public struct LanguageRules: Sendable {
         strings: [StringStyle] = [],
         wordCharacters: Set<Character> = [],
         lineCommentNeedsSpaceBefore: Bool = false,
-        highlightsNumbers: Bool = true
+        highlightsNumbers: Bool = true,
+        tagNamesAreKeywords: Bool = false
     ) {
         self.keywords = keywords
         self.lineComments = lineComments
@@ -61,5 +73,6 @@ public struct LanguageRules: Sendable {
         self.wordCharacters = wordCharacters
         self.lineCommentNeedsSpaceBefore = lineCommentNeedsSpaceBefore
         self.highlightsNumbers = highlightsNumbers
+        self.tagNamesAreKeywords = tagNamesAreKeywords
     }
 }

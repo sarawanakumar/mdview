@@ -2,6 +2,41 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 6.3, shell, JSON, YAML, HTML, CSS
+
+**Done**
+- Two small additions to `LanguageRules`, needed for HTML:
+  - a string style can be limited to starting after a given character
+    (`onlyAfter`): HTML strings only after `=`, so attribute values are
+    strings but an apostrophe in text ("Don't") isn't;
+  - `tagNamesAreKeywords`: a word right after `<` or `</` is coloured as a
+    keyword, so tag names are coloured without colouring "a" or "p" in
+    text.
+- Tables in `Languages.swift`:
+  - **Shell**: keywords and common built-ins; `#` only at the start of a
+    word (`$#`, `${#x}`, `a#b` aren't comments); both quotes span lines;
+    `-` is part of a word (`--if-needed` isn't a keyword).
+  - **JSON**: `true`/`false`/`null`, strings, numbers; `//` and `/* */`
+    comments tolerated (common in config files).
+  - **YAML**: booleans and null in their usual spellings, `#` after a
+    space, both quotes. Approximation: the doubled-quote escape `'it''s'`
+    shows as two strings side by side.
+  - **HTML**: `<!-- -->`, tag names (incl. custom elements), attribute
+    values; numbers off so text stays plain.
+  - **CSS**: `/* */`, strings, numbers with units (`600px`, `1.5rem`),
+    at-rules and a few value keywords (`!important`, `auto`, `none`,
+    `inherit`, …); `#` in words so hex colours and ids stay whole.
+
+**Checked**
+- 14 new tests (245 total): a realistic snippet per language with the
+  exact tokens expected, the tricky cases above, and 300 random inputs
+  for each of the nine languages keeping exactly their text.
+- Not used by the renderer yet (6.4).
+
+**Next**
+- Roadmap 6.4: language tags and aliases; untagged and unknown blocks stay
+  plain.
+
 ## 2026-11-05: Roadmap 6.2, Swift, Python, JavaScript, TypeScript
 
 **Done**

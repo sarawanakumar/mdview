@@ -21,7 +21,7 @@ private struct Scanner {
     let rules: LanguageRules
     let lineComments: [[Unicode.Scalar]]
     let blockComments: [(open: [Unicode.Scalar], close: [Unicode.Scalar], nests: Bool)]
-    let strings: [(open: [Unicode.Scalar], close: [Unicode.Scalar], escape: Unicode.Scalar?, spansLines: Bool)]
+    let strings: [(open: [Unicode.Scalar], close: [Unicode.Scalar], escape: Unicode.Scalar?, spansLines: Bool, onlyAfter: Unicode.Scalar?)]
 
     var index = 0
     var output = ""
@@ -35,7 +35,8 @@ private struct Scanner {
         lineComments = rules.lineComments.map { Array($0.unicodeScalars) }
         blockComments = rules.blockComments.map { (Array($0.open.unicodeScalars), Array($0.close.unicodeScalars), $0.nests) }
         strings = rules.strings.map {
-            (Array($0.open.unicodeScalars), Array($0.close.unicodeScalars), $0.escape?.unicodeScalars.first, $0.spansLines)
+            (Array($0.open.unicodeScalars), Array($0.close.unicodeScalars), $0.escape?.unicodeScalars.first,
+             $0.spansLines, $0.onlyAfter?.unicodeScalars.first)
         }
         output.reserveCapacity(code.utf8.count + code.utf8.count / 4)
     }
@@ -49,7 +50,9 @@ private struct Scanner {
                 let wordStart = index
                 while index < text.count, isWordCharacter(text[index]) { index += 1 }
                 let word = String(String.UnicodeScalarView(text[wordStart..<index]))
-                if rules.keywords.contains(word) { emit(.keyword, from: wordStart) }
+                if rules.keywords.contains(word) || rules.tagNamesAreKeywords && followsTagOpener(wordStart) {
+                    emit(.keyword, from: wordStart)
+                }
             } else {
                 index += 1
             }
@@ -87,6 +90,7 @@ private struct Scanner {
             return .comment
         }
         for style in strings where matches(style.open, at: index) {
+            if let required = style.onlyAfter, previousNonSpace(before: index) != required { continue }
             index += style.open.count
             while index < text.count {
                 if let escape = style.escape, text[index] == escape {
@@ -164,6 +168,20 @@ private struct Scanner {
     }
 
     // MARK: Characters
+
+    /// The nearest character before `i` that isn't a space or tab.
+    private func previousNonSpace(before i: Int) -> Unicode.Scalar? {
+        var j = i - 1
+        while j >= 0, text[j] == " " || text[j] == "\t" { j -= 1 }
+        return j >= 0 ? text[j] : nil
+    }
+
+    /// True if the word at `i` comes straight after `<` or `</`.
+    private func followsTagOpener(_ i: Int) -> Bool {
+        guard i > 0 else { return false }
+        if text[i - 1] == "<" { return true }
+        return i > 1 && text[i - 1] == "/" && text[i - 2] == "<"
+    }
 
     private func matches(_ pattern: [Unicode.Scalar], at i: Int) -> Bool {
         guard !pattern.isEmpty, i + pattern.count <= text.count else { return false }

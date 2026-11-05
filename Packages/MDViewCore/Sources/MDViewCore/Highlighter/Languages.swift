@@ -85,4 +85,80 @@ public enum Languages {
         strings: javaScriptStrings,
         wordCharacters: ["$"]
     )
+
+    // MARK: Shell (sh, bash, zsh)
+
+    public static let shell = LanguageRules(
+        keywords: [
+            "if", "then", "else", "elif", "fi", "case", "esac", "for", "while", "until", "do", "done", "in",
+            "function", "select", "time", "return", "exit", "break", "continue",
+            // Common built-ins
+            "local", "export", "readonly", "declare", "typeset", "unset", "shift", "source", "eval", "exec",
+            "set", "trap", "alias", "echo", "printf", "read", "cd", "test",
+        ],
+        lineComments: ["#"],
+        strings: [
+            .init(open: "\"", spansLines: true),
+            .init(open: "'", escape: nil, spansLines: true),
+        ],
+        wordCharacters: ["-"],
+        lineCommentNeedsSpaceBefore: true
+    )
+
+    // MARK: JSON
+
+    /// Comments aren't JSON, but many config files have them, so they're
+    /// coloured rather than shown as errors.
+    public static let json = LanguageRules(
+        keywords: ["true", "false", "null"],
+        lineComments: ["//"],
+        blockComments: [.init(open: "/*", close: "*/")],
+        strings: [.init(open: "\"")]
+    )
+
+    // MARK: YAML
+
+    public static let yaml = LanguageRules(
+        keywords: ["true", "false", "null", "True", "False", "Null", "TRUE", "FALSE", "NULL", "yes", "no", "on", "off"],
+        lineComments: ["#"],
+        strings: [
+            .init(open: "\""),
+            .init(open: "'", escape: nil),
+        ],
+        wordCharacters: ["-"],
+        lineCommentNeedsSpaceBefore: true
+    )
+
+    // MARK: HTML
+
+    /// Tag names, attribute values and comments. Text between tags stays
+    /// plain: numbers aren't coloured, and quotes only count after `=`.
+    public static let html = LanguageRules(
+        blockComments: [.init(open: "<!--", close: "-->")],
+        strings: [
+            .init(open: "\"", escape: nil, spansLines: true, onlyAfter: "="),
+            .init(open: "'", escape: nil, spansLines: true, onlyAfter: "="),
+        ],
+        wordCharacters: ["-"],
+        highlightsNumbers: false,
+        tagNamesAreKeywords: true
+    )
+
+    // MARK: CSS
+
+    public static let css = LanguageRules(
+        keywords: [
+            "@media", "@import", "@supports", "@keyframes", "@font-face", "@layer", "@container", "@page",
+            "@charset", "@namespace", "@property", "@scope",
+            "important", "inherit", "initial", "unset", "revert", "auto", "none",
+        ],
+        blockComments: [.init(open: "/*", close: "*/")],
+        strings: [
+            .init(open: "\""),
+            .init(open: "'"),
+        ],
+        // `-` for property names and `@` for at-rules; `#` so hex colours
+        // and id selectors stay whole rather than partly coloured.
+        wordCharacters: ["-", "@", "#"]
+    )
 }
