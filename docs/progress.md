@@ -2,6 +2,57 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 3.5, link clicks
+
+**Done**
+- `MDViewCore/Files/LinkRoute`: pure decision for a clicked URL:
+  external (http, https, mailto), open Markdown (+ fragment), open other
+  file, scroll in page, or ignore. 20 tests (relative, `../`, all four
+  Markdown extensions, anchors, own file with/without anchor, spaces and
+  accents, `file:` URLs, folders, unknown schemes).
+- Page base URL is now `mdview-file://document/<document folder>/`
+  (symlinks resolved), so WebKit resolves relative and `../` links into
+  real paths.
+- `PreviewController`: routes only real link clicks; allows our own page
+  loads; cancels everything else. Cmd-click / `target=_blank` routed the
+  same way. `scroll(toFragment:)` scrolls to a heading with the app's own
+  script, the id passed as an argument (never run as code).
+- `DocumentWindowController`: carries out the route; asks for folder
+  access first when needed (picker refactored to be reusable); brief
+  self-dismissing notice for a missing file, also announced to VoiceOver.
+
+**Found and fixed while testing**
+1. The page's own load was cancelled: WebKit asks for permission more
+   than once per load, and a "allow the next load" flag only covered the
+   first ask. Pages were blank. Now any load of the page's exact base URL
+   is allowed.
+2. **A folder picker could pop up when simply opening a file**, and cold
+   opens rose to ~1,050 ms: WebKit also asks about the spare's blank page
+   (`mdview-file://document/`), which was routed like a link to "/" and
+   started a folder picker. Now only real clicks are routed. Cold open
+   back to a 454 ms median.
+3. `/tmp` vs `/private/tmp`: document and page paths now both have
+   symlinks resolved, so "this page" is recognised.
+
+**Checked** (temporary hook clicking links with the app's own script,
+removed; web and mail links not clicked, so the browser wasn't opened)
+- On open: no sheet. `#target` on the page: scrolled (4,528 px).
+- `page2.md#target` (granted): opened, front, scrolled so the heading
+  sits 16 px from the top (the CSS scroll margin).
+- `valid.md` (granted): opened in mdview, front.
+- Link outside granted folders: folder picker sheet.
+- 178 tests pass; Debug and Release build with no warnings.
+- Timing after the fixes (load average ~4): cold median 454 ms (first
+  launch after rebuild 844 ms), warm median 131 ms.
+- **Not tested:** clicking web/mail links (would open your browser and
+  mail app), a missing file in a granted folder (needs a real folder
+  grant), opening a non-Markdown file in its default app, Cmd-click.
+  Spec 4.5 (tooltip with destination) comes from the `title` attribute
+  added in 2.7; not checked visually.
+
+**Next**
+- Roadmap 3.6: `fixtures/images.md` and `fixtures/links.md`.
+
 ## 2026-11-05: Roadmap 3.4, proving the page stays offline
 
 **Done**

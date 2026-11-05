@@ -45,7 +45,8 @@ App/                        the macOS app target (AppKit)
                             (PageShell: wraps the body with CSS and a security policy)
   AssetSchemeHandler        serves local images to the page (ADR 0005); ImageAccess
                             decides which may be shown and builds their URLs
-  LinkRouter                decides what a clicked link does (spec section 4)
+  (links)                   PreviewController passes clicks to DocumentWindowController,
+                            which carries out LinkRoute's decision (spec section 4)
   FileWatcher               notices when the file changes on disk (spec section 5)
   EditorLauncher            "Open in Editor" and the remembered editor (spec 6.10–6.12)
   FolderAccess              stores and restores folder access grants (ADR 0005)
@@ -64,6 +65,7 @@ Packages/MDViewCore/        local Swift package, no AppKit
   Highlighter/              tokenizer + one small rule set per language (ADR 0004)
   Files/FolderGrantList     which folders are granted (pure path rules, spec 9.6)
   Files/LocalReferences     resolves a page's local references; suggests a folder
+  Files/LinkRoute           decides what a clicked link does (spec 4.1–4.4)
   Tests/                    unit tests, run with `swift test`
 fixtures/                   the test Markdown files listed in spec.md
 ```
@@ -150,16 +152,28 @@ WKWebView                             images requested via mdview-file:// →
 
 ## Links
 
-`LinkRouter` is the web view's navigation delegate. Every click is
-cancelled and handled in Swift:
+Each page's base URL is `mdview-file://document/<document's folder>/`
+(symlinks resolved), so WebKit resolves relative links, `../` included,
+into real file paths.
+
+`PreviewController` is the web view's navigation delegate. Only a real
+link click (`linkActivated`) is routed; any other navigation is allowed
+only if it's our own page load (this page's base URL, or a spare's blank
+page), and cancelled otherwise. `LinkRoute` (MDViewCore) decides; the
+document window carries it out:
 
 | Link | Action |
 |---|---|
-| `#anchor` | Scroll within the page |
-| Relative or `file://` path to a Markdown file | Open it in mdview through `NSDocumentController`, then scroll to `#anchor` if there is one |
-| Other local file | `NSWorkspace.open` (its default app) |
+| `#anchor` on this page | Allowed: WebKit scrolls to it |
+| Another Markdown file (`.md`, `.markdown`, `.mdown`, `.mkd`) | Open it in mdview through `NSDocumentController`, then scroll to `#anchor` if there is one (app script, id passed as an argument) |
+| Other local file or folder | `NSWorkspace.open` (its default app) |
 | `http`, `https`, `mailto` | `NSWorkspace.open` (browser, mail) |
-| Missing file | Brief "File not found" message in the window |
+| A local file outside granted folders | Folder picker first; carried out if the grant covers it |
+| Missing file | Brief "“name” wasn't found." notice, announced to VoiceOver |
+| Anything else | Nothing |
+
+Cmd-click and `target="_blank"` links come through `createWebViewWith`
+and are routed the same way; no new web view is made.
 
 ## Automatic reload
 

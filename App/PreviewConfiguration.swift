@@ -46,7 +46,7 @@ enum PreviewConfiguration {
         // never flashes white in dark mode.
         webView.loadHTMLString(
             "<!doctype html><meta name=\"color-scheme\" content=\"light dark\"><style>html{background:Canvas}</style>",
-            baseURL: PageShell.baseURL
+            baseURL: PageShell.blankBaseURL
         )
         spare = webView
         Signposts.signposter.emitEvent("spareReady")

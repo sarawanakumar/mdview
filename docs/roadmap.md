@@ -99,7 +99,7 @@ section 2 passes.
       the content rule list blocks anything remote, with an automated
       test; refuse to show the page if the list fails to load.
       *(3.5, 9.1, 9.8, ADR 0006)*
-- [ ] **3.5** `LinkRouter`: web and mail links, anchors, other Markdown
+- [x] **3.5** `LinkRouter`: web and mail links, anchors, other Markdown
       files (with `#anchor`), other local files, missing files, link
       tooltips. *(4.1–4.6)*
 - [ ] **3.6** Write `fixtures/images.md` and `fixtures/links.md`; test

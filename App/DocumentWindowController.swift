@@ -1,4 +1,5 @@
 import AppKit
+import MDViewCore
 import OSLog
 
 /// One window per file (spec 6.1): notice bars above the rendered preview.
@@ -47,6 +48,7 @@ final class DocumentWindowController: NSWindowController {
         Self.cascadePoint = window.cascadeTopLeft(from: Self.cascadePoint)
 
         preview.onFolderAccessNeeded = { [weak self] folder in self?.updateFolderBar(offering: folder) }
+        preview.onLink = { [weak self] route in self?.follow(route) }
         NotificationCenter.default.addObserver(
             self, selector: #selector(folderAccessDidChange), name: FolderAccess.didChange, object: nil
         )
@@ -88,29 +90,107 @@ final class DocumentWindowController: NSWindowController {
         removeFolderBar()
     }
 
-    /// The standard folder picker, as a sheet, starting at the suggested
-    /// folder. Any folder can be chosen; one higher up covers more.
     @objc private func allowFolder() {
+        guard let suggestedFolder else { return }
+        requestFolderAccess(startingAt: suggestedFolder) { _ in }
+    }
+
+    /// The standard folder picker, as a sheet, starting at `folder`. Any
+    /// folder can be chosen; one higher up covers more. Calls `done` with
+    /// whether a folder was granted.
+    private func requestFolderAccess(startingAt folder: URL, done: @escaping @MainActor (Bool) -> Void) {
         guard let window else { return }
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.allowsMultipleSelection = false
         panel.canCreateDirectories = false
-        panel.directoryURL = suggestedFolder
+        panel.directoryURL = folder
         panel.prompt = "Allow"
         panel.message = "mdview can show images and open linked files in the folder you choose and every folder inside it. Choosing a folder higher up, such as your home folder, means you won’t be asked again for anything in it."
         panel.beginSheetModal(for: window) { response in
-            guard response == .OK, let folder = panel.url else { return }
             MainActor.assumeIsolated {
+                guard response == .OK, let chosen = panel.url else { return done(false) }
                 do {
-                    try FolderAccess.shared.grant(folder)
+                    try FolderAccess.shared.grant(chosen)
+                    done(true)
                 } catch {
                     Self.log.error("couldn't save folder grant: \(error.localizedDescription, privacy: .public)")
                     NSApp.presentError(error)
+                    done(false)
                 }
             }
         }
+    }
+
+    // MARK: Links (spec 4.1–4.6)
+
+    private func follow(_ route: LinkRoute) {
+        switch route {
+        case .external(let url):
+            NSWorkspace.shared.open(url)
+        case .openMarkdown(let file, let fragment):
+            withAccess(to: file) { [weak self] in self?.openMarkdown(file, fragment: fragment) }
+        case .openFile(let file):
+            withAccess(to: file) { [weak self] in self?.openFile(file) }
+        case .scrollInPage, .ignore:
+            break
+        }
+    }
+
+    /// Runs `action` if mdview may read `file`; otherwise asks for its
+    /// folder first, then runs it if the grant covers the file (spec 4.2).
+    private func withAccess(to file: URL, then action: @escaping @MainActor () -> Void) {
+        if FolderAccess.shared.covers(file) || file == documentFile {
+            action()
+            return
+        }
+        let start = documentFile.map { LocalReferences.suggestedFolder(for: $0, needing: [file]) }
+            ?? file.deletingLastPathComponent()
+        requestFolderAccess(startingAt: start) { granted in
+            if granted, FolderAccess.shared.covers(file) { action() }
+        }
+    }
+
+    private func openMarkdown(_ file: URL, fragment: String?) {
+        guard FileManager.default.fileExists(atPath: file.path) else { return showNotFound(file) }
+        NSDocumentController.shared.openDocument(withContentsOf: file, display: true) { document, _, error in
+            if let error {
+                NSApp.presentError(error)
+                return
+            }
+            if let fragment,
+               let controller = document?.windowControllers.first as? DocumentWindowController {
+                controller.preview.scroll(toFragment: fragment)
+            }
+        }
+    }
+
+    private func openFile(_ file: URL) {
+        guard FileManager.default.fileExists(atPath: file.path) else { return showNotFound(file) }
+        if !NSWorkspace.shared.open(file) {
+            showBriefNotice("mdview couldn’t open “\(file.lastPathComponent)”.")
+        }
+    }
+
+    /// Spec 4.6: a link to a file that isn't there.
+    private func showNotFound(_ file: URL) {
+        showBriefNotice("“\(file.lastPathComponent)” wasn’t found.")
+    }
+
+    /// A notice bar that goes away by itself after a few seconds.
+    private func showBriefNotice(_ message: String) {
+        let bar = Self.noticeBar(message: message, buttons: [])
+        stack.insertArrangedSubview(bar, at: 0)
+        bar.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
+        NSAccessibility.post(element: bar, notification: .announcementRequested, userInfo: [
+            .announcement: message, .priority: NSAccessibilityPriorityLevel.high.rawValue,
+        ])
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak bar] in bar?.removeFromSuperview() }
+    }
+
+    private var documentFile: URL? {
+        (document as? MarkdownDocument)?.fileURL?.resolvingSymlinksInPath()
     }
 
     /// A grant anywhere may cover what this window needs: render again.
