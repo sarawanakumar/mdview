@@ -1,0 +1,50 @@
+<h1 id="images">Images</h1>
+<p>The test file for spec section 3. Paths are relative to this file, so it
+works wherever the repository is. Absolute paths and <code>file://</code> URLs are
+covered by unit tests, since they depend on where the repository lives.</p>
+<p>All local images need folder access to this folder (spec 9.5); until it&#39;s
+granted, they show their alt text.</p>
+<h2 id="local-images-31-33">Local images (3.1, 3.3)</h2>
+<p>Relative: <span class="image-placeholder" role="img" aria-label="The sample image" title="images/sample.png">The sample image</span></p>
+<p>With <code>./</code>: <span class="image-placeholder" role="img" aria-label="The sample image again" title="./images/sample.png">The sample image again</span></p>
+<p>Through the parent folder: <span class="image-placeholder" role="img" aria-label="Via the parent folder" title="../fixtures/images/sample.png">Via the parent folder</span></p>
+<p>Space in the name, percent-encoded: <span class="image-placeholder" role="img" aria-label="Space encoded" title="images/with%20space.png">Space encoded</span></p>
+<p>Space in the name, in angle brackets: <span class="image-placeholder" role="img" aria-label="Space in brackets" title="images/with space.png">Space in brackets</span></p>
+<p>With a title: <span class="image-placeholder" role="img" aria-label="Has a title" title="images/sample.png">Has a title</span></p>
+<p>No alt text (the file name stands in if it can&#39;t be shown): <span class="image-placeholder" role="img" aria-label="sample.png" title="images/sample.png">sample.png</span></p>
+<h2 id="sizes-34">Sizes (3.4)</h2>
+<p>Small images show at their natural size: <span class="image-placeholder" role="img" aria-label="Small" title="images/sample.png">Small</span></p>
+<p>A wide image (2400 × 300) scales down to fit the column:</p>
+<p><span class="image-placeholder" role="img" aria-label="Wide image" title="images/wide.png">Wide image</span></p>
+<h2 id="inside-other-elements">Inside other elements</h2>
+<p>In a link: <a href="https://example.com" title="https://example.com"><span class="image-placeholder" role="img" aria-label="Linked image" title="images/sample.png">Linked image</span></a></p>
+<p>In a table:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Image</th>
+<th>Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="image-placeholder" role="img" aria-label="In a table" title="images/sample.png">In a table</span></td>
+<td>sample.png</td>
+</tr>
+</tbody>
+</table></div>
+<p>In a list:</p>
+<ul>
+<li><span class="image-placeholder" role="img" aria-label="In a list" title="images/sample.png">In a list</span> beside text</li>
+</ul>
+<p>In a quote:</p>
+<blockquote>
+<p><span class="image-placeholder" role="img" aria-label="In a quote" title="images/sample.png">In a quote</span></p>
+</blockquote>
+<h2 id="never-shown-35-36">Never shown (3.5, 3.6)</h2>
+<p>Missing file: <span class="image-placeholder" role="img" aria-label="This file does not exist" title="images/missing.png">This file does not exist</span></p>
+<p>Not an image: <span class="image-placeholder" role="img" aria-label="A Markdown file, not an image" title="elements.md">A Markdown file, not an image</span></p>
+<p>Remote, never downloaded: <span class="image-placeholder" role="img" aria-label="Remote image" title="https://example.com/remote.png">Remote image</span></p>
+<p>Remote over plain HTTP: <span class="image-placeholder" role="img" aria-label="Remote over HTTP" title="http://example.com/remote.png">Remote over HTTP</span></p>
+<p>Unsafe source: <span class="image-placeholder" role="img" aria-label="Script source" title="javascript:alert(1)">Script source</span></p>
+<p>Inline data: <span class="image-placeholder" role="img" aria-label="Data source" title="data:image/png;base64,iVBORw0KGgo=">Data source</span></p>

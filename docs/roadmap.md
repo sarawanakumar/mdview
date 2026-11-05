@@ -86,7 +86,7 @@ All in `MDViewCore`, test-first against fixture files.
 **Done when:** `elements.md` renders completely and correctly, and spec
 section 2 passes.
 
-## M3. Images, links and folder access
+## M3. Images, links and folder access (tasks done 2026-11-05; manual checks listed in progress.md)
 
 - [x] **3.1** `FolderAccess`: save and restore folder grants as
       security-scoped bookmarks. *(9.6)*
@@ -102,7 +102,7 @@ section 2 passes.
 - [x] **3.5** `LinkRouter`: web and mail links, anchors, other Markdown
       files (with `#anchor`), other local files, missing files, link
       tooltips. *(4.1–4.6)*
-- [ ] **3.6** Write `fixtures/images.md` and `fixtures/links.md`; test
+- [x] **3.6** Write `fixtures/images.md` and `fixtures/links.md`; test
       against them. *(3.7)*
 
 **Done when:** spec sections 3 and 4 and criteria 9.5–9.7 pass.

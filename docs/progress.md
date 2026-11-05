@@ -2,6 +2,49 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 3.6, images and links test files; M3 tasks done
+
+**Done**
+- `fixtures/images.md`: 13 local images (relative, `./`, `../`, space
+  encoded and in angle brackets, with title, no alt, small, wide, in a
+  link, table, list and quote) and 6 that must never show (missing, a
+  Markdown file, https and http remote, `javascript:`, `data:`).
+  Added `images/wide.png` (2400 × 300) and `images/with space.png`.
+- `fixtures/links.md`: 20 links covering anchors, other Markdown files,
+  other files and folders, web, mail, bare and angle-bracket addresses,
+  reference links, missing files; plus 3 unsafe links shown as text.
+  Added `edge/with space.md`.
+- `FixtureDrivenTests`: images.md rendered as if granted gives exactly
+  13 `<img>` and the 6 expected placeholders; without access, 19
+  placeholders. Every link in links.md goes through `LinkRoute` as a
+  click would and gives the expected route; linked files exist except the
+  "missing" ones; images the file expects exist.
+- `<img>` now has `decoding="async"` so decoding a big image never holds
+  up the text (spec 3.7).
+- Expected HTML recorded for images.md, links.md and edge/with space.md.
+  The placeholders' hover text shows the source as written, including
+  `javascript:`/`data:`, as plain attribute text (never a src or href).
+
+**Checked**
+- 184 tests pass; Debug and Release build with no warnings.
+- In the app with a temporary hook (removed), after granting the three
+  image files: images.md showed 13 images, all loaded; the small one at
+  its natural 48 px; the wide one 2400 px scaled to the 781 px column;
+  6 placeholders; no sideways page scroll (spec 3.4).
+
+**M3 status:** all six tasks done. Still to check by hand (each needs a
+person or would open other apps):
+- Choosing a real folder in the picker (spec 9.5, 9.6), then reopening.
+- Clicking web and mail links in `links.md` (4.1).
+- A missing file inside a granted folder shows the notice (4.6).
+- An image or folder link opening in Preview / Finder (4.4).
+- Hover tooltips on links (4.5).
+To try them: `open -a build/mdview.app fixtures/links.md`, click
+Allow… and choose the `fixtures` folder, then click through the list.
+
+**Next**
+- Roadmap M4, task 4.1: `FileWatcher`.
+
 ## 2026-11-05: Roadmap 3.5, link clicks
 
 **Done**

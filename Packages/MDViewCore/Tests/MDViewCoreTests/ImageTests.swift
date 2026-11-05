@@ -14,7 +14,7 @@ struct ImageTests {
 
     @Test func availableLocalImageBecomesImg() {
         #expect(render("![A cat](ok/cat.png)\n")
-            == "<p><img src=\"mdview-file://document/notes/ok/cat.png\" alt=\"A cat\"></p>\n")
+            == "<p><img src=\"mdview-file://document/notes/ok/cat.png\" alt=\"A cat\" decoding=\"async\"></p>\n")
     }
 
     @Test func titleIsKept() {
@@ -58,7 +58,7 @@ struct ImageTests {
 
     @Test func imageInsideALink() {
         #expect(render("[![logo](ok/l.png)](https://x.y)\n")
-            == "<p><a href=\"https://x.y\" title=\"https://x.y\"><img src=\"mdview-file://document/notes/ok/l.png\" alt=\"logo\"></a></p>\n")
+            == "<p><a href=\"https://x.y\" title=\"https://x.y\"><img src=\"mdview-file://document/notes/ok/l.png\" alt=\"logo\" decoding=\"async\"></a></p>\n")
     }
 
     @Test func locatorIsAskedWithTheSourceAsWritten() {

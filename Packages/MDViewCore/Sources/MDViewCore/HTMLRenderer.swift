@@ -366,7 +366,9 @@ struct HTMLVisitor: MarkupVisitor {
         if Self.isSafeDestination(source) { noteReference(source) }
 
         if Self.isLocalDestination(source), let src = locateImage?(source) {
-            var html = "<img src=\"\(escape(src))\" alt=\"\(escape(alt))\""
+            // decoding="async": decoding a large image never holds up the text
+            // (spec 3.7).
+            var html = "<img src=\"\(escape(src))\" alt=\"\(escape(alt))\" decoding=\"async\""
             if let title = image.title, !title.isEmpty { html += " title=\"\(escape(title))\"" }
             return html + ">"
         }

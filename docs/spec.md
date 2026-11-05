@@ -181,8 +181,13 @@ A folder of Markdown files kept in the repo for checking the criteria above
   (also a local and a remote image, and links, so it shows every kind of
   content in one place)
 - `front-matter.md`: front matter at the top, plus a `---` rule further down
-- `images.md`: relative, absolute, missing, remote and oversized images
-- `links.md`: web, relative, anchor and broken links
+- `images.md`: relative (incl. `./`, `../`, spaces), missing, not an
+  image, remote, unsafe and oversized images, and images inside links,
+  tables, lists and quotes (absolute paths and `file://` are unit tested,
+  since they depend on where the repository is)
+- `links.md`: anchors, other Markdown files (incl. subfolders, `../`,
+  spaces, with anchors), other files and folders, web and mail, reference
+  links, missing files, and unsafe links
 - `code.md`: one block per supported language, plus untagged, unknown and
   malformed blocks
 - `typical.md`: about 50 KB of realistic README-style content (performance)
