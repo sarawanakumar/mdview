@@ -63,7 +63,8 @@ Packages/MDViewCore/        local Swift package, no AppKit
   HTMLEscaping              escapes text for HTML
   HTMLRenderer              swift-markdown tree → HTML string
   HeadingSlugger            GitHub-style heading anchors (spec 4.3)
-  Highlighter/              tokenizer + one small rule set per language (ADR 0004)
+  Highlighter/              Highlighter (the scanner) + LanguageRules (one small
+                            table per language, roadmap 6.2–6.3) (ADR 0004)
   Files/FolderGrantList     which folders are granted (pure path rules, spec 9.6)
   Files/LocalReferences     resolves a page's local references; suggests a folder
   Files/LinkRoute           decides what a clicked link does (spec 4.1–4.4)

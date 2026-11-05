@@ -135,7 +135,7 @@ section 2 passes.
 
 ## M6. Code highlighting
 
-- [ ] **6.1** Scanner and the rule-table format; tests for the four token
+- [x] **6.1** Scanner and the rule-table format; tests for the four token
       kinds and malformed input. *(7.2, 7.6, ADR 0004)*
 - [ ] **6.2** Rule tables for Swift, Python, JavaScript/TypeScript.
 - [ ] **6.3** Rule tables for shell, JSON, YAML, HTML, CSS.

@@ -2,6 +2,39 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 6.1, the highlighter's scanner
+
+**Done**
+- `MDViewCore/Highlighter/LanguageRules`: per-language table: keywords;
+  line comments (optionally only at a word's start, for shell `#`);
+  block comments (optionally nesting, for Swift); string styles (open,
+  close, escape character, whether they span lines; longest opener
+  first so `"""` wins over `"`); extra word characters (`$`, `-`); and
+  whether to colour numbers.
+- `MDViewCore/Highlighter/Highlighter`: one pass over the code's Unicode
+  scalars. At each position: block comment, line comment, string, number,
+  word (keyword or not), else one character. Every branch moves forward;
+  a debug assert plus a release fallback step guarantee it can't stall
+  (spec 7.6). Output: `<span class="tok-keyword|string|comment|number">`,
+  everything HTML-escaped. Numbers: decimal, `0x`/`0o`/`0b`, `_`,
+  fractions, exponents, short suffixes (`10px`, `3n`, `1.5f`), never
+  inside a word (`x1`), not swallowing a following method (`1.description`).
+  An unclosed one-line string stops at the end of its line; an unclosed
+  multi-line string or block comment runs to the end of the block.
+
+**Checked**
+- 22 new tests (219 total) using a made-up language with every rule:
+  each token kind; keywords only as whole words; nesting; escapes; 12
+  number forms; unicode; escaping; every malformed case; tiny and odd
+  inputs; 5,000 lines of unclosed openers under 1 s; and, over 500 random
+  inputs, the visible text always equals the input exactly (nothing
+  added, dropped or changed).
+- Speed: 2,000 lines (134 KB) in 22 ms (release), 122 ms (debug).
+- Not yet used by the renderer (6.4) and no real languages yet (6.2, 6.3).
+
+**Next**
+- Roadmap 6.2: rule tables for Swift, Python, JavaScript/TypeScript.
+
 ## 2026-11-05: Roadmap 5.7, keyboard and VoiceOver; M5 done
 
 **Found and fixed**
