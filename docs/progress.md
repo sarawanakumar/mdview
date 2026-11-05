@@ -2,6 +2,43 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 5.6, windows, tabs, copying, restoration
+
+No code changes were needed; this was checking. (Temporary hooks,
+removed.)
+
+**Checked**
+- **6.1** Each window is titled with its file name and represents its
+  file (`representedURL`), which gives the title bar its proxy icon and
+  ⌘-click path menu.
+- **6.2** Windows use automatic tabbing with a shared tab identifier;
+  Window ▸ Merge All Windows put two files into 2 tabs of one window.
+- **6.5** Selecting the first heading and Edit ▸ Copy put plain text
+  ("Valid") on the clipboard, plus rich text, HTML and a web archive for
+  apps that want them. The clipboard was saved first and restored
+  exactly afterwards.
+- **6.13** Opened two files, used the app, switched away, force-quit,
+  relaunched with no file: both windows came back, and **no Open panel**
+  appeared over them (the open question from 1.6). A fresh launch with
+  nothing to restore shows the Open panel; after an ordinary quit, with
+  macOS's default "Close windows when quitting", nothing is restored and
+  the panel shows. Spec 6.13 now describes this.
+- Debug and Release build with no warnings.
+
+**Found**
+- macOS saves window state while the app is active or as you switch away.
+  My first restoration tests launched MDView in the background and never
+  made it active, so nothing was saved; one even restored a file from an
+  earlier session of yours instead. Not a bug in MDView.
+
+**Not checked** (needs a person)
+- The tab commands (Show Tab Bar, Merge All Windows, …) appearing in the
+  Window menu: macOS inserts them only when the menu opens.
+- ⌘-click on the window title for the path menu.
+
+**Next**
+- Roadmap 5.7: keyboard and VoiceOver pass.
+
 ## 2026-11-05: Roadmap 5.5, Open in Editor
 
 **Done**

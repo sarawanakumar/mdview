@@ -127,7 +127,7 @@ section 2 passes.
 - [x] **5.4** Reveal in Finder. *(6.9)*
 - [x] **5.5** Open in Editor, Change Editor, missing editor handling.
       *(6.10–6.12)*
-- [ ] **5.6** Check tabs, title bar path menu, state restoration and text
+- [x] **5.6** Check tabs, title bar path menu, state restoration and text
       selection all work. *(6.1, 6.2, 6.5, 6.13)*
 - [ ] **5.7** Keyboard and VoiceOver pass. *(6.14)*
 
