@@ -43,7 +43,8 @@ App/                        the macOS app target (AppKit)
   Signposts                 timing points for Instruments
   PreviewController         wraps WKWebView: loads HTML, reload, zoom, print, find
                             (PageShell: wraps the body with CSS and a security policy)
-  AssetSchemeHandler        serves local images and files to the page (ADR 0005)
+  AssetSchemeHandler        serves local images to the page (ADR 0005); ImageAccess
+                            decides which may be shown and builds their URLs
   LinkRouter                decides what a clicked link does (spec section 4)
   FileWatcher               notices when the file changes on disk (spec section 5)
   EditorLauncher            "Open in Editor" and the remembered editor (spec 6.10–6.12)
@@ -116,12 +117,16 @@ WKWebView                             images requested via mdview-file:// →
 - **Wide content.** Code blocks and tables sit in their own
   `overflow-x: auto` boxes, so they scroll sideways on their own (spec 2.8,
   2.9).
-- **Images.** Relative and `file://` paths are rewritten to `mdview-file://`
-  URLs. Remote images become a placeholder showing the alt text (spec 3.5).
-  The renderer is given a "does this file exist and can I read it?" check
-  by the app, and missing or unreadable images get the same placeholder
-  (spec 3.6). This is done while building the HTML, because with JavaScript
-  off the page can't react to a failed image load itself.
+- **Images.** The renderer asks an `ImageLocator` (supplied by the app)
+  for each local image. The app's locator resolves the source against the
+  document and returns `mdview-file://document/<absolute path>` only for
+  an image file that exists inside a granted folder; it uses a snapshot of
+  the grants, so it's safe on the render thread. Everything else (missing,
+  not granted, remote, unsafe) becomes a placeholder showing the alt text
+  (spec 3.5, 3.6). This is decided while building the HTML, because with
+  JavaScript off the page can't react to a failed image load itself. The
+  scheme handler checks the same rules again before serving a file, reads
+  it off the main thread, and ignores requests WebKit has cancelled.
 - **Link tooltips.** Each link gets a `title` attribute with its destination
   (spec 4.5).
 

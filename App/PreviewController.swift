@@ -42,12 +42,13 @@ final class PreviewController: NSViewController, WKNavigationDelegate {
         let title = document.displayName ?? ""
         let fileURL = document.fileURL
         let configuration = PreviewConfiguration.shared()
+        let locateImage = ImageAccess.locator(for: fileURL, grants: FolderAccess.shared.snapshot)
 
         Task {
             // Markdown goes through renderSafely: a large stack, and a plain
             // text fallback for files nested too deeply to parse (spec 10.4).
             let rendered = isMarkdown
-                ? await HTMLRenderer.renderSafely(markdown: text)
+                ? await HTMLRenderer.renderSafely(markdown: text, locateImage: locateImage)
                 : RenderedPage(html: await Task.detached { HTMLRenderer.render(plainText: text) }.value, localReferences: [])
             Signposts.signposter.emitEvent("documentRendered")
             onFolderAccessNeeded?(fileURL.flatMap { Self.folderNeeded(for: rendered.localReferences, document: $0) })

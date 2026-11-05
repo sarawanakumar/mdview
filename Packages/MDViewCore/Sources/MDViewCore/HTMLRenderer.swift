@@ -31,17 +31,25 @@ public struct RenderedPage: Equatable, Sendable {
     }
 }
 
+/// Decides whether a local image can be shown, and where the page loads it
+/// from. Given the image source as written; returns the URL for `src`, or
+/// nil if the image can't be shown (missing, unreadable, not an image), in
+/// which case its alt text is shown instead (spec 3.6). The app supplies
+/// this, since only it knows what the sandbox allows.
+public typealias ImageLocator = @Sendable (String) -> String?
+
 public enum HTMLRenderer {
     /// Renders Markdown text: front matter hidden (spec 2.13), smart
-    /// punctuation off (spec 2.15).
-    public static func render(markdown: String) -> String {
-        renderPage(markdown: markdown).html
+    /// punctuation off (spec 2.15). Without a locator, every image is shown
+    /// as its alt text.
+    public static func render(markdown: String, locateImage: ImageLocator? = nil) -> String {
+        renderPage(markdown: markdown, locateImage: locateImage).html
     }
 
     /// Like `render(markdown:)`, plus the local files the page refers to.
-    public static func renderPage(markdown: String) -> RenderedPage {
+    public static func renderPage(markdown: String, locateImage: ImageLocator? = nil) -> RenderedPage {
         let document = Document(parsing: FrontMatter.strip(markdown), options: [.disableSmartOpts])
-        var visitor = HTMLVisitor()
+        var visitor = HTMLVisitor(locateImage: locateImage)
         let html = visitor.visit(document)
         return RenderedPage(html: html, localReferences: visitor.localReferences)
     }
@@ -57,13 +65,13 @@ public enum HTMLRenderer {
     /// a notice. Everything else renders on a thread with a 64 MB stack,
     /// because swift-markdown's recursion needs far more than the 512 KB a
     /// Swift task's thread has.
-    public static func renderSafely(markdown: String) async -> RenderedPage {
+    public static func renderSafely(markdown: String, locateImage: ImageLocator? = nil) async -> RenderedPage {
         if NestingGuard.isTooDeep(markdown) {
             return RenderedPage(html: tooDeeplyNestedNotice + render(plainText: markdown), localReferences: [])
         }
         return await withCheckedContinuation { continuation in
             let thread = Thread {
-                continuation.resume(returning: renderPage(markdown: markdown))
+                continuation.resume(returning: renderPage(markdown: markdown, locateImage: locateImage))
             }
             thread.stackSize = renderStackSize
             thread.qualityOfService = .userInitiated
@@ -79,6 +87,12 @@ public enum HTMLRenderer {
 
 struct HTMLVisitor: MarkupVisitor {
     typealias Result = String
+
+    let locateImage: ImageLocator?
+
+    init(locateImage: ImageLocator? = nil) {
+        self.locateImage = locateImage
+    }
 
     private var slugger = HeadingSlugger()
     /// One entry per list being rendered, innermost last: whether it's
@@ -340,12 +354,32 @@ struct HTMLVisitor: MarkupVisitor {
         return anchor(href: destination, content: content)
     }
 
-    /// Images show their alt text for now (roadmap 3.3).
+    // MARK: Images (spec section 3)
+
+    /// A local image the app can show becomes `<img>`, loaded through the
+    /// `mdview-file:` scheme (ADR 0005). Anything else (missing,
+    /// unreadable, remote, unsafe) becomes a placeholder showing its alt
+    /// text (spec 3.5, 3.6): remote images are never fetched.
     mutating func visitImage(_ image: Image) -> String {
-        if let source = image.source, Self.isSafeDestination(source) { noteReference(source) }
-        linkDepth += 1
-        defer { linkDepth -= 1 }
-        return visitChildren(of: image)
+        let alt = Self.text(of: image)
+        let source = image.source ?? ""
+        if Self.isSafeDestination(source) { noteReference(source) }
+
+        if Self.isLocalDestination(source), let src = locateImage?(source) {
+            var html = "<img src=\"\(escape(src))\" alt=\"\(escape(alt))\""
+            if let title = image.title, !title.isEmpty { html += " title=\"\(escape(title))\"" }
+            return html + ">"
+        }
+        return Self.imagePlaceholder(alt: alt, source: source)
+    }
+
+    /// Alt text in a small box, read by VoiceOver as an image. With no alt
+    /// text, the file name stands in.
+    static func imagePlaceholder(alt: String, source: String) -> String {
+        let fallback = source.split(separator: "/").last.map(String.init) ?? "image"
+        let label = alt.isEmpty ? fallback : alt
+        let escaped = HTMLEscaping.escape(label)
+        return "<span class=\"image-placeholder\" role=\"img\" aria-label=\"\(escaped)\" title=\"\(HTMLEscaping.escape(source))\">\(escaped)</span>"
     }
 
     private func anchor(href: String, content: String) -> String {

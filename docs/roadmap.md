@@ -92,10 +92,10 @@ section 2 passes.
       security-scoped bookmarks. *(9.6)*
 - [x] **3.2** Folder access bar and picker; reload images once granted.
       *(9.5, 9.7)*
-- [ ] **3.3** `AssetSchemeHandler` serving local images; rewrite relative,
+- [x] **3.3** `AssetSchemeHandler` serving local images; rewrite relative,
       absolute and `file://` image paths; renderer checks file exists.
       *(3.1–3.4, 3.6)*
-- [ ] **3.4** Remote images become alt-text placeholders; confirm
+- [ ] **3.4** Remote images become alt-text placeholders (done in 3.3); confirm
       the content rule list blocks anything remote, with an automated
       test; refuse to show the page if the list fails to load.
       *(3.5, 9.1, 9.8, ADR 0006)*

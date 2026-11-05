@@ -2,6 +2,47 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 3.3, local images
+
+**Done**
+- Renderer: images go through an `ImageLocator` (closure supplied by the
+  app). A local image it approves becomes `<img src alt [title]>`;
+  anything else (missing, not granted, remote, `javascript:`, `data:`)
+  becomes `<span class="image-placeholder" role="img">alt text</span>`
+  (file name if there's no alt text). Remote images are never fetched, so
+  that part of 3.4 is done.
+- `App/AssetSchemeHandler.swift`: serves `mdview-file://document/<path>`
+  only for image files inside a granted folder (checked again, even
+  though the renderer already checked); reads off the main thread; MIME
+  type from the extension; ignores cancelled requests.
+- `ImageAccess`: the app's locator (resolves against the document; image
+  type, exists, granted) using a value snapshot of the grants so it runs
+  safely on the render thread.
+- `elements.md` expected HTML re-recorded: the only change is its two
+  images, now placeholders (the tests render without the app's locator).
+
+**Checked**
+- 160 tests pass (10 new image tests: img for available, placeholder for
+  missing/remote/unsafe, title kept, alt from formatting, file name when
+  no alt, escaping, image inside a link, locator asked with the source as
+  written).
+- In the app with a temporary hook (removed), granting
+  `fixtures/images/sample.png` (a file macOS had given access to):
+  - Before: all 6 images on a test page were placeholders.
+  - After, relaunched: absolute path, `file://` URL and relative path all
+    loaded as the real 48 px image; missing, ungranted and remote stayed
+    placeholders.
+  - In the same session: with the page already open, granting made all 3
+    images appear without reopening (spec 9.5).
+  - Test grant cleared afterwards.
+- Debug and Release build with no warnings.
+- Not checked visually; image sizing relies on `img { max-width: 100% }`
+  (spec 3.4) from 2.8.
+
+**Next**
+- Roadmap 3.4: automated test that the block list stops remote loads, and
+  refusing to show a page if the list fails to load.
+
 ## 2026-11-05: Roadmap 3.2, folder access bar and picker
 
 **Done**

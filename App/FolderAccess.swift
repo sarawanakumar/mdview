@@ -77,13 +77,17 @@ final class FolderAccess {
         grants.covers(Self.path(of: url))
     }
 
+    /// The current grants as a plain value, safe to use off the main thread
+    /// (rendering runs on its own thread).
+    var snapshot: FolderGrantList { grants }
+
     private func save() {
         let ordered = grants.folders.compactMap { bookmarks[$0] }
         UserDefaults.standard.set(ordered, forKey: Self.defaultsKey)
     }
 
     /// The real path, so "/a/../b" and symlinks compare as the same place.
-    private static func path(of url: URL) -> String {
+    nonisolated static func path(of url: URL) -> String {
         url.standardizedFileURL.resolvingSymlinksInPath().path(percentEncoded: false)
     }
 }
