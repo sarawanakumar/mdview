@@ -73,17 +73,27 @@ final class MarkdownDocument: NSDocument {
         guard let url = fileURL, let type = fileType else { return }
         switch event {
         case .changed:
-            do {
-                try revert(toContentsOf: url, ofType: type)
-                for case let controller as DocumentWindowController in windowControllers {
-                    controller.documentDidChangeOnDisk()
-                }
-            } catch {
-                Self.log.info("re-read failed: \(error.localizedDescription, privacy: .public)")
-            }
+            reread(from: url, ofType: type)
         case .disappeared:
-            // Roadmap 4.3 shows a notice; for now the last content stays.
-            Self.log.info("file disappeared")
+            // Spec 5.4: deleted or moved away (including to the Trash). Keep
+            // the last content and say the file is gone. The watcher keeps
+            // checking and reports `.changed` if it comes back.
+            Self.log.info("file no longer available")
+            for case let controller as DocumentWindowController in windowControllers {
+                controller.documentDidDisappear()
+            }
         }
     }
+
+    private func reread(from url: URL, ofType type: String) {
+        do {
+            try revert(toContentsOf: url, ofType: type)
+            for case let controller as DocumentWindowController in windowControllers {
+                controller.documentDidChangeOnDisk()
+            }
+        } catch {
+            Self.log.info("re-read failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
 }

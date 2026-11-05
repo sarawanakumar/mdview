@@ -113,7 +113,7 @@ section 2 passes.
       re-watching after save-by-replace. *(5.1, 5.3)*
 - [x] **4.2** Swap in new content while keeping the scroll position;
       refresh changed images. *(5.2, 5.5)*
-- [ ] **4.3** Handle the file disappearing and coming back. *(5.4)*
+- [x] **4.3** Handle the file disappearing and coming back. *(5.4)*
 - [ ] **4.4** Test with a few real editors (for example TextEdit, Xcode,
       VS Code, vim).
 
@@ -182,4 +182,6 @@ whatever you used before.
 
 Ideas from the vision's non-goals, to revisit only if they stay fast and
 native: footnotes (if not free in 0.2), more highlighted languages, an
-outline of headings, math, Mermaid diagrams.
+outline of headings, math, Mermaid diagrams. Following a file that's
+renamed or moved while open (today it shows "no longer available"; the
+watcher could find the new path with `F_GETPATH` on its descriptor).

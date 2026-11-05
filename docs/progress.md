@@ -2,6 +2,41 @@
 
 Newest session first.
 
+## 2026-11-05: App shown as "MDView"; roadmap 4.3, file gone and back
+
+**Name**
+- The owner changed the display name to **MDView** in Xcode (Xcode also
+  dropped the entitlements file from the synced group's exception list;
+  checked: the built app has no stray file and the same entitlements).
+  Menus (About / Hide / Quit MDView), the folder bar and picker message,
+  and error notices now say MDView; spec, README and vision updated.
+  Project, code, bundle ID and file names stay `mdview`.
+
+**4.3 Done**
+- When the watcher reports the file gone, the window keeps the last
+  content and shows "“note.md” is no longer available. You're seeing the
+  last version; it will update if the file comes back." (also announced
+  to VoiceOver). When the file is back, the notice goes and the new
+  content shows.
+- Tried following a coordinated (Finder-style) move to its new name;
+  AppKit didn't update the document's URL, and spec 5.4 treats "moved
+  away" as gone anyway, so that code was removed. Noted under "After v1".
+
+**Checked** (temporary hook, removed; file in `~/Library/Caches`)
+
+| Event | Window |
+|---|---|
+| deleted | notice, last content kept |
+| recreated | notice gone, new content |
+| `mv` away / back | notice / gone |
+| coordinated move away / back | notice / gone |
+| edited after coming back | updates (still watched) |
+
+- 192 tests pass; Debug and Release build with no warnings.
+
+**Next**
+- Roadmap 4.4: try it with real editors (TextEdit, Xcode, VS Code, vim).
+
 ## 2026-11-05: Roadmap 4.2, keeping your place on reload; changed images
 
 **Done**

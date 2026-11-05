@@ -193,9 +193,35 @@ final class DocumentWindowController: NSWindowController {
         (document as? MarkdownDocument)?.fileURL?.resolvingSymlinksInPath()
     }
 
-    /// The file changed on disk and has been read again (spec 5.1).
+    /// The file changed on disk (or came back) and has been read again
+    /// (spec 5.1, 5.4).
     func documentDidChangeOnDisk() {
+        removeMissingNotice()
         preview.reload()
+    }
+
+    // MARK: File no longer available (spec 5.4)
+
+    private var missingNotice: NSView?
+
+    /// The file was deleted or moved away: keep showing the last content,
+    /// with a notice that stays until the file is back.
+    func documentDidDisappear() {
+        guard missingNotice == nil else { return }
+        let name = window?.title ?? "This file"
+        let message = "“\(name)” is no longer available. You’re seeing the last version; it will update if the file comes back."
+        let bar = Self.noticeBar(message: message, buttons: [])
+        stack.insertArrangedSubview(bar, at: 0)
+        bar.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
+        missingNotice = bar
+        NSAccessibility.post(element: bar, notification: .announcementRequested, userInfo: [
+            .announcement: message, .priority: NSAccessibilityPriorityLevel.high.rawValue,
+        ])
+    }
+
+    private func removeMissingNotice() {
+        missingNotice?.removeFromSuperview()
+        missingNotice = nil
     }
 
     /// A grant anywhere may cover what this window needs: render again.

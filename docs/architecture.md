@@ -197,8 +197,11 @@ and are routed the same way; no new web view is made.
 - Image URLs carry the image file's modification time (`?v=`), so a
   changed image gets a new URL and is fetched again, while unchanged ones
   stay cached (spec 5.5).
-- If the file is gone, the window keeps the last content and shows a notice;
-  the watcher keeps checking for it to come back (spec 5.4).
+- If the file is gone (deleted, or moved away, including to the Trash),
+  the window keeps the last content and shows a notice that stays until
+  the file is back; the watcher keeps checking once a second (spec 5.4).
+  A moved file is not followed to its new name: AppKit didn't follow a
+  coordinated move here, and the spec treats "moved away" as gone.
 
 ## Windows, menus and system features
 
