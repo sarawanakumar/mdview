@@ -1,0 +1,4 @@
+/* The name in the menu bar, the About box and system dialogs. The
+   product, executable and bundle file stay "mdview" (Xcode always sets
+   the unlocalized CFBundleName to the product name). */
+CFBundleName = "MDView";

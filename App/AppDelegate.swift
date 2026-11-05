@@ -65,8 +65,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 .paragraphStyle: paragraph,
             ]
         )
-        // The bundle name is "mdview"; the name people see is MDView.
-        NSApp.orderFrontStandardAboutPanel(options: [.applicationName: "MDView", .credits: credits])
+        // The name comes from CFBundleName (MDView, Info.plist).
+        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
     }
 
     /// Untitled windows only come from File ▸ New (spec 12.2).

@@ -2,6 +2,32 @@
 
 Newest session first.
 
+## 2026-11-05: "MDView" in the menu bar
+
+**Done**
+- The app menu next to the Apple menu said "mdview": macOS uses
+  `CFBundleName` there, and Xcode always sets that to the product name.
+  Neither a `CFBundleName` key in Info.plist nor an
+  `INFOPLIST_KEY_CFBundleName` build setting changed it (both tried,
+  both reverted).
+- Fix: `App/Resources/en.lproj/InfoPlist.strings` with
+  `CFBundleName = "MDView"`, the localized name macOS shows. The product,
+  executable and bundle file stay `mdview`, so `build/mdview.app`, the
+  README's paths and the scripts' process names don't change.
+- The About box now takes its name from the bundle (the explicit
+  "MDView" option in `showAbout` is gone).
+- Checked on a release build: menu bar "Apple, MDView, File, Edit, View,
+  Window, Help"; app menu "About MDView", "Hide MDView", "Quit MDView";
+  About box "MDView, Version 1.1.0 (2)". The process is still `mdview`.
+- Released as **v1.1.1** (build 3), the owner's choice. Automated
+  checklist on the release build: 271 core tests pass; `check-offline.zsh`
+  passes; bundle 5,032,997 bytes; menu bar "MDView", Open panel at launch.
+  `time-open.swift`, two rounds (load average 3.4): cold 494 / 474 ms,
+  warm 149 / 152 ms, large 1,163 / 1,147 ms, all under target. Warm is
+  higher than 8.11's 124 ms (earlier runs: 110–133); warm opens don't
+  read the bundle name, so it's most likely machine noise. Annotated tag
+  `v1.1.1`, pushed with `main`.
+
 ## 2026-11-05: Roadmap 8.11, v1.1 measured again; checklist section 12
 
 **Done**

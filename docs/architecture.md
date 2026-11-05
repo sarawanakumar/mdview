@@ -57,7 +57,8 @@ App/                        the macOS app target (AppKit)
   mdview.entitlements       sandbox, user-selected read-write (ADR 0008; the project's
                             ENABLE_USER_SELECTED_FILES setting must match), app-scoped bookmarks,
                             outgoing network
-  Resources/                preview.css, Info.plist, Assets.xcassets (app icon)
+  Resources/                preview.css, Info.plist, Assets.xcassets (app icon),
+                            en.lproj/InfoPlist.strings (the name "MDView" in the menu bar)
 Packages/MDViewCore/        local Swift package, no AppKit
   UTF8Text                  bytes → text, bad bytes replaced and reported (spec 10.2);
                             text → bytes for saving, byte order mark put back (spec 11.8)
