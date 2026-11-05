@@ -165,7 +165,7 @@ see colours sooner.*
 - [x] **7.4** App icon and About box.
 - [x] **7.5** Decide distribution (build from source, or notarised
       GitHub release) and write it up as an ADR.
-- [ ] **7.6** Go through every spec criterion with the written checklist;
+- [x] **7.6** Go through every spec criterion with the written checklist;
       fix what fails.
 - [ ] **7.7** Set mdview as the default `.md` app and use it daily for a
       week. *(Vision success measure.)*

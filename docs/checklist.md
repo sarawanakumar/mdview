@@ -25,10 +25,10 @@ in the app during a roadmap task (see progress.md), ✋ = by hand.
 | AC | How | Last checked |
 |---|---|---|
 | 1.1 Open With lists MDView | S: `NSWorkspace.urlsForApplications` for `.md`, `.markdown`, `.mdown`, `.mkd` | 7.6: all four |
-| 1.2 Can be the default app | ✋ 1 | 1.2/1.3: offered; set in 7.7 |
+| 1.2 Can be the default app | ✋ 1 | 7.6 (owner) |
 | 1.3 File → Open… | A (1.4) | 1.4 |
 | 1.4 Several files, one window each | A, and S: `check-offline.zsh` opens 18 | 7.6: 18 windows |
-| 1.5 Drop on the Dock icon | ✋ 2 | not yet |
+| 1.5 Drop on the Dock icon | ✋ 2 | 7.6 (owner) |
 | 1.6 Already open → brought forward | A (1.6), S: `time-open.swift` relies on it | 1.6 |
 | 1.7 Open Recent, Clear Menu | A (1.4) | 1.4 |
 | 1.8 No file → Open panel, no empty window | A (1.4, 5.6) | 5.6 |
@@ -45,7 +45,7 @@ in the app during a roadmap task (see progress.md), ✋ = by hand.
 
 | AC | How | Last checked |
 |---|---|---|
-| 3.1, 3.2 Relative, absolute, `file://` | T: `ImageTests`, `FixtureDrivenTests`; ✋ 3 with a real grant | 3.6 (tests) |
+| 3.1, 3.2 Relative, absolute, `file://` | T: `ImageTests`, `FixtureDrivenTests`; ✋ 3 with a real grant | 7.6 (owner) |
 | 3.3 Formats | T: type check; A (3.3) | 3.3 |
 | 3.4 Wide images scale down | A (3.3): `wide.png` | 3.3 |
 | 3.5 Remote image → placeholder | T; S: `check-offline.zsh` | 7.6 |
@@ -56,12 +56,12 @@ in the app during a roadmap task (see progress.md), ✋ = by hand.
 
 | AC | How | Last checked |
 |---|---|---|
-| 4.1 Web and mail links → default app | T: `LinkRouteTests`; ✋ 4 | 3.5 (tests) |
+| 4.1 Web and mail links → default app | T: `LinkRouteTests`; ✋ 4 | 7.6 (owner) |
 | 4.2 Other Markdown files | T; A (3.5) | 3.5 |
 | 4.3 Anchors, `other.md#section` | T: slugs and routes; A (3.5) | 3.5 |
-| 4.4 Other local files → default app | T; ✋ 4 | 3.5 (tests) |
-| 4.5 Hover shows destination | ✋ 4 | not yet |
-| 4.6 Missing file → "File not found" | T; ✋ 4 | 3.5 (tests) |
+| 4.4 Other local files → default app | T; ✋ 4 | 7.6 (owner) |
+| 4.5 Hover shows destination | ✋ 4 | 7.6 (owner) |
+| 4.6 Missing file → "File not found" | T; ✋ 4 | 7.6 (owner) |
 
 ## 5. Automatic reload
 
@@ -70,25 +70,25 @@ in the app during a roadmap task (see progress.md), ✋ = by hand.
 | 5.1, 5.3, 5.4 Saves, save-by-replace, deleted and back | T: `FileWatcherTests` (real files) | 7.6 |
 | 5.2 Scroll position kept | A (4.2) | 4.2 |
 | 5.5 Changed image refreshes | A (4.2) | 4.2 |
-| 5.1–5.3 With real editors | A (4.4): vim, sed, cp, git-style and TextEdit/Xcode-style saves, all under 110 ms; ✋ 5 the editors' own windows | 4.4 |
+| 5.1–5.3 With real editors | A (4.4): vim, sed, cp, git-style and TextEdit/Xcode-style saves, all under 110 ms; ✋ 5 the editors' own windows | 7.6 (owner) |
 
 ## 6. Windows and appearance
 
 | AC | How | Last checked |
 |---|---|---|
 | 6.1 One window per file, titled | A (5.6) | 5.6 |
-| 6.1 ⌘-click title → path menu | ✋ 6 | not yet |
-| 6.2 Merge All Windows, tabs | A (5.6) merged 2 files; ✋ 6 for the menu items | 5.6 |
+| 6.1 ⌘-click title → path menu | ✋ 6 | 7.6 (owner) |
+| 6.2 Merge All Windows, tabs | A (5.6) merged 2 files; ✋ 6 for the menu items | 7.6 (owner) |
 | 6.3 Font, 80-character column | A (2.8) | 2.8 |
-| 6.4 Light/dark, switches live | T: `ContrastTests`; A (2.8, 6.5); ✋ 7 live switch | 6.5 |
+| 6.4 Light/dark, switches live | T: `ContrastTests`; A (2.8, 6.5); ✋ 7 live switch | 7.6 (owner) |
 | 6.5 Select and copy as plain text | A (5.6) | 5.6 |
 | 6.6 Find | A (5.1) | 5.1 |
 | 6.7 Zoom | T: `ZoomLevelsTests`; A (5.2) | 5.2 |
-| 6.8 Print, Save as PDF | A (5.3) made a PDF; ✋ 8 the panel | 5.3 |
+| 6.8 Print, Save as PDF | A (5.3) made a PDF; ✋ 8 the panel | 7.6 (owner) |
 | 6.9 Reveal in Finder | A (5.4) | 5.4 |
-| 6.10–6.12 Open in Editor, Change Editor, editor gone | A (5.5); ✋ 9 the picker | 5.5 |
+| 6.10–6.12 Open in Editor, Change Editor, editor gone | A (5.5); ✋ 9 the picker | 7.6 (owner) |
 | 6.13 State restoration | A (5.6) | 5.6 |
-| 6.14 Keyboard and VoiceOver | A (5.7) keyboard; ✋ 10 VoiceOver | 5.7 |
+| 6.14 Keyboard and VoiceOver | A (5.7) keyboard; ✋ 10 VoiceOver | 7.6 (owner) |
 
 ## 7. Code highlighting
 
@@ -118,7 +118,7 @@ Bundle size: `find build/mdview.app -type f -exec stat -f %z {} + | awk '{s+=$1}
 | 9.2 Sandbox | `codesign -d --entitlements -`; `sandbox_check` (7.3) | 7.3 |
 | 9.3 No telemetry | Code and binary search (7.3) | 7.3 |
 | 9.4 Only swift-markdown | `Package.resolved` (7.3) | 7.3 |
-| 9.5–9.7 Folder bar, grant, Not Now | T: `FolderGrantListTests`; A (3.2); ✋ 3 a real grant | 3.2 |
+| 9.5–9.7 Folder bar, grant, Not Now | T: `FolderGrantListTests`; A (3.2); ✋ 3 a real grant | 7.6 (owner) |
 | 9.8 No page without the block list | T; A (3.4) | 3.4 |
 
 ## 10. Errors and edge cases

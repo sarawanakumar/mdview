@@ -2,7 +2,7 @@
 
 Newest session first.
 
-## 2026-11-05: Roadmap 7.6, release checklist (in progress)
+## 2026-11-05: Roadmap 7.6, release checklist
 
 **Done**
 - `docs/checklist.md`: all 82 spec criteria, each with how it's checked
@@ -32,8 +32,12 @@ Newest session first.
   menu's tab items (6.2), live dark mode (6.4), the print panel (6.8),
   the editor picker (6.10), VoiceOver (6.14).
 
+**Hand checks: all passed** (the owner ran checklist items 1–10 on the
+release build). With these, every spec criterion passes, so 7.6 is
+ticked. The checklist's "Last checked" column is updated.
+
 **Next**
-- The owner runs the hand checks; fix anything that fails; then tick 7.6.
+- 7.7: set MDView as the default `.md` app and use it daily for a week.
 
 ## 2026-11-05: Roadmap 7.5, distribution (ADR 0007)
 
