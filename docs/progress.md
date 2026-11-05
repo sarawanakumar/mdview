@@ -23,14 +23,15 @@ Newest session first.
   existing app nests the new one inside it. It merges instead, which is
   the actual reason to remove the old copy first.
 
-**Open**
-- The repository has no remote, so "publish" (push the tag, ADR 0007)
-  needs a GitHub repository from the owner. The README's clone command
-  says `<repository URL>` until then.
+- Published: the owner made https://github.com/sarawanakumar/mdview. It's
+  the `origin` remote now, and the README's clone command uses it. `main`
+  and the annotated tag `v1.0` are pushed. The tag was first made one
+  commit earlier, then moved (before any push) so v1.0 includes the real
+  clone URL.
+- 7.8 is ticked, so the v1 roadmap is complete.
 
 **Next**
-- Commit, tag `v1.0`, and push once there's a remote. Then tick 7.8,
-  the end of the v1 roadmap.
+- Nothing planned. "After v1" ideas are listed at the end of roadmap.md.
 
 ## 2026-11-05: Roadmap 7.7, a week of daily use
 

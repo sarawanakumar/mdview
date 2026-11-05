@@ -25,7 +25,7 @@ MDView is installed by building it from source
 or later and Xcode 16 or later.
 
 ```bash
-git clone <repository URL> mdview
+git clone https://github.com/sarawanakumar/mdview.git
 cd mdview
 xcodebuild -project mdview.xcodeproj -scheme mdview -configuration Release \
   -destination 'generic/platform=macOS' -derivedDataPath build/DerivedData build

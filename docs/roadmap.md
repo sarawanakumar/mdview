@@ -169,7 +169,7 @@ see colours sooner.*
       fix what fails.
 - [x] **7.7** Set mdview as the default `.md` app and use it daily for a
       week. *(Vision success measure.)*
-- [ ] **7.8** Tag v1.0 and publish as decided in 7.5 (ADR 0007: build
+- [x] **7.8** Tag v1.0 and publish as decided in 7.5 (ADR 0007: build
       from source, so "publish" means pushing the tagged repository). Add
       a license and update the README with install steps.
 
