@@ -50,6 +50,8 @@ enum MainMenu {
 
     private static func fileMenu() -> NSMenu {
         let menu = NSMenu(title: "File")
+        // Spec 12.1: an untitled window, in edit mode.
+        menu.addItem(item("New", #selector(NSDocumentController.newDocument(_:)), "n"))
         menu.addItem(item("Open…", #selector(NSDocumentController.openDocument(_:)), "o"))
 
         let recent = NSMenu(title: "Open Recent")

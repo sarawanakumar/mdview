@@ -1,6 +1,7 @@
 # 0008. A plain-text edit mode, saved only on ⌘S
 
-- **Status:** Accepted (by the owner, 2026-11-05)
+- **Status:** Accepted (by the owner, 2026-11-05); points 5 and 8 changed by
+  [ADR 0009](0009-new-files.md) (new files, saved once through a save panel)
 - **Date:** 2026-11-05
 - **Changes:** the vision's "No editing" non-goal, CLAUDE.md's "Read-only"
   rule, the read-only part of [ADR 0002](0002-appkit-nsdocument.md), and

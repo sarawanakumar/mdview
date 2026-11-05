@@ -34,7 +34,9 @@ criteria pass. Record measurements (timings, app size) with the numbers.
 - **No page JavaScript.** Only the app's own small scripts may run in the
   web view.
 - **Writes only on save.** mdview writes a user's file only when they
-  press ⌘S in edit mode (ADR 0008): no autosave, no other writes.
+  press ⌘S in edit mode (ADR 0008), and creates a file only when they
+  save a new window through the `.md`-only save panel (ADR 0009): no
+  autosave, no other writes.
 - **Stay in scope.** Work on the current roadmap task. Anything listed as a
   non-goal in `vision.md` or "out of scope" in `spec.md` needs the owner's
   OK first.

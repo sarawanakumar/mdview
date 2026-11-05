@@ -1,6 +1,6 @@
 # Spec
 
-What mdview v1 does, plus the edit mode planned for v1.1 (section 11),
+What mdview v1 does, plus v1.1's edit mode and new files (sections 11 and 12),
 and how we know each part works. See
 [vision.md](vision.md) for why. How it's built belongs in
 [architecture.md](architecture.md).
@@ -175,15 +175,33 @@ is written unless the user saves.
 | 11.3 | The editor uses the system monospaced font, follows light/dark mode, and wraps long lines to the window width. There is no colouring and no automatic changes to what's typed: no smart quotes or dashes, no automatic links, no spelling corrections. |
 | 11.4 | Undo and Redo (Cmd+Z, Shift+Cmd+Z), Cut, Copy, Paste and Select All work in the editor, from the Edit menu and the keyboard. Undo history survives switching to the preview and back. |
 | 11.5 | Switching back to the preview renders the editor's current text, saved or not, in under 0.2 s for a typical file. |
-| 11.6 | Unsaved edits show the standard edited marker in the window's title bar and close button. **File → Save** (Cmd+S) writes the file; it's dimmed when there's nothing to save. Nothing else writes it: no autosave, no Versions, no Save As. |
+| 11.6 | Unsaved edits show the standard edited marker in the window's title bar and close button. **File → Save** (Cmd+S) writes the file; it's dimmed when there's nothing to save. Nothing else writes it: no autosave, no Versions, no Save As. (A new, untitled window's first save asks where, section 12.) |
 | 11.7 | Closing a window or quitting with unsaved edits asks the standard Save / Don't Save / Cancel question. |
 | 11.8 | A saved file is UTF-8, keeps its byte order mark if it had one, and keeps its line endings. Text that's read and saved again unchanged gives the same bytes the file had. |
 | 11.9 | In edit mode, **Edit → Find** (Cmd+F, Cmd+G) searches the source with the standard find bar. |
 | 11.10 | Edit Mode is dimmed for a file that didn't decode cleanly as UTF-8 (the notice in 10.2, including UTF-16 files), so its original bytes can't be overwritten. |
 | 11.11 | When the file changes on disk and there are no unsaved edits, it reloads as in section 5, in either mode. With unsaved edits, an alert says the file was changed by another app and offers **Keep My Edits** or **Reload from Disk**. MDView's own saves never cause a reload or this alert, and the file keeps being watched after them (5.3). |
-| 11.12 | If the file can't be saved, an alert names the file and the reason, and the edits stay in the window. A locked or read-only file gets the standard "The file is locked" alert, whose **Save Anyway** saves it and leaves it locked. A file that has been deleted or moved away is never written back or saved somewhere else: Save says it's no longer available, and no save panel ever appears. |
+| 11.12 | If the file can't be saved, an alert names the file and the reason, and the edits stay in the window. A locked or read-only file gets the standard "The file is locked" alert, whose **Save Anyway** saves it and leaves it locked. A file that has been deleted or moved away is never written back or saved somewhere else: Save says it's no longer available, and no save panel appears (12.10). |
 | 11.13 | The editor is reachable by keyboard and readable with VoiceOver, as a standard text view. |
 | 11.14 | A 5 MB file (8.3) can be switched to edit mode, scrolled and typed in without a spinning cursor. The app is still under the size limit (8.4). |
+
+## 12. New files (v1.1)
+
+Starting a new Markdown file in MDView and saving it once, as `.md`
+([ADR 0009](adr/0009-new-files.md)).
+
+| AC | Criterion |
+|---|---|
+| 12.1 | **File → New** (Cmd+N) opens a new window titled "Untitled" ("Untitled 2" and so on for more), in edit mode, with the cursor in the empty editor. Cmd+/ switches it to the preview and back as in section 11. |
+| 12.2 | Nothing else makes untitled windows: launching with no file still shows the Open panel (1.8), and so does clicking the Dock icon with no windows open. |
+| 12.3 | The first **File → Save** (Cmd+S) in an untitled window shows the standard save panel, named after the window ("Untitled.md") and opening in the folder last saved to (Documents the first time). It offers one file type only, Markdown with the `.md` extension, with no format menu, and the saved file always ends in `.md`: a name typed without it gets it ("notes" → `notes.md`), and so does a name with another extension ("notes.txt" → `notes.txt.md`). The window's title shows the `.md`. |
+| 12.4 | Choosing a name that already exists shows the standard "already exists. Do you want to replace it?" question; the file is replaced only if the user confirms. |
+| 12.5 | Cancelling the save panel writes nothing; the window stays untitled with its text and its edited marker. |
+| 12.6 | After the first save the window is like any opened file: titled with the file name (with the path menu, 6.1), listed in Open Recent (1.7), reloaded when the file changes on disk (section 5, 11.11), and later saves happen in place without a panel. The preview renders against the file's folder, so local images and links work as in sections 3, 4 and 9.5. |
+| 12.7 | The new file is UTF-8 with no byte order mark, and keeps line endings as typed (11.8). |
+| 12.8 | Closing an untitled window with text shows the standard save panel with **Delete**, Cancel and Save: Delete closes it without writing anything. Quitting asks the same way (with several unsaved windows, macOS first offers Review Changes…). An untitled window with nothing typed closes without asking. Untitled windows aren't restored after a relaunch. |
+| 12.9 | Before the first save, the preview renders the text; local images show their placeholder (3.6) and links to local files do nothing harmful (4.6). |
+| 12.10 | Windows of opened files never show a save panel (11.6, 11.12). |
 
 ---
 
@@ -194,8 +212,9 @@ images, plugins, themes, a settings screen, Mermaid diagrams, math, and any
 network access.
 
 **Rich editing** stays out in v1.1 (ADR 0008): no side-by-side source and
-preview, no colouring in the editor, no autosave or Versions, no Save As,
-no new files, and no ticking task-list boxes in the preview (2.5).
+preview, no colouring in the editor, no autosave or Versions, no Save As for
+opened files, no file types other than `.md` for new files (ADR 0009),
+and no ticking task-list boxes in the preview (2.5).
 
 **Footnotes** are also out: `swift-markdown` 0.9.0 doesn't support them
 (checked in roadmap 0.2), so `[^1]` and its definition show as plain text.

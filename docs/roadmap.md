@@ -176,7 +176,7 @@ see colours sooner.*
 **Done when:** every spec criterion passes and mdview has replaced
 whatever you used before.
 
-## M8. v1.1: edit mode (ADR 0008, spec section 11)
+## M8. v1.1: edit mode and new files (ADR 0008, 0009, spec sections 11, 12)
 
 ADR 0008 accepted 2026-11-05.
 
@@ -202,11 +202,29 @@ ADR 0008 accepted 2026-11-05.
 - [x] **8.6** Outside changes while editing: reload when clean, Keep My
       Edits / Reload from Disk when not, ignore our own saves (today the
       reload after our own save clears the undo history). *(11.11, 11.4)*
-- [ ] **8.7** Measure: open times unchanged, 5 MB file in edit mode, app
-      size, offline check, preview after editing under 0.2 s (11.5); add section 11 to `checklist.md` and run it.
-      Version 1.1.0, tag v1.1 and push. *(8.1–8.4, 9.1, 11.2, 11.14)*
+- [x] **8.7** Measure: open times unchanged, 5 MB file in edit mode, app
+      size, offline check, preview after editing under 0.2 s (11.5); add
+      section 11 to `checklist.md`. Version 1.1.0. (Hand check 12, the
+      tag and the push moved to 8.11 when new files joined v1.1.)
+      *(8.1–8.4, 9.1, 11.2, 11.5, 11.14)*
+- [x] **8.8** Once ADR 0009 is accepted: update vision.md, CLAUDE.md and
+      ADR 0008's status (ADR 0009 consequences). File → New (Cmd+N):
+      `MarkdownDocumentController.defaultType`, the untitled window opens
+      in edit mode; nothing makes untitled windows by itself. *(12.1, 12.2)*
+- [x] **8.9** The first save of an untitled window: `save(_:)` lets it
+      through; `prepareSavePanel` sets up a `.md`-only panel for untitled
+      documents and still refuses for every other one; Replace and Cancel.
+      *(12.3–12.5, 12.7, 12.10)*
+- [ ] **8.10** After the first save: watcher starts, title and Open
+      Recent, preview re-renders against the new folder. Close and quit
+      with an untitled window; the preview before saving. Untitled windows
+      must not be restored (today they come back empty after a force
+      quit). *(12.6, 12.8, 12.9)*
+- [ ] **8.11** Measure again (open times, size, memory, offline); add
+      section 12 to `checklist.md`; hand checks 12 and a new one for File →
+      New; tag v1.1 and push. *(8.1–8.6, 9.1, 11.14, 12.x)*
 
-**Done when:** spec section 11 passes and every v1 criterion still does.
+**Done when:** spec sections 11 and 12 pass and every v1 criterion still does.
 
 ---
 

@@ -2,6 +2,100 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 8.8 and 8.9, File → New and the first save
+
+**Done**
+- The owner accepted ADR 0009. Updated: vision.md (File → New in the
+  non-goal's wording), CLAUDE.md (the write rule covers a new file's
+  first save), ADR 0008's status, architecture.md's table.
+- About box no longer says "read-only".
+- **8.8:** File → New ⌘N (`MarkdownDocumentController.defaultType`); an
+  untitled window starts in edit mode. `applicationShouldOpenUntitledFile`
+  stays false.
+- **8.9, done in the same go, because 8.8 alone left a window that can't
+  close:** on current macOS, closing an edited untitled window goes
+  straight to the save panel (with Delete), and NSDocument first wants a
+  writable type for a "save as". With our panel refused, Close did
+  nothing and Quit was cancelled. Now:
+  - `writableTypes(for:)` allows `.saveAsOperation` for untitled
+    documents only
+  - `save(_:)` lets untitled documents through to NSDocument
+  - `prepareSavePanel`: for untitled documents only, Markdown is the one
+    allowed type, no other types, extension shown; refused for opened
+    ones as before
+  - no format menu (`shouldRunSavePanelWithAccessoryView`), extension
+    `md`, and files are written with the extension visible
+- Checked on a release build with System Events:
+  - launch with no file: Open panel; Dock-style reopen with no windows:
+    Open panel, no untitled window (12.2)
+  - ⌘N: "Untitled", edit mode checked, editor focused and empty; again:
+    "Untitled 2"; an empty one closes without asking (12.1, 12.8)
+  - typed text shows in the preview before saving
+  - ⌘S: panel named "Untitled 5.md", in Documents, only Cancel and Save,
+    no format menu, no hide-extension box (12.3)
+  - saved via Go to Folder as `first.md`: bytes exactly as typed, UTF-8,
+    no byte order mark; title "first.md" (12.7)
+  - the next panel opens in the folder last saved to
+  - "third" → `third.md`, "second.txt" → `second.txt.md`, no alert.
+    "third" first showed as "third" in the title (the panel had hidden the
+    extension); fixed with `fileAttributesToWrite`, "fourth" → title
+    "fourth.md"
+  - an existing name: "“first.md” already exists. Do you want to replace
+    it?"; Cancel goes back to the panel with the file untouched, Replace
+    overwrites it. NSDocument then closed the other window open on that
+    file, so there's still one window per file (1.6)
+  - Cancel in the panel: still untitled, still edited, nothing written
+    (12.5)
+  - close an edited untitled window: the panel with Delete / Cancel /
+    Save; Delete closes and writes nothing (12.8)
+  - quit with two edited untitled windows: macOS's "You have 2 mdview
+    documents with unsaved changes" dialog (Review Changes…)
+  - an opened file that's gone: ⌘S shows our alert, and the close
+    question's Save → Save As… opens no panel and writes nothing (12.10)
+- spec 12.3 and 12.8 now describe what macOS does (the extension rule,
+  the folder, the Delete panel, the review dialog). architecture.md
+  describes new files.
+- Release build, no warnings. MDViewCore unchanged.
+
+**Open (8.10)**
+- After a force quit, untitled windows come back on launch, empty and
+  not edited (state restoration). Spec 12.8 says they aren't restored.
+- A new file isn't watched yet after its first save, and isn't checked
+  for Open Recent or the preview's folder yet.
+- Testing notes: `pkill` doesn't stop MDView while it has unsaved
+  documents (use `pkill -9`); saved window state is per bundle ID, so it's
+  shared with the copy in /Applications. Close test windows and quit
+  normally at the end, as I did.
+
+**Next**
+- 8.10.
+
+## 2026-11-05: New files planned for v1.1 (ADR 0009 proposed)
+
+**Done**
+- Committed 8.7's work (`e3713ea`), not tagged or pushed (owner's
+  choice).
+- Interviewed the owner about creating new files. Their choices:
+  - new files only: no Save As for opened files
+  - a new window opens in edit mode
+  - the save panel's standard Replace question for a name that exists
+  - fold it into v1.1 rather than v1.2
+  - "only save as .md, nothing else": one file type in the panel
+- ADR 0009 written, status Proposed. It changes ADR 0008's "no new files"
+  and "no save panel", so vision.md, CLAUDE.md and ADR 0008's status
+  change only once it's accepted (roadmap 8.8).
+- spec.md: new section 12 (10 criteria); 11.6, 11.12 and "Out of scope"
+  adjusted. roadmap.md: 8.7 ticked (its measurements are done; hand
+  check 12, the tag and the push moved to 8.11), new tasks 8.8–8.11.
+  architecture.md lists ADR 0009. No code changed.
+- Found while planning: Info.plist's Viewer role leaves NSDocumentController
+  with no default type for File → New, and `save(_:)` and
+  `prepareSavePanel` refuse documents without a file. ADR 0009 point 9
+  covers each.
+
+**Next**
+- 8.8, once ADR 0009 is accepted.
+
 ## 2026-11-05: Roadmap 8.7, v1.1 measurements and checklist
 
 **Done**

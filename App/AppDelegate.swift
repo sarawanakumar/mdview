@@ -53,7 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         paragraph.alignment = .center
         let credits = NSAttributedString(
             string: """
-                A fast, read-only Markdown viewer that never goes online.
+                A fast Markdown viewer that never goes online.
 
                 Uses Apple’s swift-markdown (Apache License 2.0, © Apple Inc. \
                 and the Swift project authors) and swift-cmark (BSD 2-Clause, \
@@ -69,7 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.orderFrontStandardAboutPanel(options: [.applicationName: "MDView", .credits: credits])
     }
 
-    /// A viewer has nothing to create.
+    /// Untitled windows only come from File ▸ New (spec 12.2).
     func applicationShouldOpenUntitledFile(_ sender: NSApplication) -> Bool {
         false
     }

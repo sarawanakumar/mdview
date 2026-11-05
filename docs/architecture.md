@@ -17,6 +17,7 @@ the pieces fit.
 | [0006](adr/0006-outgoing-network-entitlement-for-webkit.md) | Grant the outgoing-network entitlement, because WebKit can't run in the sandbox without it; offline is enforced by the layers below | Accepted |
 | [0007](adr/0007-distribution.md) | v1 is build-from-source only; no published binary, so no signing or notarisation | Accepted |
 | [0008](adr/0008-edit-mode.md) | v1.1: plain-text edit mode swapped in place of the preview, written only on ⌘S, read-write sandbox entitlement | Accepted |
+| [0009](adr/0009-new-files.md) | v1.1: File → New opens an untitled window in edit mode; its first save uses a `.md`-only save panel, the only save panel MDView shows | Accepted |
 
 ## Technology
 
@@ -225,8 +226,18 @@ Don't Save / Cancel question on close and quit. `MarkdownDocument` adds:
 `writableTypes(for:)` (the file's own type, since Info.plist keeps the
 Viewer role), `data(ofType:)` through `UTF8Text.encode`, Save dimmed when
 nothing changed or the file had bad bytes (`canEdit`), its own alert when
-the file is gone, and `prepareSavePanel` returning false so no save panel
-ever opens. With unsaved edits, it asks Keep My Edits or Reload from Disk (spec 11.11).
+the file is gone, and `prepareSavePanel`, which allows a save panel only
+for an untitled document (ADR 0009) and refuses it for every opened one.
+
+**New files** (spec 12, ADR 0009). File ▸ New uses
+`MarkdownDocumentController.defaultType` (the Markdown type; Info.plist
+keeps the Viewer role). An untitled window starts in edit mode. Its first
+save is a "save as" to NSDocument, so `writableTypes(for:)` allows that
+one operation for untitled documents only; without it NSDocument won't
+even show the close panel. The panel allows only Markdown (`.md`), with no
+format menu (`shouldRunSavePanelWithAccessoryView` false), and the file is
+written with its extension visible, so the title shows `.md`. Closing an
+edited untitled window shows the standard save panel with Delete. With unsaved edits, it asks Keep My Edits or Reload from Disk (spec 11.11).
 The document remembers the bytes it last read or saved; a change on disk
 with the same bytes (our own save, or the file coming back unchanged) only
 updates `fileModificationDate`, so there's no reload and the undo history

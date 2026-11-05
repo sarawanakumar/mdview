@@ -68,9 +68,10 @@ Concretely, v1 is successful when:
   Package Manager. It parses full GitHub-flavored Markdown, which the
   built-in system APIs can't, and Apple maintains it.
 - **No rich editing.** v1.1 adds a plain-text edit mode, swapped in place
-  of the preview and saved only on ⌘S (ADR 0008). No side-by-side view,
-  colouring, autosave or new files: for real writing, opening the file in
-  my editor is one click away.
+  of the preview and saved only on ⌘S (ADR 0008), and File → New for a
+  new `.md` file (ADR 0009). No side-by-side view, colouring, autosave or
+  Save As: for real writing, opening the file in my editor is one click
+  away.
 - **No network:** no remote images, no update checks, no telemetry, no sync.
 - **No export** (PDF, HTML) in v1. Print from the system menu is acceptable
   if it comes free.

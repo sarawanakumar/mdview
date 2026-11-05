@@ -44,7 +44,11 @@ final class MarkdownDocument: NSDocument {
     /// asynchronous writing, saves start from the menu or the close question.
     override nonisolated func writableTypes(for saveOperation: NSDocument.SaveOperationType) -> [String] {
         MainActor.assumeIsolated {
-            guard saveOperation == .saveOperation, canEdit, let fileType else { return [] }
+            // An untitled file's first save is a "save as" to NSDocument
+            // (spec 12.3); without a type for it, NSDocument won't even ask
+            // Save / Don't Save on close. Opened files only save in place.
+            let allowed = saveOperation == .saveOperation || (fileURL == nil && saveOperation == .saveAsOperation)
+            guard allowed, canEdit, let fileType else { return [] }
             return [fileType]
         }
     }
@@ -102,10 +106,12 @@ final class MarkdownDocument: NSDocument {
         }
     }
 
-    /// Save only ever writes the file back in place. If it has been deleted
-    /// or moved away (spec 5.4), NSDocument would offer Save As, which
-    /// would make a new file; say why it can't be saved instead (spec 11.12).
+    /// An opened file is only ever saved back in place. If it has been
+    /// deleted or moved away (spec 5.4), NSDocument would offer Save As,
+    /// which would make a new file; say why it can't be saved instead (spec
+    /// 11.12). An untitled file's first save goes to the save panel (12.3).
     override func save(_ sender: Any?) {
+        guard fileURL != nil else { return super.save(sender) }
         guard let url = fileURL, FileManager.default.fileExists(atPath: url.path) else {
             let error = NSError(domain: NSCocoaErrorDomain, code: CocoaError.fileNoSuchFile.rawValue, userInfo: [
                 NSLocalizedDescriptionKey: "“\(displayName ?? "This file")” can’t be saved because it’s no longer available.",
@@ -121,12 +127,45 @@ final class MarkdownDocument: NSDocument {
         super.save(sender)
     }
 
-    /// No Save As, ever (ADR 0008): if NSDocument reaches for a save panel
-    /// (for example from the close question for a file that's gone), the
-    /// save is cancelled and the edits stay in the window.
+    /// The only save panel MDView shows: an untitled file's first save,
+    /// also from the close and quit questions (spec 12.3, ADR 0009). It
+    /// saves Markdown as `.md` and nothing else. For an opened file there's
+    /// no Save As (ADR 0008): the panel is refused and the edits stay in
+    /// the window, for example when its file is gone.
     override func prepareSavePanel(_ savePanel: NSSavePanel) -> Bool {
-        Self.log.info("save panel refused")
-        return false
+        guard fileURL == nil, let markdown = UTType(Self.markdownType) else {
+            Self.log.info("save panel refused")
+            return false
+        }
+        savePanel.allowedContentTypes = [markdown]
+        savePanel.allowsOtherFileTypes = false
+        savePanel.isExtensionHidden = false
+        savePanel.canSelectHiddenExtension = false
+        return true
+    }
+
+    /// No file format menu in the save panel: there's only one format.
+    override var shouldRunSavePanelWithAccessoryView: Bool { false }
+
+    override nonisolated func fileNameExtension(
+        forType typeName: String, saveOperation: NSDocument.SaveOperationType
+    ) -> String? {
+        "md"
+    }
+
+    static let markdownType = "net.daringfireball.markdown"
+
+    /// The `.md` stays visible: the save panel hides it when the name was
+    /// typed without one, and then the window title would leave it out too.
+    override nonisolated func fileAttributesToWrite(
+        to url: URL, ofType typeName: String, for saveOperation: NSDocument.SaveOperationType,
+        originalContentsURL absoluteOriginalContentsURL: URL?
+    ) throws -> [String: Any] {
+        var attributes = try super.fileAttributesToWrite(
+            to: url, ofType: typeName, for: saveOperation, originalContentsURL: absoluteOriginalContentsURL
+        )
+        attributes[FileAttributeKey.extensionHidden.rawValue] = false
+        return attributes
     }
 
     /// File ▸ Save is dimmed when there's nothing to save, so pressing ⌘S in
@@ -141,7 +180,11 @@ final class MarkdownDocument: NSDocument {
     }
 
     override func makeWindowControllers() {
-        addWindowController(DocumentWindowController(document: self))
+        let controller = DocumentWindowController(document: self)
+        addWindowController(controller)
+        // A new, untitled file is for typing (spec 12.1). It has no file
+        // to watch until it's saved.
+        if fileURL == nil { controller.toggleEditMode(nil) }
         startWatching()
     }
 
