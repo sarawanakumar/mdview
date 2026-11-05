@@ -139,7 +139,7 @@ section 2 passes.
       kinds and malformed input. *(7.2, 7.6, ADR 0004)*
 - [x] **6.2** Rule tables for Swift, Python, JavaScript/TypeScript.
 - [x] **6.3** Rule tables for shell, JSON, YAML, HTML, CSS.
-- [ ] **6.4** Language tag aliases; unknown/untagged blocks stay plain.
+- [x] **6.4** Language tag aliases; unknown/untagged blocks stay plain.
       *(7.1, 7.4)*
 - [ ] **6.5** Light and dark token colours with 4.5:1 contrast. *(7.5)*
 - [ ] **6.6** Write `fixtures/code.md`; check a 2,000-line block against

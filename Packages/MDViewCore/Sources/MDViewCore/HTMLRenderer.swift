@@ -14,9 +14,8 @@ import Markdown
 /// Rendered (roadmap 2.2–2.6): headings with anchors, paragraphs, line
 /// breaks, emphasis, strong, strikethrough, inline code, horizontal rules,
 /// lists and task lists, blockquotes, code blocks, tables, inline and block
-/// HTML (as text), links and bare web addresses. Front matter is hidden.
-/// Images show their alt text for now (roadmap 3.3); code isn't
-/// highlighted yet (M6).
+/// HTML (as text), links and bare web addresses, images, and code blocks
+/// coloured for the languages in `Languages`. Front matter is hidden.
 /// A rendered body plus what the page refers to on disk.
 public struct RenderedPage: Equatable, Sendable {
     public let html: String
@@ -255,7 +254,11 @@ struct HTMLVisitor: MarkupVisitor {
     mutating func visitCodeBlock(_ code: CodeBlock) -> String {
         let language = code.language.map(Self.languageName) ?? ""
         let attribute = language.isEmpty ? "" : " class=\"language-\(language)\""
-        return "<pre><code\(attribute)>\(escape(trimmingFinalNewline(code.code)))</code></pre>\n"
+        let source = trimmingFinalNewline(code.code)
+        // A known language is coloured (spec 7.1–7.3); anything else stays
+        // plain monospaced text (7.4). The highlighter escapes everything.
+        let body = Languages.rules(forTag: language).map { Highlighter.highlight(source, rules: $0) } ?? escape(source)
+        return "<pre><code\(attribute)>\(body)</code></pre>\n"
     }
 
     /// The fence's first word, lowercased, keeping only characters that are

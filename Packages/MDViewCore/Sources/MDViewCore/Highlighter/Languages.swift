@@ -2,6 +2,24 @@
 /// Aim: clearly readable, not editor-grade (ADR 0004). Roadmap 6.4 maps
 /// code fence tags (`swift`, `py`, `ts`, …) to these.
 public enum Languages {
+    /// The rules for a code fence's language tag (already lowercased), or
+    /// nil for an unknown tag, which stays plain (spec 7.4). Spec 7.1's tags,
+    /// plus a few close relatives that use the same rules.
+    public static func rules(forTag tag: String) -> LanguageRules? {
+        switch tag.lowercased() {
+        case "swift": swift
+        case "python", "py": python
+        case "javascript", "js", "jsx", "mjs", "cjs": javaScript
+        case "typescript", "ts", "tsx": typeScript
+        case "sh", "bash", "zsh", "shell": shell
+        case "json", "jsonc": json
+        case "yaml", "yml": yaml
+        case "html", "htm", "xml", "svg": html
+        case "css": css
+        default: nil
+        }
+    }
+
     // MARK: Swift
 
     public static let swift = LanguageRules(

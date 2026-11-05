@@ -2,6 +2,36 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 6.4, code blocks coloured by language tag
+
+**Done**
+- `Languages.rules(forTag:)`: the fence's first word (lowercased) picks
+  the rules. Spec 7.1's tags: `swift`; `python`/`py`;
+  `javascript`/`js`/`jsx`; `typescript`/`ts`/`tsx`; `sh`/`bash`/`zsh`/
+  `shell`; `json`; `yaml`/`yml`; `html`; `css`. Plus close relatives using
+  the same rules: `mjs`, `cjs`, `jsonc`, `htm`, `xml`, `svg`.
+- The renderer colours code blocks with a known tag; untagged, unknown
+  (`text`, `cobol`, …) and indented blocks stay plain, escaped (spec 7.4).
+  Inline code is never coloured.
+- `elements.md` expected HTML re-recorded: the only changes are its
+  Swift, Python and JSON blocks now coloured; the `text` block unchanged.
+- Fixed a stale comment in `HTMLRenderer` (it still said images showed
+  alt text only).
+
+**Checked**
+- 9 new tests (254 total): every listed tag colours a keyword; tag case
+  doesn't matter; relatives work; untagged/unknown/indented stay plain and
+  escaped; inline code never coloured; code inside lists and quotes
+  coloured; only the info string's first word counts.
+- Speed (release): one 2,000-line Swift block renders in 23 ms; the 5 MB
+  worst case with a Swift block in each of ~19,000 sections went from
+  1,133 to 1,247 ms.
+- App builds with no warnings. **No colours show yet**: the token colours
+  are roadmap 6.5.
+
+**Next**
+- Roadmap 6.5: light and dark token colours with 4.5:1 contrast.
+
 ## 2026-11-05: Roadmap 6.3, shell, JSON, YAML, HTML, CSS
 
 **Done**

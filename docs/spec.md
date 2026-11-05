@@ -116,7 +116,7 @@ highlighter written inside the project.
 
 | AC | Criterion |
 |---|---|
-| 7.1 | These language tags are highlighted (case doesn't matter): `swift`; `python` / `py`; `javascript` / `js` / `jsx`; `typescript` / `ts` / `tsx`; `sh` / `bash` / `zsh` / `shell`; `json`; `yaml` / `yml`; `html`; `css`. |
+| 7.1 | These language tags are highlighted (case doesn't matter): `swift`; `python` / `py`; `javascript` / `js` / `jsx`; `typescript` / `ts` / `tsx`; `sh` / `bash` / `zsh` / `shell`; `json`; `yaml` / `yml`; `html`; `css`. Close relatives use the same rules: `mjs`, `cjs`, `jsonc`, `htm`, `xml`, `svg`. |
 | 7.2 | Each highlighted language distinguishes at least **keywords, strings, comments and numbers**, each in its own colour. |
 | 7.3 | Strings and comments that span several lines (block comments, triple-quoted strings, template literals) are coloured correctly across lines. |
 | 7.4 | Code blocks with no tag or an unknown tag render as plain monospaced text with no colouring. |

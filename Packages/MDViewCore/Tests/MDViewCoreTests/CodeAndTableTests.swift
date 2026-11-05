@@ -8,7 +8,8 @@ private func render(_ markdown: String) -> String {
 @Suite("Code blocks (2.8)")
 struct CodeBlockTests {
     @Test func fencedWithLanguage() {
-        #expect(render("```swift\nlet x = 1\n```\n") == "<pre><code class=\"language-swift\">let x = 1</code></pre>\n")
+        #expect(render("```swift\nlet x = 1\n```\n")
+            == "<pre><code class=\"language-swift\"><span class=\"tok-keyword\">let</span> x = <span class=\"tok-number\">1</span></code></pre>\n")
     }
 
     @Test func fencedWithoutLanguage() {
@@ -16,7 +17,7 @@ struct CodeBlockTests {
     }
 
     @Test func tildeFence() {
-        #expect(render("~~~python\nprint(1)\n~~~\n") == "<pre><code class=\"language-python\">print(1)</code></pre>\n")
+        #expect(render("~~~python\nprint(1)\n~~~\n") == "<pre><code class=\"language-python\">print(<span class=\"tok-number\">1</span>)</code></pre>\n")
     }
 
     @Test func indentedCode() {
