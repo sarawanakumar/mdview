@@ -142,7 +142,7 @@ section 2 passes.
 - [x] **6.4** Language tag aliases; unknown/untagged blocks stay plain.
       *(7.1, 7.4)*
 - [x] **6.5** Light and dark token colours with 4.5:1 contrast. *(7.5)*
-- [ ] **6.6** Write `fixtures/code.md`; check a 2,000-line block against
+- [x] **6.6** Write `fixtures/code.md`; check a 2,000-line block against
       the speed targets. *(7.3, 7.7)*
 
 **Done when:** spec section 7 passes.

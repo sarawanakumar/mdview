@@ -1,0 +1,108 @@
+<h1 id="code-blocks">Code blocks</h1>
+<p>One block per supported language (spec 7.1), then blocks that must stay
+plain (7.4) and blocks that are broken on purpose (7.6). Each language block
+has keywords, strings, comments and numbers (7.2), and most have a string
+or comment that spans lines (7.3).</p>
+<h2 id="swift">Swift</h2>
+<pre><code class="language-swift"><span class="tok-keyword">import</span> Foundation
+
+<span class="tok-comment">/* A block comment
+   over two lines */</span>
+<span class="tok-keyword">struct</span> Greeter: Sendable {
+    <span class="tok-keyword">let</span> name: String
+    <span class="tok-keyword">func</span> greet(times: Int = <span class="tok-number">3</span>) -&gt; String {
+        <span class="tok-keyword">let</span> banner = <span class="tok-string">&quot;&quot;&quot;
+            Hello, \(name)!
+            &quot;&quot;&quot;</span>
+        <span class="tok-keyword">return</span> times &gt; <span class="tok-number">0</span> ? banner : <span class="tok-string">&quot;&quot;</span> <span class="tok-comment">// never empty for 3</span>
+    }
+}</code></pre>
+<h2 id="python">Python</h2>
+<pre><code class="language-python"><span class="tok-comment"># Read a config file</span>
+<span class="tok-keyword">def</span> load(path, retries=<span class="tok-number">2</span>):
+    <span class="tok-string">&quot;&quot;&quot;Load the file.
+
+    Tries a few times.&quot;&quot;&quot;</span>
+    <span class="tok-keyword">for</span> attempt <span class="tok-keyword">in</span> range(retries):
+        <span class="tok-keyword">if</span> attempt <span class="tok-keyword">is</span> <span class="tok-keyword">not</span> <span class="tok-keyword">None</span>:
+            <span class="tok-keyword">return</span> open(path).read()
+    <span class="tok-keyword">return</span> <span class="tok-string">&#39;none&#39;</span></code></pre>
+<h2 id="javascript">JavaScript</h2>
+<pre><code class="language-javascript"><span class="tok-comment">// Show the list</span>
+<span class="tok-keyword">const</span> items = [<span class="tok-number">1</span>, <span class="tok-number">2.5</span>, <span class="tok-number">0x1f</span>];
+<span class="tok-keyword">async</span> <span class="tok-keyword">function</span> show(name = <span class="tok-string">&quot;list&quot;</span>) {
+  <span class="tok-keyword">const</span> text = <span class="tok-string">`${name}:
+${items.join(&quot;, &quot;)}`</span>;
+  <span class="tok-comment">/* done */</span>
+  <span class="tok-keyword">return</span> text.length &gt; <span class="tok-number">0</span> ? <span class="tok-keyword">true</span> : <span class="tok-keyword">null</span>;
+}</code></pre>
+<h2 id="typescript">TypeScript</h2>
+<pre><code class="language-ts"><span class="tok-keyword">interface</span> User {
+  <span class="tok-keyword">readonly</span> id: <span class="tok-keyword">number</span>;
+  name?: <span class="tok-keyword">string</span>; <span class="tok-comment">// optional</span>
+}
+<span class="tok-keyword">const</span> limit = <span class="tok-number">100</span>;
+<span class="tok-keyword">export</span> <span class="tok-keyword">function</span> label(user: User): <span class="tok-keyword">string</span> {
+  <span class="tok-keyword">return</span> <span class="tok-string">`#${user.id} ${user.name ?? &quot;anonymous&quot;}`</span>;
+}</code></pre>
+<h2 id="shell">Shell</h2>
+<pre><code class="language-bash"><span class="tok-comment">#!/bin/bash</span>
+<span class="tok-comment"># Build every file given</span>
+<span class="tok-keyword">set</span> -euo pipefail
+<span class="tok-keyword">for</span> file <span class="tok-keyword">in</span> <span class="tok-string">&quot;$@&quot;</span>; <span class="tok-keyword">do</span>
+  <span class="tok-keyword">if</span> [ -f <span class="tok-string">&quot;$file&quot;</span> ]; <span class="tok-keyword">then</span> <span class="tok-keyword">echo</span> <span class="tok-string">&#39;building&#39;</span> <span class="tok-string">&quot;$file&quot;</span>; <span class="tok-keyword">fi</span>
+<span class="tok-keyword">done</span>
+<span class="tok-keyword">exit</span> <span class="tok-number">0</span></code></pre>
+<h2 id="json">JSON</h2>
+<pre><code class="language-json">{
+  <span class="tok-string">&quot;name&quot;</span>: <span class="tok-string">&quot;mdview&quot;</span>,
+  <span class="tok-string">&quot;version&quot;</span>: <span class="tok-number">1.0</span>,
+  <span class="tok-string">&quot;offline&quot;</span>: <span class="tok-keyword">true</span>,
+  <span class="tok-string">&quot;plugins&quot;</span>: <span class="tok-keyword">null</span>,
+  <span class="tok-string">&quot;tags&quot;</span>: [<span class="tok-string">&quot;viewer&quot;</span>, <span class="tok-string">&quot;markdown&quot;</span>]
+}</code></pre>
+<h2 id="yaml">YAML</h2>
+<pre><code class="language-yaml"><span class="tok-comment"># Settings</span>
+name: mdview
+enabled: <span class="tok-keyword">true</span>
+retries: <span class="tok-number">3</span>
+note: <span class="tok-string">&quot;a # inside quotes&quot;</span>
+list:
+  - <span class="tok-keyword">on</span>
+  - <span class="tok-keyword">off</span>  <span class="tok-comment"># trailing comment</span></code></pre>
+<h2 id="html">HTML</h2>
+<pre><code class="language-html"><span class="tok-comment">&lt;!-- A card,
+     with a two-line comment --&gt;</span>
+&lt;<span class="tok-keyword">div</span> class=<span class="tok-string">&quot;card&quot;</span> data-id=<span class="tok-string">&#39;7&#39;</span>&gt;
+  &lt;<span class="tok-keyword">p</span>&gt;Text like &quot;this&quot; and 42 stays plain.&lt;/<span class="tok-keyword">p</span>&gt;
+&lt;/<span class="tok-keyword">div</span>&gt;</code></pre>
+<h2 id="css">CSS</h2>
+<pre><code class="language-css"><span class="tok-comment">/* Layout */</span>
+<span class="tok-keyword">@media</span> (max-width: <span class="tok-number">600px</span>) {
+  .card { margin: <span class="tok-number">0</span> <span class="tok-keyword">auto</span>; padding: <span class="tok-number">1.5rem</span>; }
+  .card::before { content: <span class="tok-string">&quot;\201C&quot;</span>; color: #1f2328; }
+}</code></pre>
+<h2 id="close-relatives-and-tag-case">Close relatives and tag case</h2>
+<pre><code class="language-jsonc">{ <span class="tok-string">&quot;a&quot;</span>: <span class="tok-number">1</span> <span class="tok-comment">/* tolerated */</span> }</code></pre>
+<pre><code class="language-xml">&lt;<span class="tok-keyword">item</span> id=<span class="tok-string">&quot;1&quot;</span>&gt;Text&lt;/<span class="tok-keyword">item</span>&gt;</code></pre>
+<h2 id="plain-blocks-74">Plain blocks (7.4)</h2>
+<p>No tag:</p>
+<pre><code>let x = 1 // not coloured</code></pre>
+<p>Unknown tag:</p>
+<pre><code class="language-cobol">DISPLAY &quot;not coloured&quot;.</code></pre>
+<p>Indented code:</p>
+<pre><code>def not_coloured(): return 1</code></pre>
+<h2 id="malformed-blocks-76">Malformed blocks (7.6)</h2>
+<p>A Python string left open stops at the end of its line:</p>
+<pre><code class="language-python">print(<span class="tok-string">&quot;never closed</span>
+x = <span class="tok-number">1</span></code></pre>
+<p>An unclosed block comment:</p>
+<pre><code class="language-javascript"><span class="tok-comment">/* never closed
+const x = 1;</span></code></pre>
+<p>An unclosed template literal:</p>
+<pre><code class="language-js"><span class="tok-keyword">const</span> s = <span class="tok-string">`open
+still open</span></code></pre>
+<p>An unclosed HTML tag and comment:</p>
+<pre><code class="language-html">&lt;<span class="tok-keyword">div</span> class=<span class="tok-string">&quot;x
+&lt;!-- never closed</span></code></pre>
+<p>The text after the broken blocks is still normal.</p>

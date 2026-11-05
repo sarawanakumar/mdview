@@ -2,6 +2,50 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 6.6, code.md and a 2,000-line block (M6 done)
+
+**Done**
+- `fixtures/code.md`: one block for each of the nine languages, each
+  with keywords, strings, comments and numbers (HTML has no numbers, and
+  plain JSON has no comments). There are multi-line strings and comments,
+  two close relatives (`JSONC` in capitals, `xml`), plain blocks (no
+  tag, `cobol`, indented) and four broken blocks (an unclosed Python
+  string, JS comment, template literal, and HTML attribute).
+  Its expected HTML is recorded in `fixtures/expected/code.html` and was
+  reviewed.
+- `CodeFixtureTests`: checks code.md block by block (spec 7.1–7.4,
+  7.6). The broken blocks don't spill colour into the text after them,
+  and every `<span>` is closed. It also has a timing test for a
+  2,025-line Swift block: it fails only above 500 ms, which in a debug
+  build catches work that grows with the square of the length. The real
+  check is the app timing below.
+- Spec section 7 now passes as a whole, so M6 is done.
+
+**Measurements** (Release, Apple silicon, load average about 4)
+
+| What | Result |
+|---|---|
+| Render a 2,025-line Swift block (62 KB), release | median 10 ms |
+| Same, debug build, tests in parallel | 69–170 ms |
+| Cold open, typical files (baseline) | median 498 ms (465–541) |
+| Warm open, typical files (baseline) | median 185 ms (max 197) |
+| Cold open, 2,000-line code file | median 464 ms (430–495) |
+| Warm open, 2,000-line code file | median 171 ms (max 178) |
+
+- Spec 7.7 passes: the 2,000-line file opens as fast as the typical
+  files. Highlighting doesn't need to move after first paint.
+- The typical-file cold median, 498 ms, is right at the 500 ms limit
+  again under this load, and one run reached 541 ms. That's the
+  existing roadmap 7.2 problem, not something 6.6 caused.
+
+**Not checked**
+- I didn't look at code.md in the app window. Its HTML is checked, and
+  roadmap 6.5 confirmed the colours apply in the app.
+
+**Next**
+- M7, starting with 7.1: `typical.md`, `large.md`, the edge fixtures and
+  a timing script in the repo.
+
 ## 2026-11-05: Roadmap 6.5, code colours
 
 **Done**
