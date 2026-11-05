@@ -1,7 +1,7 @@
 # mdview
 
-**MDView** is an ultra-lightweight, read-only Markdown viewer for macOS 15
-and later. Double-click a `.md` file and the rendered page appears in
+**MDView** is an ultra-lightweight Markdown viewer for macOS 15 and
+later. Double-click a `.md` file and the rendered page appears in
 under half a second. Native AppKit, fully offline, no settings.
 
 (The app is shown as "MDView"; the project, code and bundle ID use
@@ -15,6 +15,8 @@ under half a second. Native AppKit, fully offline, no settings.
   downloaded
 - Reloads by itself when the file is saved, keeping your place
 - Find, zoom, print, Reveal in Finder, Open in Editor
+- Edit mode for small fixes (View → Edit Mode, ⌘/): the plain source in
+  the same window, saved only when you press ⌘S
 - Sandboxed, and never touches the network. Its only package is Apple's
   `swift-markdown`.
 

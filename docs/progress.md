@@ -2,6 +2,46 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 8.7, v1.1 measurements and checklist
+
+**Done**
+- Committed 8.6 (`110a2a0`).
+- Version 1.1.0, build 2 (`MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`).
+- New signpost `previewRequested`, emitted when edit mode switches back
+  to a changed preview, so spec 11.5 can be timed inside the app.
+- README: no longer "read-only"; lists edit mode.
+- checklist.md: section 11 (14 rows), hand check 12 (edit mode by eye,
+  VoiceOver and the 5 MB file), and the changed rows (6.6, 6.7, 8.x,
+  9.1, 9.2) with today's numbers.
+- Measured on the v1.1.0 release build:
+  - 271 core tests pass; release build, no warnings
+  - `time-open.swift` (5 runs, load average 3.4): cold median 468 ms
+    (412–597), warm 110 ms (100–128), large 1,140 ms (1,106–1,158): all
+    pass, and the same as v1 (7.6: 484 / 133 / 1,115)
+  - `check-offline.zsh`: pass. Entitlements: sandbox, user-selected
+    read-write, app-scope bookmarks, network client
+  - bundle 5,029,274 bytes (spec 8.4: under 6 MB)
+  - memory, typical.md, 3 runs: 104–106 MB (app 28–30, page 49, GPU 14,
+    networking 4, spare 9); idle CPU 0.01 s over 30 s
+  - 11.5 preview after an edit, typical.md: 24–25 ms (6 runs) from
+    `previewRequested` to `documentVisible`
+  - 11.14, 5 MB file (System Events; one `osascript` round trip alone
+    takes ~175 ms): switch to edit mode 272 ms, a keystroke plus a
+    reply 315 ms median (max 335), page down 311 ms (max 320), jump to
+    the end 315 ms. So the app answers within ~150 ms each time, and
+    never hangs. Back to the preview after an edit: 1,321 ms (the 5 MB
+    re-render, within 8.3's 2 s).
+- Measuring note: `pkill` is a force quit, so the next launch restores
+  windows (6.13). A window left over from the timing script doubled the
+  first memory reading (156 MB). Quit MDView normally before measuring
+  memory; the checklist row now says so.
+
+**Open**
+- Hand checks: 12 (new, edit mode) at least; the v1 ones (1–11) if you
+  want the full release pass.
+- Then tag v1.1 and push (roadmap 8.7's last step).
+- Still the gone-file "Save As…" rough edge (8.3).
+
 ## 2026-11-05: Roadmap 8.6, outside changes while editing; size limit raised
 
 **Done**

@@ -82,8 +82,8 @@ in the app during a roadmap task (see progress.md), ✋ = by hand.
 | 6.3 Font, 80-character column | A (2.8) | 2.8 |
 | 6.4 Light/dark, switches live | T: `ContrastTests`; A (2.8, 6.5); ✋ 7 live switch | 7.6 (owner) |
 | 6.5 Select and copy as plain text | A (5.6) | 5.6 |
-| 6.6 Find | A (5.1) | 5.1 |
-| 6.7 Zoom | T: `ZoomLevelsTests`; A (5.2) | 5.2 |
+| 6.6 Find | A (5.1); in edit mode A (8.5) | 8.5 |
+| 6.7 Zoom | T: `ZoomLevelsTests`; A (5.2); editor A (8.5) | 8.5 |
 | 6.8 Print, Save as PDF | A (5.3) made a PDF; ✋ 8 the panel | 7.6 (owner) |
 | 6.9 Reveal in Finder | A (5.4) | 5.4 |
 | 6.10–6.12 Open in Editor, Change Editor, editor gone | A (5.5); ✋ 9 the picker | 7.6 (owner) |
@@ -102,11 +102,11 @@ in the app during a roadmap task (see progress.md), ✋ = by hand.
 
 | AC | How | Last checked |
 |---|---|---|
-| 8.1–8.3 Cold, warm, large | S: `time-open.swift` | 7.6: 484 / 133 / 1,115 ms |
+| 8.1–8.3 Cold, warm, large | S: `time-open.swift` | 8.7: 468 / 110 / 1,140 ms |
 | 8.3 Smooth scrolling | ✋ 11 | 7.2 (owner) |
-| 8.4 Bundle under 5 MB | S: add up the bundle's file sizes (below) | 7.4: 4,936,346 bytes |
-| 8.5 Memory under 110 MB | footprint of each process after 12 s (7.2 method) | 7.2: 103–106 MB |
-| 8.6 Idle CPU | CPU time of every process over 30 s (7.2 method) | 7.2: 0 s |
+| 8.4 Bundle under 6 MB | S: add up the bundle's file sizes (below) | 8.7: 5,029,274 bytes |
+| 8.5 Memory under 110 MB | footprint of each process after 12 s (7.2 method; quit MDView normally first, or restored windows count too) | 8.7: 104–106 MB |
+| 8.6 Idle CPU | CPU time of every process over 30 s (7.2 method) | 8.7: 0.01 s |
 
 Bundle size: `find build/mdview.app -type f -exec stat -f %z {} + | awk '{s+=$1} END {print s}'`
 
@@ -114,8 +114,8 @@ Bundle size: `find build/mdview.app -type f -exec stat -f %z {} + | awk '{s+=$1}
 
 | AC | How | Last checked |
 |---|---|---|
-| 9.1 No network | S: `check-offline.zsh`; T: `OfflineProtectionTests` | 7.6: pass |
-| 9.2 Sandbox | `codesign -d --entitlements -`; `sandbox_check` (7.3) | 7.3 |
+| 9.1 No network | S: `check-offline.zsh`; T: `OfflineProtectionTests` | 8.7: pass |
+| 9.2 Sandbox | `codesign -d --entitlements -` (user-selected read-write, ADR 0008); `sandbox_check` (7.3); writes only on Save A (8.3) | 8.7 |
 | 9.3 No telemetry | Code and binary search (7.3) | 7.3 |
 | 9.4 Only swift-markdown | `Package.resolved` (7.3) | 7.3 |
 | 9.5–9.7 Folder bar, grant, Not Now | T: `FolderGrantListTests`; A (3.2); ✋ 3 a real grant | 7.6 (owner) |
@@ -130,6 +130,25 @@ Bundle size: `find build/mdview.app -type f -exec stat -f %z {} + | awk '{s+=$1}
 | 10.3 Can't be read | A (1.6): vanished Open Recent entry | 1.6 |
 | 10.4 Any input, no crash or hang | T: fuzz, pathological and truncated tests | 7.6 |
 | 10.5 Non-Markdown as plain text | T: `edge/plain.txt`; A (1.3) | 7.6 |
+
+## 11. Edit mode (v1.1)
+
+| AC | How | Last checked |
+|---|---|---|
+| 11.1 View → Edit Mode, ⌘/, check mark, Print dimmed | A (8.4) | 8.4 |
+| 11.2 Opens in preview; open times unchanged | S: `time-open.swift` | 8.7: 468 / 110 ms |
+| 11.3 Monospaced, wraps, no substitutions | A (8.4) typed text saved exactly; ✋ 12 light/dark | 8.4 |
+| 11.4 Undo, Redo, Cut, Copy, Paste, Select All | A (8.4, 8.6) | 8.6 |
+| 11.5 Preview after editing under 0.2 s | `previewRequested` → `documentVisible` signposts (8.7) | 8.7: 24–25 ms |
+| 11.6 Edited marker; Save only on ⌘S, dimmed when clean | A (8.3, 8.4) | 8.4 |
+| 11.7 Close / quit question | A (8.3) | 8.3 |
+| 11.8 UTF-8, byte order mark, line endings | T: `UTF8TextEncodeTests` (every fixture round-trips); A (8.3) | 8.7: 271 tests |
+| 11.9 Find in the source | A (8.5) | 8.5 |
+| 11.10 Dimmed for bad bytes | T: `latin1.md`, `utf16.md` reported; A (8.4) | 8.4 |
+| 11.11 Outside changes, own saves | A (8.6) | 8.6 |
+| 11.12 Save errors: locked, read-only, gone | A (8.3) | 8.3 |
+| 11.13 Keyboard and VoiceOver | A (8.5) focus and roles; ✋ 12 VoiceOver | 8.5 |
+| 11.14 5 MB file in edit mode; size | A (8.7) switch, type, page with no hang; ✋ 12 scrolling | 8.7 |
 
 ## Hand checks
 
@@ -170,3 +189,11 @@ Use the release build: `open -a build/mdview.app <file>`.
 11. **Smooth scrolling (8.3).** Run `time-open.swift` once (it makes
     `build/timing/large.md`), open that file and scroll quickly to the
     end: no stutter or spinning cursor.
+12. **Edit mode (11.3, 11.13, 11.14).** Open a copy of
+    `fixtures/typical.md`, press ⌘/: the source shows in a monospaced
+    font and lines wrap. Switch Appearance between Light and Dark: the
+    editor follows. With VoiceOver on, the editor reads as "Markdown
+    source" and reads what you type. Open `build/timing/large.md`
+    (made by `time-open.swift`), press ⌘/, scroll quickly to the end and
+    type a few words: no stutter or spinning cursor. Close without
+    saving (Don't Save).

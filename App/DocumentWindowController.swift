@@ -252,6 +252,7 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
             // Spec 11.5: the preview shows the editor's text, saved or not.
             if previewIsStale {
                 previewIsStale = false
+                Signposts.signposter.emitEvent("previewRequested")
                 preview.reload()
             }
             window?.makeFirstResponder(preview.view.subviews.first)
