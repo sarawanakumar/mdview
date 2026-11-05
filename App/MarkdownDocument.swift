@@ -99,9 +99,18 @@ final class MarkdownDocument: NSDocument {
         for case let controller as DocumentWindowController in windowControllers {
             controller.documentWillSave()
         }
+        let wasUntitled = fileURL == nil
         super.save(to: url, ofType: typeName, for: saveOperation) { [weak self] error in
             if error == nil, let self, let saved = self.bytesBeingSaved { self.bytesOnDisk = saved }
             self?.bytesBeingSaved = nil
+            // A new file's first save (spec 12.6): from now on it's like
+            // any opened file, watched for changes and restored on relaunch.
+            if error == nil, wasUntitled, let self, self.fileURL != nil {
+                self.startWatching()
+                for case let controller as DocumentWindowController in self.windowControllers {
+                    controller.documentDidGetFile()
+                }
+            }
             completionHandler(error)
         }
     }

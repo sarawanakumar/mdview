@@ -34,6 +34,9 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
             defer: false
         )
         self.window = window
+        // An untitled window isn't restored after a relaunch: without
+        // autosave its text is only in the window (spec 12.8).
+        window.isRestorable = document.fileURL != nil
 
         stack.orientation = .vertical
         stack.spacing = 0
@@ -265,6 +268,13 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
             editor.view.isHidden = false
             editor.focus(in: window)
         }
+    }
+
+    /// A new file was saved for the first time (spec 12.6): render again
+    /// against its folder, so local images and links work.
+    func documentDidGetFile() {
+        window?.isRestorable = true
+        preview.reload()
     }
 
     func documentWillSave() {

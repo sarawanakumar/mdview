@@ -2,6 +2,43 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 8.10, a new file after its first save
+
+**Done**
+- Committed 8.8 and 8.9 (`12f9663`).
+- After a new file's first save (`MarkdownDocument.save(to:…)` sees it
+  was untitled): the file watcher starts, and the window becomes
+  restorable and renders the preview again against the file's folder
+  (`DocumentWindowController.documentDidGetFile`).
+- Untitled windows aren't restorable (`window.isRestorable` false).
+- Found while checking 12.9: before the first save every link click was
+  cancelled, web links included. `PreviewController.route(for:)` now lets
+  web and mail links through for an untitled document; local links still
+  do nothing. Spec 12.9 now says so.
+- Checked on a release build with System Events:
+  - before saving: the image shows its "a pic" placeholder, no folder
+    bar. The local link couldn't be clicked through accessibility (the
+    page's links aren't listed); checked from the code instead. Web link
+    not clicked (it would open the browser).
+  - saved as `pictured.md` next to `pic.png`: title "pictured.md", the
+    window's file is that file, Open Recent lists it, the folder bar now
+    appears for the image (9.5), and an outside change reloads it (5.1)
+  - restoration: a newly saved file plus an unsaved untitled window, 30 s,
+    force quit, relaunch: only `newsaved.md` came back
+- Bundle 5,032,330 bytes (+3 KB). Release build, no warnings. MDViewCore
+  unchanged.
+
+**Testing note**
+- macOS writes window state lazily. Force-quitting 4–10 s after opening
+  a window restored nothing, which first looked like a regression of
+  spec 6.13; after 30 s and a window move, an ordinary opened file came
+  back as in v1. When checking restoration, wait about 30 s and move a
+  window first.
+
+**Next**
+- 8.11: measure again, checklist section 12, hand checks 12 and 13, tag
+  v1.1, push.
+
 ## 2026-11-05: Roadmap 8.8 and 8.9, File → New and the first save
 
 **Done**

@@ -237,7 +237,12 @@ one operation for untitled documents only; without it NSDocument won't
 even show the close panel. The panel allows only Markdown (`.md`), with no
 format menu (`shouldRunSavePanelWithAccessoryView` false), and the file is
 written with its extension visible, so the title shows `.md`. Closing an
-edited untitled window shows the standard save panel with Delete. With unsaved edits, it asks Keep My Edits or Reload from Disk (spec 11.11).
+edited untitled window shows the standard save panel with Delete.
+Untitled windows aren't restorable (`isRestorable` false); after the first
+save the document starts its file watcher, the window becomes restorable,
+and the preview renders again against the file's folder. Before that,
+`PreviewController` routes only web and mail links, since local links
+have no folder to be relative to. With unsaved edits, it asks Keep My Edits or Reload from Disk (spec 11.11).
 The document remembers the bytes it last read or saved; a change on disk
 with the same bytes (our own save, or the file coming back unchanged) only
 updates `fileModificationDate`, so there's no reload and the undo history

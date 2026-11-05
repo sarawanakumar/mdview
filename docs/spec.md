@@ -200,7 +200,7 @@ Starting a new Markdown file in MDView and saving it once, as `.md`
 | 12.6 | After the first save the window is like any opened file: titled with the file name (with the path menu, 6.1), listed in Open Recent (1.7), reloaded when the file changes on disk (section 5, 11.11), and later saves happen in place without a panel. The preview renders against the file's folder, so local images and links work as in sections 3, 4 and 9.5. |
 | 12.7 | The new file is UTF-8 with no byte order mark, and keeps line endings as typed (11.8). |
 | 12.8 | Closing an untitled window with text shows the standard save panel with **Delete**, Cancel and Save: Delete closes it without writing anything. Quitting asks the same way (with several unsaved windows, macOS first offers Review Changes…). An untitled window with nothing typed closes without asking. Untitled windows aren't restored after a relaunch. |
-| 12.9 | Before the first save, the preview renders the text; local images show their placeholder (3.6) and links to local files do nothing harmful (4.6). |
+| 12.9 | Before the first save, the preview renders the text. Web and mail links open as in 4.1. Local images show their placeholder (3.6), links to local files do nothing, and the folder access bar (9.5) doesn't appear: there's no folder yet. |
 | 12.10 | Windows of opened files never show a save panel (11.6, 11.12). |
 
 ---

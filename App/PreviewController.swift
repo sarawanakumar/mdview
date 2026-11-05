@@ -193,11 +193,19 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
                 || url.absoluteString == PageShell.blankBaseURL?.absoluteString
             return isOurs && navigationAction.targetFrame?.isMainFrame != false ? .allow : .cancel
         }
-        guard let document = documentFile else { return .cancel }
-        let route = LinkRoute.decide(url, document: document)
+        guard let route = route(for: url) else { return .cancel }
         if route == .scrollInPage { return .allow }
         onLink?(route)
         return .cancel
+    }
+
+    /// What a clicked link does (spec 4.1–4.4). A new file that isn't saved
+    /// yet has no folder for local links to be relative to, so only web
+    /// and mail links work there (spec 12.9).
+    private func route(for url: URL) -> LinkRoute? {
+        if let document = documentFile { return LinkRoute.decide(url, document: document) }
+        guard let scheme = url.scheme?.lowercased(), ["http", "https", "mailto"].contains(scheme) else { return nil }
+        return .external(url)
     }
 
     /// Cmd-click and `target="_blank"` links ask for a new web view; treat
@@ -206,9 +214,8 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
         _ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
         for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures
     ) -> WKWebView? {
-        if let url = navigationAction.request.url, let document = documentFile {
-            let route = LinkRoute.decide(url, document: document)
-            if route != .scrollInPage { onLink?(route) }
+        if let url = navigationAction.request.url, let route = route(for: url), route != .scrollInPage {
+            onLink?(route)
         }
         return nil
     }

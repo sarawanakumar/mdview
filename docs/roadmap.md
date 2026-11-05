@@ -215,7 +215,7 @@ ADR 0008 accepted 2026-11-05.
       through; `prepareSavePanel` sets up a `.md`-only panel for untitled
       documents and still refuses for every other one; Replace and Cancel.
       *(12.3–12.5, 12.7, 12.10)*
-- [ ] **8.10** After the first save: watcher starts, title and Open
+- [x] **8.10** After the first save: watcher starts, title and Open
       Recent, preview re-renders against the new folder. Close and quit
       with an untitled window; the preview before saving. Untitled windows
       must not be restored (today they come back empty after a force
