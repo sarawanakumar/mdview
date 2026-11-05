@@ -58,6 +58,10 @@ enum MainMenu {
 
         menu.addItem(.separator())
         menu.addItem(item("Close", #selector(NSWindow.performClose(_:)), "w"))
+        // Spec 6.8; NSDocument handles both (it's in the responder chain).
+        menu.addItem(.separator())
+        menu.addItem(item("Page Setup…", #selector(NSDocument.runPageLayout(_:)), "p", [.command, .shift]))
+        menu.addItem(item("Print…", #selector(NSDocument.printDocument(_:)), "p"))
         return menu
     }
 

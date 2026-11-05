@@ -268,6 +268,12 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
         }
     }
 
+    // MARK: Printing (spec 6.8)
+
+    func printOperation(with info: NSPrintInfo) -> NSPrintOperation? {
+        preview.printOperation(with: info)
+    }
+
     // MARK: Zoom (spec 6.7)
 
     @objc func zoomIn(_ sender: Any?) {

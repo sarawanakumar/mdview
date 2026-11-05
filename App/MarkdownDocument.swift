@@ -47,6 +47,26 @@ final class MarkdownDocument: NSDocument {
         startWatching()
     }
 
+    // MARK: Printing (spec 6.8)
+
+    /// File ▸ Print… prints the rendered page (the print panel also offers
+    /// Save as PDF). The page's print styles make it black on white at full
+    /// width (preview.css).
+    override func printOperation(withSettings printSettings: [NSPrintInfo.AttributeKey: Any]) throws -> NSPrintOperation {
+        guard let info = printInfo.copy() as? NSPrintInfo else { throw CocoaError(.featureUnsupported) }
+        info.dictionary().addEntries(from: printSettings)
+        info.horizontalPagination = .fit
+        info.verticalPagination = .automatic
+        info.isHorizontallyCentered = false
+        info.isVerticallyCentered = false
+        guard let controller = windowControllers.first as? DocumentWindowController,
+              let operation = controller.printOperation(with: info) else {
+            throw CocoaError(.featureUnsupported)
+        }
+        operation.jobTitle = displayName
+        return operation
+    }
+
     override func close() {
         watcher?.stop()
         watcher = nil

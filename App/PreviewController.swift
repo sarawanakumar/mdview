@@ -208,6 +208,19 @@ final class PreviewController: NSViewController, WKNavigationDelegate, WKUIDeleg
         return nil
     }
 
+    // MARK: Printing (spec 6.8)
+
+    /// WebKit's own print operation for the page. Its view needs a real
+    /// size, or WebKit prints blank pages.
+    func printOperation(with info: NSPrintInfo) -> NSPrintOperation? {
+        guard let webView else { return nil }
+        let operation = webView.printOperation(with: info)
+        operation.view?.frame = webView.bounds
+        operation.showsPrintPanel = true
+        operation.showsProgressPanel = true
+        return operation
+    }
+
     // MARK: Zoom (spec 6.7)
 
     /// This window's zoom; kept when the page re-renders.

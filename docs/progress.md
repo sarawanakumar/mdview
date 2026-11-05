@@ -2,6 +2,37 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 5.3, printing and Save as PDF
+
+**Done**
+- File ▸ Page Setup… ⇧⌘P and Print… ⌘P, handled by `NSDocument`.
+  `MarkdownDocument` overrides `printOperation(withSettings:)` with
+  WebKit's own print operation for the page, fitted to the page width,
+  with the user's Page Setup settings. The standard print panel offers
+  Save as PDF.
+- (A force cast in the first version replaced with a checked cast, per
+  CLAUDE.md.)
+
+**Checked** (temporary hook, removed: printed elements.md through the
+same operation, saving a PDF instead of using the panel, which is what
+Save as PDF does)
+
+| | App in light mode | App in dark mode |
+|---|---|---|
+| Pages | 8 × A4 (595 × 842 pt) | the same |
+| Text | 3,869 characters; "Elements", "Tables (2.9)", "Heading level 6", "Straight double quotes", "The end." all present | the same |
+| Each page | 94–100 % near-white, dark text | the same |
+
+- So the print styles force black on white whatever the app's
+  appearance. A copy is in the git-ignored `build/` folder
+  (`elements-printed-from-dark-mode.pdf`) for a visual check.
+- 197 tests pass; Debug and Release build with no warnings.
+- Not checked: the print panel itself and printing to a real printer
+  (needs a person).
+
+**Next**
+- Roadmap 5.4: Reveal in Finder.
+
 ## 2026-11-05: Roadmap 5.2, zoom
 
 **Done**
