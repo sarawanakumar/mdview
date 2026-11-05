@@ -2,6 +2,48 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 7.8, v1.0
+
+**Done**
+- `LICENSE`: MIT, "Copyright (c) 2026 Saravanakumar Selladurai" (the
+  owner chose MIT).
+- Version 1.0.0 (`MARKETING_VERSION`), build 1. The About box shows it.
+- `README.md` rewritten for v1:
+  - what MDView does
+  - install by building from source (ADR 0007): clone, `xcodebuild`
+    release, copy to /Applications, set as default with Get Info →
+    Change All
+  - how to update
+  - folder access
+  - the layout, now with `scripts/` and `checklist.md`
+  - the license, naming both packages and theirs
+- Checked the README's exact commands from a fresh clone into a stand-in
+  Applications folder: the build succeeds, the copy works, and the update
+  (remove, then copy) works. My first wording said `cp -R` onto an
+  existing app nests the new one inside it. It merges instead, which is
+  the actual reason to remove the old copy first.
+
+**Open**
+- The repository has no remote, so "publish" (push the tag, ADR 0007)
+  needs a GitHub repository from the owner. The README's clone command
+  says `<repository URL>` until then.
+
+**Next**
+- Commit, tag `v1.0`, and push once there's a remote. Then tick 7.8,
+  the end of the v1 roadmap.
+
+## 2026-11-05: Roadmap 7.7, a week of daily use
+
+**Done**
+- The owner set MDView as the default app for `.md` and used it daily
+  for a week. Their report: "working fine". No problems to fix.
+- That's the vision's last success measure ("I've set it as my default
+  app for `.md` and don't miss anything"), so 7.7 is ticked.
+
+**Next**
+- 7.8: choose a license, add README install steps (ADR 0007), tag
+  v1.0 and push the repository.
+
 ## 2026-11-05: Roadmap 7.6, release checklist
 
 **Done**
