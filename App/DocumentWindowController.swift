@@ -275,6 +275,18 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
         NSWorkspace.shared.activateFileViewerSelecting([file])
     }
 
+    // MARK: Open in Editor (spec 6.10–6.12)
+
+    @objc func openInEditor(_ sender: Any?) {
+        guard let file = documentFile, let window else { return }
+        EditorLauncher.shared.open(file, from: window)
+    }
+
+    @objc func changeEditor(_ sender: Any?) {
+        guard let window else { return }
+        EditorLauncher.shared.chooseEditor(for: window) { _ in }
+    }
+
     // MARK: Printing (spec 6.8)
 
     func printOperation(with info: NSPrintInfo) -> NSPrintOperation? {
@@ -305,13 +317,22 @@ final class DocumentWindowController: NSWindowController, NSMenuItemValidation {
 
     /// Greys out commands that wouldn't do anything.
     func validateMenuItem(_ item: NSMenuItem) -> Bool {
+        let fileIsThere = missingNotice == nil && documentFile != nil
         switch item.action {
-        case #selector(zoomIn(_:)): ZoomLevels.zoomedIn(from: preview.zoom) != nil
-        case #selector(zoomOut(_:)): ZoomLevels.zoomedOut(from: preview.zoom) != nil
-        case #selector(actualSize(_:)): !ZoomLevels.isActualSize(preview.zoom)
-        // Nothing to show while the file is gone (spec 5.4).
-        case #selector(revealInFinder(_:)): missingNotice == nil && documentFile != nil
-        default: true
+        case #selector(zoomIn(_:)):
+            return ZoomLevels.zoomedIn(from: preview.zoom) != nil
+        case #selector(zoomOut(_:)):
+            return ZoomLevels.zoomedOut(from: preview.zoom) != nil
+        case #selector(actualSize(_:)):
+            return !ZoomLevels.isActualSize(preview.zoom)
+        case #selector(revealInFinder(_:)):
+            return fileIsThere  // nothing to show while the file is gone (spec 5.4)
+        case #selector(openInEditor(_:)):
+            // "Open in TextEdit" once chosen (spec 6.11); "…" means it asks.
+            item.title = EditorLauncher.shared.editorName.map { "Open in \($0)" } ?? "Open in Editor…"
+            return fileIsThere
+        default:
+            return true
         }
     }
 

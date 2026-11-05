@@ -125,7 +125,7 @@ section 2 passes.
 - [x] **5.2** Zoom in, zoom out, actual size. *(6.7)*
 - [x] **5.3** Print and Save as PDF. *(6.8)*
 - [x] **5.4** Reveal in Finder. *(6.9)*
-- [ ] **5.5** Open in Editor, Change Editor, missing editor handling.
+- [x] **5.5** Open in Editor, Change Editor, missing editor handling.
       *(6.10–6.12)*
 - [ ] **5.6** Check tabs, title bar path menu, state restoration and text
       selection all work. *(6.1, 6.2, 6.5, 6.13)*

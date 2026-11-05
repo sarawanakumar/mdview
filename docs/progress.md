@@ -2,6 +2,37 @@
 
 Newest session first.
 
+## 2026-11-05: Roadmap 5.5, Open in Editor
+
+**Done**
+- `App/EditorLauncher.swift`: the chosen editor saved as a bookmark
+  (still works if the app is moved). If it can't be found it's forgotten
+  and the picker comes back (spec 6.12).
+- Picker: app-only `NSOpenPanel` sheet starting in /Applications.
+  Choosing MDView itself is refused with an explanation.
+- File ▸ Open in Editor… ⇧⌘E, which reads "Open in <app>" once an editor
+  is chosen (6.11), and Change Editor… Both greyed out while the file is
+  gone. Opening uses `NSWorkspace.open(_:withApplicationAt:)`; errors are
+  shown.
+
+**Checked** (temporary hook, removed; saved choice cleared afterwards)
+
+| Situation | Menu | Choosing it |
+|---|---|---|
+| nothing chosen | "Open in Editor…" ⇧⌘E | app picker sheet |
+| TextEdit remembered | "Open in TextEdit" | TextEdit launched with the file, no picker |
+| remembered app deleted | back to "Open in Editor…" | picker again |
+
+- TextEdit (not running before) was quit afterwards. It doesn't keep the
+  file open, so the shell couldn't confirm which file it showed; it was
+  launched with the file handed to it.
+- 197 tests pass; Debug and Release build with no warnings.
+- Not checked: choosing an app in the picker by hand, and VS Code / other
+  editors as the choice.
+
+**Next**
+- Roadmap 5.6: tabs, title bar path menu, window restoration, selection.
+
 ## 2026-11-05: Roadmap 5.4, Reveal in Finder
 
 **Done**

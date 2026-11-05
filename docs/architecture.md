@@ -218,7 +218,7 @@ The document is read-only: no saving, no autosave, no "edited" dot.
 | Zoom (6.7) | `WKWebView.pageZoom`, per window, in Safari's steps (`ZoomLevels`, MDViewCore: 50–300 %). View menu: Actual Size ⌘0, Zoom In ⌘= (and ⌘+), Zoom Out ⌘−, greyed out when they'd do nothing. Kept when the page re-renders; not remembered after the window closes. |
 | Print (6.8) | File ▸ Page Setup… ⇧⌘P and Print… ⌘P, handled by `NSDocument`. `MarkdownDocument.printOperation(withSettings:)` returns `WKWebView.printOperation(with:)` (its view given the web view's size, or WebKit prints blank pages), fitted to the page width. The standard print panel includes Save as PDF. Print styles in `preview.css` make it black on white at full width, even in dark mode. |
 | Reveal in Finder (6.9) | File ▸ Reveal in Finder ⇧⌘R → `NSWorkspace.activateFileViewerSelecting`; greyed out while the file is gone (spec 5.4) |
-| Open in Editor (6.10–6.12) | Remembered app URL in `UserDefaults`; `NSWorkspace.open(_:withApplicationAt:)`. Picker is an `NSOpenPanel` limited to applications. |
+| Open in Editor (6.10–6.12) | `EditorLauncher`: the chosen app saved as a bookmark in `UserDefaults` (survives the app being moved; forgotten if it's gone, so the picker returns). `NSWorkspace.open(_:withApplicationAt:)`. Picker: an `NSOpenPanel` sheet limited to applications, starting in /Applications; choosing MDView itself is refused. File ▸ Open in Editor… ⇧⌘E (titled "Open in TextEdit" etc. once chosen) and Change Editor… |
 | VoiceOver (6.14) | Comes from WebKit reading proper HTML headings, links and image alt text |
 
 ## Code highlighting

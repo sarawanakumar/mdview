@@ -59,6 +59,9 @@ enum MainMenu {
         menu.addItem(.separator())
         // Spec 6.9; handled by the document window.
         menu.addItem(item("Reveal in Finder", #selector(DocumentWindowController.revealInFinder(_:)), "r", [.command, .shift]))
+        // Spec 6.10–6.12; the title becomes "Open in <app>" once chosen.
+        menu.addItem(item("Open in Editor…", #selector(DocumentWindowController.openInEditor(_:)), "e", [.command, .shift]))
+        menu.addItem(item("Change Editor…", #selector(DocumentWindowController.changeEditor(_:))))
         menu.addItem(.separator())
         menu.addItem(item("Close", #selector(NSWindow.performClose(_:)), "w"))
         // Spec 6.8; NSDocument handles both (it's in the responder chain).

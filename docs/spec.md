@@ -104,7 +104,7 @@ parsed with Apple's `swift-markdown`.
 | 6.8 | **File → Print…** (Cmd+P) prints the rendered document using the standard print panel (which also offers "Save as PDF"). |
 | 6.9 | **File → Reveal in Finder** (Cmd+Shift+R) shows the file in Finder. |
 | 6.10 | **File → Open in Editor** (Cmd+Shift+E) opens the current file in a chosen editor app. The first time, a standard app picker (starting in Applications) asks which editor to use. After that, the choice is remembered and the file opens there directly. |
-| 6.11 | **File → Change Editor…** shows the same picker to choose a different editor. The menu item for 6.10 shows the editor's name (for example "Open in TextEdit"). |
+| 6.11 | **File → Change Editor…** shows the same picker to choose a different editor. The menu item for 6.10 shows the editor's name (for example "Open in TextEdit"); before one is chosen it reads "Open in Editor…". MDView itself can't be chosen. |
 | 6.12 | If the remembered editor has been deleted or moved, Open in Editor shows the picker again instead of failing. |
 | 6.13 | On relaunch, macOS restores previously open windows (standard state restoration). |
 | 6.14 | Everything is reachable by keyboard and readable with VoiceOver: headings are announced as headings, and links and images (by alt text) are announced as such. |
